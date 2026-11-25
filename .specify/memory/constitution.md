@@ -1,5 +1,9 @@
 <!--
 Sync Impact Report
+- Version change: 1.2.2 → 1.2.3 (PATCH: CI scope narrowed to Linux x86_64 only, D-31;
+  macOS arm64 and Linux arm64 are checked locally before every push by a pre-push hook, D-53)
+
+Previous report (1.2.2):
 - Version change: 1.2.1 → 1.2.2 (PATCH: Principle VIII examples aligned with the approved
   glossary in docs/naming.md)
 
@@ -200,10 +204,10 @@ historical conventions.
 
   x86_64 is not run locally; CI is its only test environment. Emulation on the M2 is not a
   test environment.
-- CI (GitHub Actions) runs the same CMake presets on every target that the hosted runners
-  provide. At minimum this is Linux x86_64; Linux arm64 and macOS arm64 runners are used
-  where available. The runner availability, labels and costs are verified at the Phase 2 gate
-  (to verify).
+- CI (GitHub Actions) runs the same CMake presets **only on Linux x86_64** (D-31). macOS
+  arm64 and Linux arm64 are not run in CI; a versioned pre-push git hook runs the same presets
+  on both before every push and blocks the push on failure (D-53). The runner label is verified when the workflow is
+  written (to verify).
 - Portability consequences, kept in every risk table that touches concurrency or code
   generation:
   - x86_64 has a stronger memory model (TSO) than arm64. Ordering bugs therefore show up first
@@ -257,4 +261,4 @@ historical conventions.
 - `/speckit-analyze` is run before implementation of each feature to check
   spec/plan/tasks consistency with this constitution.
 
-**Version**: 1.2.2 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24
+**Version**: 1.2.3 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-25

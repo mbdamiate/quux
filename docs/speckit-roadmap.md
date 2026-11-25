@@ -43,8 +43,8 @@ After `/speckit-plan`, append the new D-xx rows to `docs/decisions.md` and updat
 
 | # | Feature | Phase | Run when | Source prompt |
 |---|---|---|---|---|
-| 001 | language-spec | 0 | **done** (branch `001-language-spec`) | `01-phases-0-1.md` (Part A) |
-| 002 | blocking-prototype | 1 | **next** | `01-phases-0-1.md` (Part B) |
+| 001 | language-spec | 0 | **done** (branch `001-language-spec`, merged to `main`) | `01-phases-0-1.md` (Part A) |
+| 002 | blocking-prototype | 1 | **in progress** (spec + plan done; branch `002-blocking-prototype`) | `01-phases-0-1.md` (Part B) |
 | 003 | dependency-gate | 2 | prototype runs programs 1–10 + simulated 11–12 | `02-phase-2.md` |
 | 004 | vm-scheduler-gc | 3 | Phase 2 spikes done | `03-phases-3-4.md` |
 | 005 | async-io-timers | 4 | VM runs programs 1–9 | `03-phases-3-4.md` |
@@ -113,7 +113,7 @@ Success = all 12 programs run as automated tests on macOS arm64, Linux arm64 and
 **`/speckit-plan` input:**
 
 ```text
-C17 with GNU extensions (gnu17), CMake + Ninja presets, pthreads + stdatomic, Homebrew clang pinned, Docker Ubuntu LTS arm64 image (gcc, clang, cmake, ninja, valgrind) with source mounted as a volume; GitHub Actions CI with Linux x86_64 (plus arm64 and macOS runners where available) running the same presets (D-28). Define: C project structure (modules, internal API conventions, portability header, testing policy), Dockerfile and scripts, minimal special forms and primitives, minimal root/allocation convention (shadow stack or handles, decide and justify), the multi-node simulator design. First task is the toolchain smoke test. Continue D-xx numbering from docs/decisions.md. Risks table must include "x86_64 tested only in CI, no local reproduction" and "memory-ordering bugs masked on x86 TSO".
+C17 with GNU extensions (gnu17), CMake + Ninja presets, pthreads + stdatomic, Homebrew clang pinned, Docker Ubuntu LTS arm64 image (gcc, clang, cmake, ninja, valgrind) with source mounted as a volume; GitHub Actions CI on Linux x86_64 only, running the same presets (D-28, D-31). Define: C project structure (modules, internal API conventions, portability header, testing policy), Dockerfile and scripts, minimal special forms and primitives, minimal root/allocation convention (shadow stack or handles, decide and justify), the multi-node simulator design. First task is the toolchain smoke test. Continue D-xx numbering from docs/decisions.md. Risks table must include "x86_64 tested only in CI, no local reproduction" and "memory-ordering bugs masked on x86 TSO".
 ```
 
 ### 003 — dependency-gate (Phase 2)
