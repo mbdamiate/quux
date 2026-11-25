@@ -24,7 +24,11 @@
 ## Examples
 
 ```quux
+(namespace accounts)
+(define-function balance-of [account] (get account :balance))
+
 (namespace bank (:import accounts))
+(balance-of {:balance 120})                             ;=> 120
 
 (define-function fee [amount] (quotient amount 100))
 (define first-fee-hash (function-hash fee))
@@ -48,8 +52,9 @@
 - The policy for **code reloading**: when and how live references are re-resolved to new
   hashes. **Open — closed in Phase 5c and Phase 7.**
 - How a namespace name relates to package distribution. **Open — closed in Phase 7** (packages).
-- The core forms live in the namespace `core` (approved in `docs/naming.md`). Which forms are
-  imported implicitly into every namespace. **Open — closed in Phase 1.**
+- None for the core forms: they live in the namespace `core`, which is imported implicitly into
+  every namespace, and a name is looked up in the namespace itself, then in its imports in
+  order, then in `core` (closed in Phase 1, feature 002).
 
 ## Used by programs
 

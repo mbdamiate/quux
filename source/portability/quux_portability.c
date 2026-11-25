@@ -210,3 +210,7 @@ bool quux_random_bytes(void *buffer, size_t size) {
     }
     return true;
 }
+
+bool quux_standard_input_is_terminal(void) {
+    return isatty(STDIN_FILENO) != 0;
+}

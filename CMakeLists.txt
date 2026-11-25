@@ -58,7 +58,7 @@ enable_testing()
 # source/<module>/quux_<module>.h. The order follows the dependency direction of
 # contracts/module-interface.md rule 3; a module may link only the modules before it.
 set(quux_modules
-  portability memory values hashing collections reader printer expander namespaces encoding
+  portability memory values hashing collections reader printer namespaces expander encoding
   evaluator concurrency executor_blocking input_output simulation harness)
 foreach(quux_module IN LISTS quux_modules)
   set(quux_module_directory "${CMAKE_SOURCE_DIR}/source/${quux_module}")

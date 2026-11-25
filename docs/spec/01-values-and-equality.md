@@ -82,7 +82,10 @@ and structures across nodes (D-03, section 13).
 (define f (function [x] (increment x)))
 (define g (function [y] (increment y)))
 (equal? f g)                                 ;=> true    ; same normalized code, no captures
+```
 
+<!-- example-requires: concurrency -->
+```quux
 (with-scope [scope]
   (let [a (future 1)
         b (future 1)]

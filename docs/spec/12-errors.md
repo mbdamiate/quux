@@ -86,7 +86,10 @@ simulated nodes in one process; Phase 5 produces them on real nodes.
   (catch (function [candidate] (equal? (error-kind candidate) :division-by-zero)) caught
     :handled))
 ;=> :handled
+```
 
+<!-- example-requires: concurrency -->
+```quux
 ;; several failing children: one primary, the others suppressed
 (try
   (with-scope [scope]
@@ -100,6 +103,7 @@ simulated nodes in one process; Phase 5 produces them on real nodes.
 
 ### Distribution kinds
 
+<!-- example-requires: simulated-nodes -->
 ```quux
 ;; a node that crashed: its futures fail with :node-unreachable
 (try

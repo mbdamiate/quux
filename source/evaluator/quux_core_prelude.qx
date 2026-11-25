@@ -1,0 +1,76 @@
+;; The derived forms of the namespace `core` (specs/001-language-spec/contracts/core-forms.md),
+;; written as macros. Evaluated once when a runtime starts. Helpers are local (let-functions),
+;; so no name outside docs/naming.md is introduced.
+
+(define-macro define-function [name parameters :rest body]
+  (quasi-quote
+    (define (unquote name) (function (unquote parameters) (unquote-splicing body)))))
+
+(define-macro when [test :rest body]
+  (quasi-quote (if (unquote test) (sequence (unquote-splicing body)) nothing)))
+
+(define-macro unless [test :rest body]
+  (quasi-quote (if (unquote test) nothing (sequence (unquote-splicing body)))))
+
+;; (conditional test result test result ...): the result of the first true test, else nothing.
+(define-macro conditional [:rest clauses]
+  (if (empty? clauses)
+    nothing
+    (quasi-quote
+      (if (unquote (first clauses))
+        (unquote (first (rest clauses)))
+        (conditional (unquote-splicing (rest (rest clauses))))))))
+
+;; (case expression value result value result ... default): values are not evaluated and are
+;; compared with equal?; a final lone form is the default.
+(define-macro case [expression :rest clauses]
+  (let [subject (unique-symbol "case")]
+    (let-functions [(expand [remaining]
+                      (conditional
+                        (empty? remaining) nothing
+                        (empty? (rest remaining)) (first remaining)
+                        true (quasi-quote
+                               (if (equal? (unquote subject) (quote (unquote (first remaining))))
+                                 (unquote (first (rest remaining)))
+                                 (unquote (expand (rest (rest remaining))))))))]
+      (quasi-quote
+        (let [(unquote subject) (unquote expression)]
+          (unquote (expand clauses)))))))
+
+(define-macro and [:rest operands]
+  (conditional
+    (empty? operands) true
+    (empty? (rest operands)) (first operands)
+    true (let [operand (unique-symbol "and")]
+           (quasi-quote
+             (let [(unquote operand) (unquote (first operands))]
+               (if (unquote operand) (and (unquote-splicing (rest operands))) (unquote operand)))))))
+
+(define-macro or [:rest operands]
+  (conditional
+    (empty? operands) nothing
+    (empty? (rest operands)) (first operands)
+    true (let [operand (unique-symbol "or")]
+           (quasi-quote
+             (let [(unquote operand) (unquote (first operands))]
+               (if (unquote operand) (unquote operand) (or (unquote-splicing (rest operands)))))))))
+
+;; (thread-first value (f a) g) is (g (f value a)).
+(define-macro thread-first [value :rest steps]
+  (if (empty? steps)
+    value
+    (let [step (first steps)
+          call (if (list? step)
+                 (prepend (first step) (prepend value (rest step)))
+                 (list step value))]
+      (quasi-quote (thread-first (unquote call) (unquote-splicing (rest steps)))))))
+
+;; (thread-last value (f a) g) is (g (f a value)).
+(define-macro thread-last [value :rest steps]
+  (if (empty? steps)
+    value
+    (let [step (first steps)
+          call (if (list? step)
+                 (as-sequence (add (pour-into [] step) value))
+                 (list step value))]
+      (quasi-quote (thread-last (unquote call) (unquote-splicing (rest steps)))))))

@@ -129,6 +129,8 @@ uint64_t quux_monotonic_nanoseconds(void);
 void quux_sleep_nanoseconds(uint64_t nanoseconds);
 /* The page size, queried at run time (16 KiB on macOS arm64, usually 4 KiB on Linux). */
 size_t quux_page_size(void);
+/* Whether standard input is an interactive terminal (the REPL prints a prompt only then). */
+bool quux_standard_input_is_terminal(void);
 /* Fills the buffer with random bytes from the operating system. Returns false on failure. */
 bool quux_random_bytes(void *buffer, size_t size);
 

@@ -93,6 +93,9 @@ void quux_runtime_destroy(quux_runtime *runtime) {
         return;
     }
     quux_memory_shutdown(runtime->heap);
+    /* Module state blocks are plain allocations owned by the runtime. */
+    free(runtime->namespaces);
+    free(runtime->evaluator);
     free(runtime->symbol_table);
     free(runtime->keyword_table);
     quux_mutex_destroy(&runtime->intern_mutex);
