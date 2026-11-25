@@ -1,0 +1,48 @@
+;; Reference program 04 — actor version (hypothetical actor library, D-24; not part of the core)
+;;
+;; Hypothetical library used in every actors.qx:
+;;   (spawn-actor function argument …)  starts `function` as a task with its own mailbox, in the
+;;                                       current scope, and returns its address
+;;   (receive)                           takes the next message from the current actor's mailbox;
+;;                                       waits while it is empty (a cancellation point)
+;;   (send-message address message)      enqueues `message`; returns a future of the reply
+;;   (reply message value)               fills the future that the sender of `message` holds
+;;   (link address)                      if either actor fails, the other is cancelled
+;;   (supervise restart-limit function argument …)
+;;                                       runs an actor and restarts it, at most `restart-limit`
+;;                                       times, when it fails
+(namespace programs.bank-account-agent.actors)
+
+;; The actor is a loop over its mailbox; the balance is the loop variable.
+(define-function account-actor [balance]
+  (let [message (receive)]
+    (conditional
+      (has-key? message :stop)
+        (reply message balance)                            ; ends the loop: the actor finishes
+      (has-key? message :balance)
+        (sequence (reply message balance)
+                  (account-actor balance))
+      (>= balance (get message :amount))
+        (sequence (reply message :accepted)
+                  (account-actor (- balance (get message :amount))))
+      true
+        (sequence (reply message :insufficient-funds)
+                  (account-actor balance)))))
+
+(define-function count-replies [replies reply-value]
+  (count (filter (function [candidate] (equal? candidate reply-value)) replies)))
+
+(define-function main [input]
+  (with-scope [scope]
+    (let [account     (tag :account (spawn-actor account-actor 100))
+          withdrawals (transform (function [index]
+                                   (future (wait-for (send-message account {:amount 20}))))
+                                 (range 0 (get input :withdrawals)))
+          replies     (wait-for (all withdrawals))
+          balance     (wait-for (send-message account {:balance true}))]
+      ;; the actor is a child of this scope and loops forever: it must be stopped explicitly,
+      ;; or the scope would wait for it
+      (wait-for (send-message account {:stop true}))
+      {:accepted (count-replies replies :accepted)
+       :refused  (count-replies replies :insufficient-funds)
+       :balance  balance})))

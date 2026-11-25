@@ -1,0 +1,57 @@
+;; Reference program 10 — actor version (hypothetical actor library, D-24; not part of the core).
+;; The library is described at the top of programs/04-bank-account-agent/actors.qx.
+;; The clients and the writing helpers are reused from the agent version.
+(namespace programs.chat-server.actors
+  (:import programs.chat-server))          ; write-to-all, run-all-clients
+
+;; ---------- the room is an actor; its mailbox serializes registrations and deliveries
+(define-function room-actor [connections log expected-clients]
+  (let [message (receive)]
+    (conditional
+      (has-key? message :register)
+        (let [registered (add connections (get message :register))]
+          (when (equal? (count registered) expected-clients)
+            (write-to-all registered "start"))
+          (reply message :registered)
+          (room-actor registered log expected-clients))
+      (has-key? message :deliver)
+        (sequence
+          (write-to-all connections (get message :deliver))
+          (reply message :delivered)
+          (room-actor connections (add log (get message :deliver)) expected-clients))
+      true
+        (room-actor connections log expected-clients))))
+
+;; ---------- one actor per connection, linked to the room
+(define-function connection-actor [room connection]
+  (link room)                                    ; if the room fails, this connection stops too
+  (let-functions [(read-loop []
+                    (let [line (read-line connection)]
+                      (when (not (nothing? line))
+                        (wait-for (send-message room {:deliver line}))
+                        (read-loop))))]
+    (read-loop)))                                ; returns normally when the client leaves
+
+(define-function serve-connection [room outcomes connection]
+  (let [name (read-line connection)]
+    (wait-for (send-message room {:register connection}))
+    (with-scope [connection-scope]
+      (spawn-actor connection-actor room connection))
+    (wait-for (update outcomes put name :disconnected))))
+
+(define-function accept-forever [listener room outcomes]
+  (let [connection (accept listener)]
+    (future (serve-connection room outcomes connection))
+    (accept-forever listener room outcomes)))
+
+;; ---------- the room is supervised: it is restarted (with an empty state) if it fails
+(define-function main [input]
+  (with-scope [scope]
+    (let [listener (listen (get input :port))
+          outcomes (agent {})]
+      (wait-for
+        (first-success
+          [(future (with-scope [server-scope]
+                     (let [room (supervise 3 room-actor [] [] (count (get input :clients)))]
+                       (accept-forever listener room outcomes))))
+           (future (run-all-clients input outcomes))])))))

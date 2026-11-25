@@ -1,0 +1,48 @@
+;; Reference program 12 — actor version (hypothetical actor library, D-24; not part of the core).
+;; The library is described at the top of programs/04-bank-account-agent/actors.qx.
+;; Part 2 (the stream between nodes) is unchanged and reused from the agent version.
+(namespace programs.remote-agent-stream.actors
+  (:import programs.remote-agent-stream))   ; produce-forever, consume
+
+;; The actor remembers the identifiers it has applied, so a resent operation is not applied
+;; twice. With agents this bookkeeping is inside update-once; here it is the program's job.
+(define-function account-actor [balance applied]
+  (let [message    (receive)
+        identifier (get message :identifier)]
+    (conditional
+      (has-key? message :balance)
+        (sequence (reply message balance)
+                  (account-actor balance applied))
+      (has-key? applied identifier)
+        (sequence (reply message balance)                 ; already applied: only reply
+                  (account-actor balance applied))
+      true
+        (let [new-balance (+ balance (get message :amount))]
+          (reply message new-balance)
+          (account-actor new-balance (add applied identifier))))))
+
+(define-function send-with-retry [account identifier amount]
+  (try
+    (with-scope [attempt-scope]
+      (wait-for (send-message account {:identifier identifier :amount amount})))
+    (catch :transport problem
+      (send-with-retry account identifier amount))))
+
+(define-function main [input]
+  (with-scope [scope]
+    ;; KNOWN PROBLEM, kept on purpose for the comparison: the actor is a child of the proxy
+    ;; scope of this spawn-on call (D-21). That scope must join its children before the call
+    ;; returns, and the actor loops forever, so the call never returns. An agent does not have
+    ;; this problem because agents live outside the scope tree (D-15). An actor layer would
+    ;; need the same exception, or a long-lived scope owned by the node. See
+    ;; programs/actors-comparison.md.
+    (let [account (wait-for (spawn-on (node :b) (spawn-actor account-actor 0 #{})))]
+      (reduce (function [ignored amount] (send-with-retry account amount amount) nothing)
+              nothing
+              (range 1 11))
+      (let [numbers    (tag :producer (make-stream produce-forever {:maximum-ahead 1}))
+            stream-sum (wait-for (spawn-on (node :b)
+                                   (wait-for (stream-reduce consume 0
+                                               (stream-take (get input :items) numbers)))))]
+        {:balance    (wait-for (send-message account {:balance true}))
+         :stream-sum stream-sum}))))

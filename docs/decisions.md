@@ -9,7 +9,7 @@ States: `open` | `recommended` | `adopted` | `superseded by D-xx`.
 
 | ID | Decision | Closed in (feature / phase) | State | Inherited by |
 |----|----------|-----------------------------|-------|--------------|
-| D-01 | Clojure-like S-expression syntax (`[]` `{}` `#{}` keywords, `@`) | 001 / Phase 0 | recommended | Phase 1 |
+| D-01 | S-expression syntax with `[]` `{}` `#{}` literals and keywords; no reader shorthands (`'` `` ` `` `~` `@` removed by D-27) | 001 / Phase 0 | recommended | Phase 1 |
 | D-02 | Structural `=` for data; functions by content hash + env; identity for futures, agents, scopes; NaN reflexive in `=` | 001 / Phase 0 | recommended | Phase 3, Phase 5 |
 | D-03 | Canonical CHAMP maps/sets, trie vectors (RRB postponed); two hashes: fast value hash + lazy cryptographic content hash | 001 / Phase 0 | recommended | Phase 1, Phase 2, Phase 5 |
 | D-04 | 64-bit ints with `:overflow` error, IEEE doubles, no bignums yet | 001 / Phase 0 | adopted (Q3) | Phase 1, Phase 6 |
@@ -19,13 +19,13 @@ States: `open` | `recommended` | `adopted` | `superseded by D-xx`.
 | D-08 | `with-scope`, implicit current scope, `future`/`spawn`, root scope, join on exit | 001 / Phase 0 | recommended | Phase 1, Phase 3 |
 | D-09 | Cooperative cancellation at defined points; `check-cancelled`, `shield`, `finally` | 001 / Phase 0 | recommended | Phase 3, Phase 4, Phase 5, Phase 6 |
 | D-10 | Futures may escape only settled (follows from join) | 001 / Phase 0 | recommended | Phase 3, Phase 5 |
-| D-11 | First failure (completion order) primary; other failures suppressed | 001 / Phase 0 | recommended | Phase 3, Phase 5 |
-| D-12 | `all`, `any` (`:all-failed`), `then`, `timeout`, `async`, `let-par`; no await keyword | 001 / Phase 0 | recommended | Phase 1, Phase 3 |
-| D-13 | Error = value with `:kind` etc.; standard kinds incl. network/timeout; no implicit retries | 001 / Phase 0 | recommended | Phase 1, Phase 3, Phase 5 |
+| D-11 | First failure (completion order) primary; other failures suppressed; cancellations caused by the scope or by a combinator do not fail the scope (amended in US2) | 001 / Phase 0 | recommended | Phase 3, Phase 5 |
+| D-12 | `all`, `first-success` (`:all-failed`), `then`, `with-timeout`, `let-parallel`; no async marker, `wait-for` suspends | 001 / Phase 0 | recommended | Phase 1, Phase 3 |
+| D-13 | Error = value with `:kind` etc.; standard kinds incl. network/timeout, plus `:division-by-zero`, `:index-out-of-range`, `:resource-closed` (amended); no implicit retries | 001 / Phase 0 | recommended | Phase 1, Phase 3, Phase 5 |
 | D-14 | Wait-for cycle detection → `:deadlock` (local + simulated nodes; distributed: timeouts) | 001 / Phase 0 | adopted (Q1) | Phase 3, Phase 5 |
-| D-15 | Agents: `update`/`transact`, per-sender FIFO, failed update keeps state, not scope-owned | 001 / Phase 0 | recommended | Phase 1, Phase 3, Phase 5 |
+| D-15 | Agents: `update`/`transact`/`update-once`, per-sender FIFO, failed update keeps state, not scope-owned | 001 / Phase 0 | recommended | Phase 1, Phase 3, Phase 5 |
 | D-16 | Send future in sender scope; on cancel: queued → withdrawn, running → commits; future cancelled (resolves H3) | 001 / Phase 0 | adopted (Q2) | Phase 3, Phase 5 |
-| D-17 | Streams: rest is a future, pull-driven, `:ahead` bound (1), owned by creator scope | 001 / Phase 0 | recommended | Phase 1, Phase 4, Phase 5 |
+| D-17 | Streams: rest is a future, pull-driven, `:maximum-ahead` bound (1), owned by creator scope; producers cancelled when the scope's body returns; `emit` is a cancellation point (amended) | 001 / Phase 0 | recommended | Phase 1, Phase 4, Phase 5 |
 | D-18 | Deterministic parallelism via fixed reduction tree; parallel work in child scope | 001 / Phase 0 | adopted (Q3) | Phase 3, Phase 5 |
 | D-19 | Function identity by content: expanded AST, de Bruijn, deps by hash, SCC group hashing; closure = hash + env | 001 / Phase 0 | recommended | Phase 1, Phase 5 |
 | D-20 | Serialization classes: by value / by remote reference / local-only (`:not-serializable` at sender) | 001 / Phase 0 | recommended | Phase 1, Phase 5 |

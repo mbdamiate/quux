@@ -211,7 +211,7 @@ or H-n.
 
 **Independent Test**: [quickstart.md](./quickstart.md) steps 4 and 5 pass.
 
-- [ ] T037 [US5] Fill `docs/spec/open-questions.md` (M).
+- [X] T037 [US5] Fill `docs/spec/open-questions.md` (M).
   - One row per FR-026 item:
     - cancellation → D-09
     - scope-ended future → D-10
@@ -228,7 +228,7 @@ or H-n.
     - H3 → resolved
     - H4 → partly resolved, rest in 5c
   - H1, H2 and H7 point to feature 002; H5 and H6 to Phase 5; H8–H12 to the phases given in `docs/hypotheses.md`.
-- [ ] T038 [US5] Check `docs/decisions.md` and `docs/hypotheses.md` against `research.md` (S).
+- [X] T038 [US5] Check `docs/decisions.md` and `docs/hypotheses.md` against `research.md` (S).
   - There are 28 decision rows, and the "Inherited by" column is filled for D-07, D-09, D-10, D-11, D-13, D-14, D-19, D-20 and D-21.
   - H3 is resolved, H4 is partly resolved, and H8–H12 are present.
   - Run [quickstart.md](./quickstart.md) step 4.
@@ -242,10 +242,10 @@ or H-n.
 **Independent Test**: the three `actors.qx` files exist, and the comparison table has identical
 rows for each pair.
 
-- [ ] T039 [P] [US4] Write `programs/04-bank-account-agent/actors.qx` using `spawn-actor`, `receive`, `send-message` and `reply` (S)
-- [ ] T040 [P] [US4] Write `programs/10-chat-server/actors.qx`, with a room actor and connection actors joined by `link` and `supervise` (M)
-- [ ] T041 [P] [US4] Write `programs/12-remote-agent-stream/actors.qx`, with a remote actor that deduplicates operation identifiers (M)
-- [ ] T042 [US4] Write `programs/actors-comparison.md` (M).
+- [X] T039 [P] [US4] Write `programs/04-bank-account-agent/actors.qx` using `spawn-actor`, `receive`, `send-message` and `reply` (S)
+- [X] T040 [P] [US4] Write `programs/10-chat-server/actors.qx`, with a room actor and connection actors joined by `link` and `supervise` (M)
+- [X] T041 [P] [US4] Write `programs/12-remote-agent-stream/actors.qx`, with a remote actor that deduplicates operation identifiers (M)
+- [X] T042 [US4] Write `programs/actors-comparison.md` (M).
   - One table per pair, with the same rows: lines of code, where atomicity lives, how the caller observes a failure, what supervision with restart adds, what is lost without actors.
   - A closing paragraph feeds the Phase 4 evaluation and Phase 5f.
 

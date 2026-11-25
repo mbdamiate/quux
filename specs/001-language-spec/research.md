@@ -337,6 +337,11 @@ Phase 2 gate (feature 003), as the constitution requires.
   - A global total order: impossible to keep across nodes without consensus.
   - Clojure's `send`/`send-off` split by thread pool `[MEMORY]`: the Phase 1 runtime decides
     blocking behavior, so the split is unnecessary.
+- **Amendment (implementation of US3, 2026-11-24)**: `(update-once agent operation-identifier
+  function argument …)` is applied at most once per operation identifier; a resend returns the
+  state produced by the first application. It is the program-level form of program 12's
+  idempotence. How long identifiers are kept is H5 (Phase 5d). See
+  `docs/spec/13-serialization-and-identity.md`, rule 17.
 - **Inherited by**: Phase 1, Phase 3, Phase 5 (5d).
 
 ### D-16 — Scope of an agent send's future and pending-send cancellation (resolves H3)
