@@ -1,0 +1,5 @@
+;; Reference program NN — <title>
+;; Names: docs/naming.md (approved only). Contract: specs/001-language-spec/contracts/reference-program.md
+
+(define-function main [input]
+  nothing)

@@ -1,0 +1,28 @@
+# Build outputs (C, CMake + Ninja)
+build/
+bin/
+obj/
+out/
+*.o
+*.a
+*.so
+*.dylib
+*.dSYM/
+*.exe
+*.dll
+compile_commands.json
+
+# Tools and editors
+.idea/
+.vscode/
+*.swp
+*.tmp
+*.log
+.env*
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Local Claude settings
+.claude/settings.local.json
