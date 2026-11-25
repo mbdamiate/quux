@@ -253,10 +253,10 @@ rows for each pair.
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T043 Check names (S): every symbol used in `docs/spec/*.md` and `programs/**/*.qx` must be in `docs/naming.md` with status `approved`. Add any missing name as `proposed` and ask the owner. Run the naming step (4b) of [quickstart.md](./quickstart.md).
-- [ ] T044 Do the self-review pass for SC-007 (M). For each of the 12 programs, draft the Phase 1 test outline in a scratch file using only the documents. Record every question in `docs/spec/open-questions.md` and resolve it. Repeat until a full pass adds no new question.
-- [ ] T045 [P] Update `docs/speckit-roadmap.md` (S): mark feature 001 complete, and point the `/speckit-specify` input of feature 002 at `docs/spec/` and `programs/`.
-- [ ] T046 Run [quickstart.md](./quickstart.md) steps 1–6 end to end and record the result at the end of `specs/001-language-spec/checklists/requirements.md` (S).
+- [X] T043 Check names (S): every symbol used in `docs/spec/*.md` and `programs/**/*.qx` must be in `docs/naming.md` with status `approved`. Add any missing name as `proposed` and ask the owner. Run the naming step (4b) of [quickstart.md](./quickstart.md).
+- [X] T044 Do the self-review pass for SC-007 (M). For each of the 12 programs, draft the Phase 1 test outline in a scratch file using only the documents. Record every question in `docs/spec/open-questions.md` and resolve it. Repeat until a full pass adds no new question.
+- [X] T045 [P] Update `docs/speckit-roadmap.md` (S): mark feature 001 complete, and point the `/speckit-specify` input of feature 002 at `docs/spec/` and `programs/`.
+- [X] T046 Run [quickstart.md](./quickstart.md) steps 1–6 end to end and record the result at the end of `specs/001-language-spec/checklists/requirements.md` (S).
 
 ---
 

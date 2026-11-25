@@ -22,7 +22,7 @@ is cancelled when the scope is cancelled.
 Rules:
 
 1. `with-timeout` accepts a future, or a function of no arguments that it starts as a future.
-   When completion and the timeout race, the first transition wins (section 06, rule 4).
+   When completion and the timeout race, the first transition wins (section 06, rule 5).
 2. `let-parallel` is the sequential-looking form: the body reads like sequential code, but the
    bindings run in parallel. No async marker exists anywhere: any function can wait.
 3. A combinator never retries anything.

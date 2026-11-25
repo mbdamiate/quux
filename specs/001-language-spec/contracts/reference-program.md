@@ -51,6 +51,9 @@ Harness conventions:
   every message to the node is lost, and its pending futures fail with `:node-unreachable`.
 - `:network :drop` loses the matching message: `:message :acknowledgement` matches the replies to
   agent updates, and `:occurrence n` selects the `n`-th such message between the two nodes.
+  In simulation, the sender's pending future fails with `:transport` as soon as its message is
+  dropped. On real networks, the deadline after which a missing reply becomes `:transport` is
+  decided in Phase 5a.
 - `(applied-once identifier)` holds when the update sent with `update-once` and that operation
   identifier was applied exactly once, whatever the number of sends.
 

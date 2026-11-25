@@ -43,8 +43,8 @@ After `/speckit-plan`, append the new D-xx rows to `docs/decisions.md` and updat
 
 | # | Feature | Phase | Run when | Source prompt |
 |---|---|---|---|---|
-| 001 | language-spec | 0 | now | `01-phases-0-1.md` (Part A) |
-| 002 | blocking-prototype | 1 | after 001 | `01-phases-0-1.md` (Part B) |
+| 001 | language-spec | 0 | **done** (branch `001-language-spec`) | `01-phases-0-1.md` (Part A) |
+| 002 | blocking-prototype | 1 | **next** | `01-phases-0-1.md` (Part B) |
 | 003 | dependency-gate | 2 | prototype runs programs 1–10 + simulated 11–12 | `02-phase-2.md` |
 | 004 | vm-scheduler-gc | 3 | Phase 2 spikes done | `03-phases-3-4.md` |
 | 005 | async-io-timers | 4 | VM runs programs 1–9 | `03-phases-3-4.md` |
@@ -63,7 +63,11 @@ reference for Phase 1's implementation.
 
 ---
 
-### 001 — language-spec (Phase 0)
+### 001 — language-spec (Phase 0) — done
+
+Delivered: `docs/spec/` (index, 14 sections, I/O appendix, open-questions register),
+`programs/01…12` with `expected.qx`/`conditions.qx`, actor comparison, decisions D-01..D-28 and
+the approved naming glossary. The inputs below are kept as a record.
 
 **`/speckit-specify` input:**
 
@@ -92,16 +96,16 @@ Document feature: output goes to docs/spec/ (specification sections) and program
 **`/speckit-specify` input:**
 
 ```text
-Blocking prototype of quux in C (Phase 1) that runs the reference programs of docs/spec and programs/ (feature 001).
+Blocking prototype of quux in C (Phase 1) that runs the reference programs in programs/ against the specification in docs/spec/ (feature 001). The test harness reads each program's conditions.qx and expected.qx as quux data, following specs/001-language-spec/contracts/reference-program.md, and every public name comes from docs/naming.md.
 
 User stories, in priority order (each independently demonstrable):
 P1 Toolchain smoke test: a minimal C program builds in every CMake preset (debug, asan-ubsan, tsan, release) on macOS, in the Ubuntu arm64 Docker container and in GitHub Actions CI on Linux x86_64; ASan catches a deliberate heap overflow, TSan a deliberate race, LSan/valgrind in the container a deliberate leak; record which Docker capabilities had to be adjusted.
 P1 Core language: reader, tree-walking evaluator, closures, mandatory TCO, macros, numerics, persistent canonical collections (lists, vectors, CHAMP maps and sets) with stable node hashes; a REPL.
 P2 Futures and scopes: blocking runtime (one OS thread per future, mutex + condition variable); with-scope, cancellation, error propagation; programs 1, 2, 3, 8, 9 pass.
-P3 Agents (program 4, 10) and streams of futures with backpressure (programs 6, 7); pmap deterministic (program 5).
-P4 Multi-node simulation in one process with injected failures and delays; programs 11 and 12 pass against simulated nodes.
+P3 Agents with update, transact and update-once (programs 4, 10), streams with backpressure and the I/O appendix (programs 6, 7, 10), deterministic parallel-transform, parallel-reduce and fork-join (programs 5, 8).
+P4 Multi-node simulation in one process with injected failures, delays, crashes and message loss as described by conditions.qx; spawn-on, :node-unreachable, :transport and update-once; programs 11 and 12 pass against simulated nodes.
 
-Constraints: the minimal GC root and allocation convention (H2) must be followed by all runtime code even though the real GC arrives in Phase 3; module boundaries must make reuse in the VM explicit (H1); a minimal portability layer for macOS/Linux arm64 (H7).
+Constraints: the minimal GC root and allocation convention (H2) must be followed by all runtime code even though the real GC arrives in Phase 3; module boundaries must make reuse in the VM explicit (H1); a minimal portability layer for macOS arm64, Linux arm64 and Linux x86_64 (H7, D-28); C identifiers in full words with the quux_ prefix (constitution VIII). Open points to close in this phase: variadic parameters and destructuring syntax (W4, W5), kind predicates such as vector? (W6, to be approved in docs/naming.md), deterministic primary error for replay (H9), stream ownership across scopes (H11).
 
 Success = all 12 programs run as automated tests on macOS arm64, Linux arm64 and Linux x86_64 (CI) with no ASan/UBSan/TSan errors.
 ```

@@ -15,10 +15,15 @@
    way to create a future outside a scope.
 2. `(spawn scope expression …)` does the same in an explicit scope, which MUST be the current
    scope or one of its live ancestors.
+3. Inside the body of a future, the current scope is the scope that owns that future, unless
+   the body opens its own `with-scope`. So a future created inside another future's body is
+   its sibling, not its child. Inside an agent update, the current scope is the agent's own
+   scope (section 09). Inside `spawn-on`, it is the proxy scope on the remote node (section
+   13).
 
 ### States
 
-3. A future is in exactly one of three states (the field `Future.state` of
+4. A future is in exactly one of three states (the field `Future.state` of
    [data-model.md](../../specs/001-language-spec/data-model.md)):
 
    | State | Meaning |
@@ -27,34 +32,34 @@
    | `:filled` | finished with a value |
    | `:failed` | finished with an error value (section 12) |
 
-4. A future leaves `:empty` at most once, and the new state is final. When two transitions
+5. A future leaves `:empty` at most once, and the new state is final. When two transitions
    race (for example a value arrives at the same moment as a cancellation), the first one wins
    and the other is discarded.
-5. **Cancellation is not a fourth state.** A cancelled future is `:failed` with an error of kind
+6. **Cancellation is not a fourth state.** A cancelled future is `:failed` with an error of kind
    `:cancelled`. The same holds for `:timeout`, `:deadlock`, and, from Phase 5 on,
    `:node-unreachable`.
-6. `(state future)` returns the current state and never waits.
+7. `(state future)` returns the current state and never waits.
 
 ### Waiting
 
-7. `(wait-for future)` returns the value of a `:filled` future, raises the error of a `:failed`
+8. `(wait-for future)` returns the value of a `:filled` future, raises the error of a `:failed`
    future, and suspends the current task while the future is `:empty`. Suspension is handled by
    the runtime: the function that calls `wait-for` needs no annotation, and neither do its
    callers.
-8. `wait-for` is a cancellation point (section 07): if the waiting task is cancelled while it
+9. `wait-for` is a cancellation point (section 07): if the waiting task is cancelled while it
    waits, `wait-for` raises `:cancelled`.
-9. If waiting would close a cycle of tasks that wait for each other, `wait-for` raises
+10. If waiting would close a cycle of tasks that wait for each other, `wait-for` raises
    `:deadlock` instead of suspending (section 07, D-14).
 
 ### Ownership and leaving the scope
 
-10. Every future belongs to exactly one scope (`Future.scope`), and that scope stays alive while
+11. Every future belongs to exactly one scope (`Future.scope`), and that scope stays alive while
     the future is `:empty`.
-11. A future MAY be returned from its scope or stored in a data structure. Because a scope
+12. A future MAY be returned from its scope or stored in a data structure. Because a scope
     always waits for all its children before it ends, such a future is always `:filled` or
     `:failed`: `wait-for` on it never suspends. There is never an `:empty` future without a live
     scope.
-12. Futures are compared and hashed by identity (section 01).
+13. Futures are compared and hashed by identity (section 01).
 
 ## Examples
 

@@ -37,3 +37,15 @@
 - Iteration 1: all items passed except the 3 open clarifications.
 - Iteration 2 (2026-11-24): clarifications answered (Q1: A, Q2: A, Q3: A). All items pass, and
   the spec is ready for `/speckit-plan`.
+
+## Quickstart run (task T046, 2026-11-24)
+
+| Step | Check | Result |
+|---|---|---|
+| 1 | 14 sections, each with a Question and a Decision or Open marker | pass (14/14) |
+| 2 | 12 program directories with the 4 required files; actor versions of 04, 10, 12 | pass |
+| 3 | `expected.qx` uses only assertion forms of the contract (plus core forms inside predicates) | pass |
+| 4 | 28 decisions; Inherited-by filled for D-07, D-09, D-10, D-11, D-13, D-14, D-19, D-20, D-21; H3, H4, H8–H12 present | pass |
+| 4b | No `proposed` names in `docs/naming.md` | pass (0) |
+| 5 | Every FR-026 row of the register has a recommendation, a record and a closing phase | pass |
+| 6 | Self-review (SC-007): the first pass added W9 and W10, both resolved; the second pass added no question | pass |
