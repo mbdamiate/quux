@@ -1,0 +1,75 @@
+;; 06 — Error handling while reading text: the records of program 05, written as quux text.
+;; The input is one string with one record per line. Each line is read as quux data; a line
+;; that cannot be read raises :syntax, which becomes a report like any other invalid record.
+;; Otherwise the program follows program 05, and ends by raising one summary error.
+;; Run with the contents of input.txt as the second argument.
+
+;; ---- Stubs: each stands for a core function that does not exist yet. ----
+
+(define-function split-into-lines [text]
+  (raise (error :user "missing: split text into lines"
+                {:needed "a core function that splits a string at line breaks into a list of strings"})))
+
+(define-function read-from-string [text]
+  (raise (error :user "missing: read data from a string"
+                {:needed "a core function that reads one quux value from a string, raising :syntax when the text is not valid"})))
+
+;; ---- Validation, as in program 05 ----
+
+(define-function reject-record [record field message]
+  (raise (error :user message {:id (get record :id) :field field})))
+
+(define-function validate [record]
+  (let [{name :name age :age email :email} record]
+    (when (or (not (string? name)) (empty? name))
+      (reject-record record :name "name is missing"))
+    (when (< age 0)
+      (reject-record record :age "age is negative"))
+    (when (nothing? email)
+      (reject-record record :email "email is missing"))
+    true))
+
+;; A report for one line. Lines are numbered from 1, and a record's :id is its line number.
+(define-function check-line [line-number line]
+  (try
+    (let [record (read-from-string line)]
+      (validate record)
+      {:id line-number :accepted true :age (get record :age)})
+    (catch :syntax problem
+      {:id line-number :accepted false :field :syntax :reason "the line is not valid quux data"})
+    (catch :user problem
+      {:id line-number :accepted false
+       :field (get (error-data problem) :field)
+       :reason (get problem :message)})
+    (catch :wrong-type problem
+      {:id line-number :accepted false :field :unknown :reason (get problem :message)})
+    (finally
+      (print-line (to-string "checked line " line-number)))))
+
+(define-function describe-report [report]
+  (let [{id :id accepted :accepted field :field reason :reason} report]
+    (if accepted
+      (to-string "record " id ": accepted")
+      (to-string "record " id ": rejected, field " field ", " reason))))
+
+(define-function main [input]
+  (let [lines (pour-into [] (reject empty? (split-into-lines input)))]
+    (print-line (to-string "lines: " (count lines)))
+    (let [reports (pour-into [] (transform (function [index]
+                                             (check-line (increment index) (element-at lines index)))
+                                           (range 0 (count lines))))
+          accepted (filter (function [report] (get report :accepted)) reports)
+          rejected (reject (function [report] (get report :accepted)) reports)
+          accepted-ages (transform (function [report] (get report :age)) accepted)]
+      (reduce (function [ignored report] (print-line (describe-report report))) nothing reports)
+      (print-line (to-string "accepted: " (count accepted) ", rejected: " (count rejected)))
+      (print-line (to-string "mean age of accepted records: "
+                             (/ (reduce + 0 accepted-ages) (* 1.0 (count accepted-ages)))))
+      (try
+        (unless (empty? rejected)
+          (raise (error :user (to-string (count rejected) " of " (count reports)
+                                         " records are invalid")
+                        {:invalid (pour-into [] (transform (function [report] (get report :id))
+                                                           rejected))})))
+        (finally
+          (print-line "report finished"))))))

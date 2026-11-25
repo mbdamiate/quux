@@ -68,6 +68,27 @@ static int check_errors(quux_context *context, void *data) {
     return 0;
 }
 
+/* An unqualified name is looked up in the namespace, then in its imports in the order they are
+ * written, then in core (section 14; found by ergonomics program 08). */
+static int check_import_order(quux_context *context, void *data) {
+    quux_unit_state *state = data;
+    QUUX_CHECK(state, quux_unit_evaluates_to(context,
+                                             "(namespace first-source)"
+                                             "(define-function label [] :first)"
+                                             "(namespace second-source)"
+                                             "(define-function label [] :second)"
+                                             "(define-function only-second [] :only-second)"
+                                             "(namespace both (:import first-source second-source))"
+                                             "[(label) (only-second) (count [1 2])]",
+                                             "[:first :only-second 2]"));
+    QUUX_CHECK(state,
+               quux_unit_evaluates_to(context,
+                                      "(namespace reversed (:import second-source first-source))"
+                                      "(label)",
+                                      ":second"));
+    return 0;
+}
+
 /* Root verification from the first allocation, including the prelude. */
 static void *verify_everything(void *argument) {
     quux_unit_state *state = argument;
@@ -100,6 +121,10 @@ static void errors_are_raised_and_caught(quux_unit_state *state) {
     QUUX_CHECK(state, quux_session_run(check_errors, state) == 0);
 }
 
+static void imports_are_searched_in_order(quux_unit_state *state) {
+    QUUX_CHECK(state, quux_session_run(check_import_order, state) == 0);
+}
+
 static void prelude_follows_the_root_convention(quux_unit_state *state) {
     quux_thread *thread = NULL;
     QUUX_CHECK(state, quux_thread_start(&thread, 512u * 1024u * 1024u, verify_everything, state));
@@ -111,4 +136,5 @@ static void prelude_follows_the_root_convention(quux_unit_state *state) {
 QUUX_UNIT_CASES(evaluator, {"tail calls run in constant stack", tail_calls_run_in_constant_stack},
                 {"content hashes ignore names and order", content_hashes_ignore_names},
                 {"errors are raised and caught", errors_are_raised_and_caught},
+                {"imports are searched in order", imports_are_searched_in_order},
                 {"the prelude follows the root convention", prelude_follows_the_root_convention});

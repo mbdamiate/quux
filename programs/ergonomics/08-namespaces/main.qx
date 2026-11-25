@@ -1,0 +1,49 @@
+;; 08 — Namespaces: one program split into three namespaces in one file.
+;; `geometry` knows shapes, `report` summarizes collections of shapes and prints labelled lines,
+;; and `drawing` holds the data and `main`. Both `geometry` and `report` define a function named
+;; `describe`; `drawing` imports both and calls each one by its qualified name.
+
+(namespace geometry)
+
+;; A shape is a map with :kind and its measures. Areas are integers.
+(define-function area [shape]
+  (case (get shape :kind)
+    :rectangle (* (get shape :width) (get shape :height))
+    :square (* (get shape :side) (get shape :side))
+    :triangle (quotient (* (get shape :base) (get shape :height)) 2)))
+
+(define-function describe [shape]
+  (to-string (get shape :kind) " with area " (area shape)))
+
+(namespace report (:import geometry))
+
+;; `area` is geometry's, used without qualification.
+(define-function total-area [shapes]
+  (reduce + 0 (transform area shapes)))
+
+(define-function largest [shapes]
+  (reduce (function [best shape] (if (> (area shape) (area best)) shape best))
+          (first shapes)
+          (rest shapes)))
+
+(define-function describe [shapes]
+  (to-string (count shapes) " shapes, total area " (total-area shapes)))
+
+(define-function show [label value]
+  (print-line (to-string label ": " value)))
+
+(namespace drawing (:import geometry report))
+
+(define shapes
+  [{:kind :rectangle :width 3 :height 4}
+   {:kind :square :side 5}
+   {:kind :triangle :base 6 :height 3}])
+
+(define-function main [input]
+  (show "shapes" (count shapes))
+  (reduce (function [ignored shape] (show "shape" (geometry/describe shape))) nothing shapes)
+  (show "summary" (report/describe shapes))
+  (show "largest" (get (largest shapes) :kind))
+  ;; Unqualified, `describe` is looked up in the imports in order: geometry first.
+  (show "unqualified describe" (describe (first shapes)))
+  (total-area shapes))

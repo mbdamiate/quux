@@ -1,0 +1,50 @@
+;; 10 — Common mistakes: twelve small mistakes a new quux programmer is likely to make.
+;; Each mistake is a function of no arguments. `main` runs each one inside try and prints the
+;; error's kind and message, so the program as a whole succeeds. Mistakes that stop a file from
+;; loading at all (for example a malformed let) cannot be shown this way; they are recorded in
+;; the README instead.
+
+(define account {:owner "ana" :balance 100})
+(define items [10 20 30])
+
+(define-function deposit [account amount]
+  (put account :balance (+ (get account :balance) amount)))
+
+;; Counts the elements of a list without a tail call: the addition waits for the recursive call.
+(define-function length-of [elements]
+  (if (empty? elements)
+    0
+    (+ 1 (length-of (rest elements)))))
+
+(define-function misspelled-name [] (incremnt 1)) ;!! :undefined-name
+
+(define mistakes
+  [["missing argument" (function [] (deposit account))]
+   ["misspelled name" misspelled-name]
+   ["vector pattern on a map" (function [] (let [[owner balance] account] owner))]
+   ["get on a string" (function [] (get (get account :owner) :balance))]
+   ["keyword called as a function" (function [] (:balance account))]
+   ["arithmetic on a missing key" (function [] (+ (get account :limit) 5))]
+   ["index one past the end" (function [] (element-at items (count items)))]
+   ["put on a vector with a keyword" (function [] (put items :first 0))]
+   ["deep non-tail recursion" (function [] (length-of (range 0 20000)))]
+   ["raise of a string" (function [] (raise "insufficient funds"))]
+   ["integer division expecting a fraction" (function [] (/ 7 2))]
+   ["reduce without an initial value" (function [] (reduce + items))]])
+
+;; Runs one mistake and describes what happened.
+(define-function describe-mistake [number entry]
+  (let [[label mistake] entry]
+    (try
+      (to-string number " " label " -> no error, returned " (mistake))
+      (catch (function [problem] true) problem
+        (to-string number " " label " -> " (error-kind problem) ": " (get problem :message))))))
+
+(define-function main [input]
+  (print-line (to-string "mistakes: " (count mistakes)))
+  (reduce (function [number entry]
+            (print-line (describe-mistake number entry))
+            (increment number))
+          1
+          mistakes)
+  (count mistakes))

@@ -2,8 +2,18 @@
 # program is a plain run with `quux`, a run under the root verifier with `quux-test run`, and a
 # valgrind run on Linux. Pending programs carry the `pending` label, which CI and the local check
 # skip. Moving a program from the pending list to the ready list turns its tests on.
-set(quux_ergonomics_ready 01-nested-data)
-set(quux_ergonomics_pending)
+set(quux_ergonomics_ready
+  01-nested-data
+  02-text-prepared-input
+  04-tree-and-parser
+  05-errors-prepared-input
+  07-macros
+  08-namespaces
+  09-numerics
+  10-common-mistakes)
+set(quux_ergonomics_pending
+  03-text-raw
+  06-errors-reading-text)
 
 set(quux_ergonomics_directory ${CMAKE_SOURCE_DIR}/programs/ergonomics)
 set(quux_ergonomics_driver ${CMAKE_CURRENT_SOURCE_DIR}/run_program_test.cmake)

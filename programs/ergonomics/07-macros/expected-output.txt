@@ -1,0 +1,20 @@
+squares
+square of 0 is 0
+square of 1 is 1
+square of 2 is 4
+square of 3 is 9
+limit computed
+0 of limit 100
+1 of limit 100
+table
+1 x 1 = 1
+1 x 2 = 2
+1 x 3 = 3
+2 x 1 = 2
+2 x 2 = 4
+2 x 3 = 6
+accounts: 3
+account 1: 0 failed []
+account 2: 1 failed ["balance is not negative"]
+account 3: 2 failed ["owner is a string" "currency is known"]
+1

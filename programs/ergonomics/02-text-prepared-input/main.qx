@@ -1,0 +1,90 @@
+;; 02 — Text with prepared input: a word count and a small comma-separated table.
+;; The input arrives already split: a vector of words, and a vector of rows whose fields are
+;; strings. The program counts the words, prints them in the order of their first appearance,
+;; and prints the table with aligned columns, the total score and the mean score.
+;; Run with the contents of input.txt as the second argument.
+
+;; A map from each word to the number of times it appears.
+(define-function count-words [words]
+  (reduce (function [counts word] (put counts word (increment (get counts word 0))))
+          {}
+          words))
+
+;; The distinct words, in the order in which they first appear.
+(define-function distinct-in-order [words]
+  (get (reduce (function [state word]
+                 (let [{seen :seen order :order} state]
+                   (if (has-key? seen word)
+                     state
+                     {:seen (add seen word) :order (add order word)})))
+               {:seen #{} :order []}
+               words)
+       :order))
+
+;; The word with the highest count; the first one wins a tie. Returns [word count].
+(define-function most-frequent [order counts]
+  (reduce (function [best word]
+            (if (> (get counts word) (element-at best 1))
+              [word (get counts word)]
+              best))
+          [nothing 0]
+          order))
+
+;; A string of `width` spaces (none when width is zero or negative).
+(define-function spaces [width]
+  (reduce (function [text ignored] (to-string text " ")) "" (range 0 width)))
+
+(define-function pad-right [text width]
+  (to-string text (spaces (- width (count text)))))
+
+(define-function pad-left [text width]
+  (to-string (spaces (- width (count text))) text))
+
+;; The widest field of each column, over every row (the header included).
+(define-function column-widths [rows]
+  (reduce (function [widths row]
+            (reduce (function [updated index]
+                      (put updated index (maximum (element-at updated index)
+                                                  (count (element-at row index)))))
+                    widths
+                    (range 0 (count row))))
+          [0 0 0]
+          rows))
+
+;; Name and city are left-aligned with two spaces after them; the score is right-aligned.
+(define-function format-row [row widths]
+  (let [[name city score] row
+        [name-width city-width score-width] widths]
+    (to-string (pad-right name (+ name-width 2))
+               (pad-right city (+ city-width 2))
+               (pad-left score score-width))))
+
+(define-function print-word-counts [words]
+  (let [counts (count-words words)
+        order (distinct-in-order words)
+        [best best-count] (most-frequent order counts)]
+    (print-line (to-string "words: " (count words)))
+    (print-line (to-string "distinct words: " (count order)))
+    (reduce (function [ignored word]
+              (print-line (to-string (pad-right word 8) (get counts word))))
+            nothing
+            order)
+    (print-line (to-string "most frequent: " best " (" best-count ")"))
+    [best best-count]))
+
+(define-function print-table [rows]
+  (let [[header :rest records] rows
+        widths (column-widths rows)
+        total (thread-last records
+                           (transform (function [record] (parse-integer (element-at record 2))))
+                           (reduce + 0))]
+    (print-line (to-string "records: " (count records)))
+    (reduce (function [ignored row] (print-line (format-row row widths))) nothing rows)
+    (print-line (to-string "total score: " total))
+    (print-line (to-string "mean score: " (/ total (* 1.0 (count records)))))))
+
+(define-function main [input]
+  (let [{words :words rows :rows} input
+        result (print-word-counts words)]
+    (print-table rows)
+    result))

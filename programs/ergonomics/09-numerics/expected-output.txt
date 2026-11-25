@@ -1,0 +1,22 @@
+values: 6
+sorted: [4 8 15 16 23 42]
+sum: 108
+mean: 18
+median: 15.5
+variance: 151.66666666666666
+float values: 3
+float mean: 2.3333333333333335
+0.1 + 0.2: 0.30000000000000004
+equal to 0.3: false
+equal? 2 2.0: false
+numerically-equal? 2 2.0: true
+1/6 + 1/3: 1/2
+2/3 * 9/4: 3/2
+harmonic sum to 10: 7381/2520
+factorial of 20: 2432902008176640000
+factorial of 21: :overflow
+factorial of 21 as a float: 5.109094217170944e+19
+7 / 2 with integers: :inexact-division
+1.0 / 0: infinity
+quotient 1 0: :division-by-zero
+[7381 2520]

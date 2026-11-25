@@ -1,0 +1,126 @@
+;; 03 — Raw text: the same task as program 02, on the text as one string.
+;; The input is the original text: a paragraph, an empty line, then comma-separated rows with
+;; spaces after the commas. The program splits it into lines, words and fields itself, then
+;; prints the same report as program 02.
+;; Run with the contents of input.txt as the second argument.
+
+;; ---- Stubs: each stands for a core function that does not exist yet. ----
+
+(define-function split-into-lines [text]
+  (raise (error :user "missing: split text into lines"
+                {:needed "a core function that splits a string at line breaks into a list of strings"})))
+
+(define-function split-on-whitespace [text]
+  (raise (error :user "missing: split text on whitespace"
+                {:needed "a core function that splits a string into a list of strings at runs of spaces"})))
+
+(define-function split-on-separator [text separator]
+  (raise (error :user "missing: split text on a separator"
+                {:needed "a core function that splits a string at every occurrence of a separator string"})))
+
+(define-function trim [text]
+  (raise (error :user "missing: trim text"
+                {:needed "a core function that removes spaces at both ends of a string"})))
+
+;; ---- The text, split into its two parts. ----
+
+;; The lines before the first empty line, and the lines after it.
+(define-function split-at-empty-line [lines]
+  (reduce (function [parts line]
+            (let [{before :before after :after found :found} parts]
+              (conditional
+                found {:before before :after (add after line) :found true}
+                (empty? line) {:before before :after after :found true}
+                true {:before (add before line) :after after :found false})))
+          {:before [] :after [] :found false}
+          lines))
+
+(define-function words-of [lines]
+  (reduce (function [words line] (pour-into words (split-on-whitespace line))) [] lines))
+
+(define-function rows-of [lines]
+  (pour-into []
+             (transform (function [line]
+                          (pour-into [] (transform trim (split-on-separator line ","))))
+                        (reject empty? lines))))
+
+;; ---- From here on, the same code as program 02. ----
+
+(define-function count-words [words]
+  (reduce (function [counts word] (put counts word (increment (get counts word 0))))
+          {}
+          words))
+
+(define-function distinct-in-order [words]
+  (get (reduce (function [state word]
+                 (let [{seen :seen order :order} state]
+                   (if (has-key? seen word)
+                     state
+                     {:seen (add seen word) :order (add order word)})))
+               {:seen #{} :order []}
+               words)
+       :order))
+
+(define-function most-frequent [order counts]
+  (reduce (function [best word]
+            (if (> (get counts word) (element-at best 1))
+              [word (get counts word)]
+              best))
+          [nothing 0]
+          order))
+
+(define-function spaces [width]
+  (reduce (function [text ignored] (to-string text " ")) "" (range 0 width)))
+
+(define-function pad-right [text width]
+  (to-string text (spaces (- width (count text)))))
+
+(define-function pad-left [text width]
+  (to-string (spaces (- width (count text))) text))
+
+(define-function column-widths [rows]
+  (reduce (function [widths row]
+            (reduce (function [updated index]
+                      (put updated index (maximum (element-at updated index)
+                                                  (count (element-at row index)))))
+                    widths
+                    (range 0 (count row))))
+          [0 0 0]
+          rows))
+
+(define-function format-row [row widths]
+  (let [[name city score] row
+        [name-width city-width score-width] widths]
+    (to-string (pad-right name (+ name-width 2))
+               (pad-right city (+ city-width 2))
+               (pad-left score score-width))))
+
+(define-function print-word-counts [words]
+  (let [counts (count-words words)
+        order (distinct-in-order words)
+        [best best-count] (most-frequent order counts)]
+    (print-line (to-string "words: " (count words)))
+    (print-line (to-string "distinct words: " (count order)))
+    (reduce (function [ignored word]
+              (print-line (to-string (pad-right word 8) (get counts word))))
+            nothing
+            order)
+    (print-line (to-string "most frequent: " best " (" best-count ")"))
+    [best best-count]))
+
+(define-function print-table [rows]
+  (let [[header :rest records] rows
+        widths (column-widths rows)
+        total (thread-last records
+                           (transform (function [record] (parse-integer (element-at record 2))))
+                           (reduce + 0))]
+    (print-line (to-string "records: " (count records)))
+    (reduce (function [ignored row] (print-line (format-row row widths))) nothing rows)
+    (print-line (to-string "total score: " total))
+    (print-line (to-string "mean score: " (/ total (* 1.0 (count records)))))))
+
+(define-function main [input]
+  (let [{before :before after :after} (split-at-empty-line (split-into-lines input))
+        result (print-word-counts (words-of before))]
+    (print-table (rows-of after))
+    result))

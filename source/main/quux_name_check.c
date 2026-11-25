@@ -298,11 +298,19 @@ static void collect_bindings(check_state *state, quux_value form) {
     quux_value head = quux_pair_first(form);
     if (quux_is_kind(head, QUUX_KIND_SYMBOL) &&
         set_contains(&state->macros, quux_name_bytes(head), quux_name_length(head))) {
-        /* a call of a macro defined here: its symbol arguments may be names it binds */
+        /* a call of a macro defined here: its symbol arguments, and the symbols directly inside
+         * its vector arguments (as in `(repeat-times [index 0 4] ...)`), may be names it binds */
         for (quux_value cell = quux_pair_rest(form); !quux_is_nothing(cell);
              cell = quux_pair_rest(cell)) {
-            if (quux_is_kind(quux_pair_first(cell), QUUX_KIND_SYMBOL)) {
-                bind_all_symbols(state, quux_pair_first(cell));
+            quux_value argument = quux_pair_first(cell);
+            if (quux_is_kind(argument, QUUX_KIND_SYMBOL)) {
+                bind_all_symbols(state, argument);
+            } else if (quux_is_kind(argument, QUUX_KIND_VECTOR)) {
+                for (uint64_t i = 0; i < quux_vector_count(argument); i++) {
+                    if (quux_is_kind(quux_vector_element(argument, i), QUUX_KIND_SYMBOL)) {
+                        bind_all_symbols(state, quux_vector_element(argument, i));
+                    }
+                }
             }
         }
     }

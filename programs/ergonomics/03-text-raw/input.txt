@@ -1,0 +1,1 @@
+"the quick brown fox jumps over the lazy dog\nthe dog sleeps\n\nname, city, score\nana, lisbon, 82\nbruno, porto, 71\ncarla, faro, 100\n"

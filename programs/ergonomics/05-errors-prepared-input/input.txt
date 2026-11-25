@@ -1,0 +1,6 @@
+[{:id 1 :name "ana" :age 34 :email "ana@example.org"}
+ {:id 2 :name "" :age 20 :email "bruno@example.org"}
+ {:id 3 :name "carla" :age -5 :email "carla@example.org"}
+ {:id 4 :name "dario" :age 41}
+ {:id 5 :name "eva" :age "old" :email "eva@example.org"}
+ {:id 6 :name "fabio" :age 29 :email "fabio@example.org"}]
