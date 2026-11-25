@@ -66,6 +66,12 @@ fact yet.
     `[FACT: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2056762]`. Expected
     adjustment: `--security-opt seccomp=` with a profile that allows `personality`, or
     lowering the sysctl in the Docker VM (to verify).
+- **Outcome of the smoke test (T012, 2026-11-25)**: none of the expected adjustments was needed.
+  Docker Desktop's VM kernel (7.0.14-linuxkit) has `vm.mmap_rnd_bits = 18`, so TSan runs, and
+  LSan reports leaks under the default seccomp profile without `SYS_PTRACE`. The image has
+  Ubuntu clang 22.1.2, gcc 15.2.0, valgrind 3.26.0 and CMake 4.2.3
+  (`docs/toolchain-record.md`). If a Docker Desktop update changes the kernel settings, the
+  smoke tests catch it.
 - **Alternatives**: Ubuntu 24.04 (older valgrind and clang; CI is moving away from it);
   Debian testing (not an LTS); building inside a Linux VM instead of Docker (heavier, no gain).
 - **Inherited by**: Phase 2, Phase 5 (one container per node).

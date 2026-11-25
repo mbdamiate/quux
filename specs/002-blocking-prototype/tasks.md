@@ -41,11 +41,11 @@ ends in something that runs.
 
 **Purpose**: the build skeleton that every story uses.
 
-- [ ] T001 Create the top-level `CMakeLists.txt` with `-std=gnu17`, warnings as errors in `debug`, `compile_commands.json` export, one static library per `source/<module>/` directory (empty libraries allowed), and the module dependency direction of contracts/module-interface.md rule 3 (M)
-- [ ] T002 Create `CMakePresets.json` with configure, build and test presets `debug`, `asan-ubsan`, `tsan`, `release` (Ninja generator; compiler taken from `QUUX_C_COMPILER`, default clang 22 per D-29) (S)
-- [ ] T003 [P] Add `.clang-format` and `.clang-tidy` (including `readability-identifier-naming` with the `quux_` prefix and snake_case, D-47) (S)
-- [ ] T004 [P] Create `docs/toolchain-record.md` with the table of data-model.md "Toolchain record" (fields target, preset, tool, adjustment, reason, evidence, date) (S)
-- [ ] T005 [P] Extend `.gitignore` with `build/`, `build-*/` and `build/local-check.log` (S)
+- [X] T001 Create the top-level `CMakeLists.txt` with `-std=gnu17`, warnings as errors in `debug`, `compile_commands.json` export, one static library per `source/<module>/` directory (empty libraries allowed), and the module dependency direction of contracts/module-interface.md rule 3 (M)
+- [X] T002 Create `CMakePresets.json` with configure, build and test presets `debug`, `asan-ubsan`, `tsan`, `release` (Ninja generator; compiler taken from `QUUX_C_COMPILER`, default clang 22 per D-29) (S)
+- [X] T003 [P] Add `.clang-format` and `.clang-tidy` (including `readability-identifier-naming` with the `quux_` prefix and snake_case, D-47) (S)
+- [X] T004 [P] Create `docs/toolchain-record.md` with the table of data-model.md "Toolchain record" (fields target, preset, tool, adjustment, reason, evidence, date) (S)
+- [X] T005 [P] Extend `.gitignore` with `build/`, `build-*/` and `build/local-check.log` (S)
 
 ---
 
@@ -70,14 +70,14 @@ defect test passes only because its tool reported the defect.
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Write `tests/smoke/clean_program.c` (threads, atomics, a condition variable and a heap allocation, all correct) and register it with label `smoke` in `tests/smoke/CMakeLists.txt` (S)
-- [ ] T009 [P] [US1] Write `tests/smoke/heap_overflow.c`, `tests/smoke/data_race.c` and `tests/smoke/memory_leak.c`, registered as `smoke` tests that pass only when the expected tool reports the defect (CTest `WILL_FAIL` or a pass-regular-expression on the sanitizer report), each enabled only in the preset or tool that detects it (M)
+- [X] T008 [P] [US1] Write `tests/smoke/clean_program.c` (threads, atomics, a condition variable and a heap allocation, all correct) and register it with label `smoke` in `tests/smoke/CMakeLists.txt` (S)
+- [X] T009 [P] [US1] Write `tests/smoke/heap_overflow.c`, `tests/smoke/data_race.c` and `tests/smoke/memory_leak.c`, registered as `smoke` tests that pass only when the expected tool reports the defect (CTest `WILL_FAIL` or a pass-regular-expression on the sanitizer report), each enabled only in the preset or tool that detects it (M)
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Run the smoke suite in the four presets on macOS arm64 with Homebrew `llvm@22`, plus Apple clang `debug`; record results and any adjustment in `docs/toolchain-record.md` (S)
-- [ ] T011 [P] [US1] Write `tools/container/Dockerfile` (Ubuntu 26.04 arm64; clang-22, gcc, cmake, ninja-build, valgrind, clang-format-22, clang-tidy-22) and `tools/container/build-image.sh` (D-30) (S)
-- [ ] T012 [US1] Write `tools/container/run-preset.sh` (source mounted at `/work`, build tree in a named volume) and `tools/ci/run-valgrind.sh`; run the smoke suite in the container, find which adjustments TSan and LSan need (`SYS_PTRACE`, seccomp profile allowing `personality`, `vm.mmap_rnd_bits` in the Docker VM), apply the minimal set, and record each in `docs/toolchain-record.md` (M)
+- [X] T010 [US1] Run the smoke suite in the four presets on macOS arm64 with Homebrew `llvm@22`, plus Apple clang `debug`; record results and any adjustment in `docs/toolchain-record.md` (S)
+- [X] T011 [P] [US1] Write `tools/container/Dockerfile` (Ubuntu 26.04 arm64; clang-22, gcc, cmake, ninja-build, valgrind, clang-format-22, clang-tidy-22) and `tools/container/build-image.sh` (D-30) (S)
+- [X] T012 [US1] Write `tools/container/run-preset.sh` (source mounted at `/work`, build tree in a named volume) and `tools/ci/run-valgrind.sh`; run the smoke suite in the container, find which adjustments TSan and LSan need (`SYS_PTRACE`, seccomp profile allowing `personality`, `vm.mmap_rnd_bits` in the Docker VM), apply the minimal set, and record each in `docs/toolchain-record.md` (M)
 - [ ] T013 [P] [US1] Write `.github/workflows/build-and-test.yml`: one `ubuntu-26.04` x86_64 job, four presets, gcc `debug` build, valgrind on `debug`, artifacts on failure, and a `workflow_dispatch` input to re-run one test N times (D-31); verify the runner label (S)
 - [ ] T014 [US1] Write `tools/local-check.sh` (every preset on macOS and in the container; labels per D-53, excluding `pending`; `--repeat N`; documentation-only fast path; a preset that `docs/toolchain-record.md` records as unavailable in the container is skipped with a visible warning instead of blocking; summary lines and `build/local-check.log`), `tools/git-hooks/pre-push` and `tools/install-git-hooks.sh` (M)
 - [ ] T015 [US1] Push and confirm CI is green on Linux x86_64; confirm a deliberately failing local test blocks the push (spec story 1 scenarios 5 and 7); record outcomes in `docs/toolchain-record.md` (S)

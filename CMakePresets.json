@@ -1,0 +1,55 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 28, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": { "CMAKE_EXPORT_COMPILE_COMMANDS": "ON" }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "displayName": "Debug, no sanitizer",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "QUUX_SANITIZER": "none" }
+    },
+    {
+      "name": "asan-ubsan",
+      "inherits": "base",
+      "displayName": "Address and undefined-behavior sanitizers",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "QUUX_SANITIZER": "address-undefined" }
+    },
+    {
+      "name": "tsan",
+      "inherits": "base",
+      "displayName": "Thread sanitizer",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "QUUX_SANITIZER": "thread" }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "displayName": "Release",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "QUUX_SANITIZER": "none" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "debug", "configurePreset": "debug" },
+    { "name": "asan-ubsan", "configurePreset": "asan-ubsan" },
+    { "name": "tsan", "configurePreset": "tsan" },
+    { "name": "release", "configurePreset": "release" }
+  ],
+  "testPresets": [
+    {
+      "name": "test-base",
+      "hidden": true,
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "ignore", "timeout": 300 }
+    },
+    { "name": "debug", "inherits": "test-base", "configurePreset": "debug" },
+    { "name": "asan-ubsan", "inherits": "test-base", "configurePreset": "asan-ubsan" },
+    { "name": "tsan", "inherits": "test-base", "configurePreset": "tsan" },
+    { "name": "release", "inherits": "test-base", "configurePreset": "release" }
+  ]
+}
