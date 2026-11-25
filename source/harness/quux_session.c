@@ -116,6 +116,10 @@ static int run_file(quux_context *context, void *data) {
     bool done = quux_evaluate_text(context, text, length, &value);
     if (done && run->input != NULL) {
         done = quux_read_one(context, run->input, strlen(run->input), &input);
+        if (!done) {
+            /* a malformed INPUT is a read error: status 2 (command-line contract) */
+            status = 2;
+        }
     }
     if (done) {
         done = quux_namespace_resolve(context, context->current_namespace,
@@ -134,7 +138,9 @@ static int run_file(quux_context *context, void *data) {
     }
     if (!done) {
         quux_session_print_error(context, stdout, context->pending_error);
-        status = 1;
+        if (status == 0) {
+            status = 1;
+        }
     }
     quux_memory_set_verify_mode(context->runtime->heap, QUUX_VERIFY_OFF);
     QUUX_ROOT_FRAME_END(context);

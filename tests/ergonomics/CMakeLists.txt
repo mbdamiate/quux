@@ -59,3 +59,12 @@ endforeach()
 foreach(program IN LISTS quux_ergonomics_pending)
   quux_ergonomics_add_test(ergonomics_${program} ${program} pending $<TARGET_FILE:quux>)
 endforeach()
+
+# A malformed INPUT is a read error: exit status 2, not 1 (found while writing program 06; report
+# section "Bugs found").
+add_test(NAME ergonomics_malformed_input_status
+  COMMAND ${CMAKE_COMMAND} -DQUUX=$<TARGET_FILE:quux>
+          -DPROGRAM=${quux_ergonomics_directory}/01-nested-data/main.qx
+          "-DINPUT_TEXT=[1 2" -DEXPECTED_STATUS=2
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/run_status_test.cmake)
+set_tests_properties(ergonomics_malformed_input_status PROPERTIES LABELS ergonomics TIMEOUT 30)
