@@ -34,5 +34,26 @@ Interpreter bugs found by the programs (task T024).
 
 Times from `ctest --preset release -L ergonomics` on macOS arm64 (task T023, D-63).
 
-| Program | Data size | Time (seconds) |
+| Program | Data size | Time in seconds (run 1, run 2) |
 |---|---|---|
+| 01 | 2 warehouses, 4 items | 0.01, 0.01 |
+| 02 | 12 words, 3 records | 0.01, 0.01 |
+| 04 | 8 keys, 5 expressions | 0.01, 0.01 |
+| 05 | 6 records | 0.01, 0.01 |
+| 07 | 3 accounts, 4 + 6 loop steps | 0.01, 0.01 |
+| 08 | 3 shapes | 0.01, 0.01 |
+| 09 | 6 integers, 3 floats, 10 fractions | 0.01, 0.01 |
+| 10 | 12 mistakes, one over a list of 20,000 elements | 0.01, 0.01 |
+
+Both runs passed every test (two runs, same results: SC-007). No program comes near 1 second; the
+data are small, so these times say little about performance. The only performance finding is the
+stack limit: non-tail recursion stops at 10,000 calls (program 10, mistake 9; D-63 counts
+`:stack-exhausted` under 10,000 elements as a finding, and this limit is exactly at it).
+
+## Change detection (task T021)
+
+- Changing `height: 3` to `height: 4` in program 04's `expected-output.txt` failed exactly
+  `ergonomics_04-tree-and-parser` and its `_verified` test; the other 14 tests passed.
+- Changing program 05's `expected-exit-status.txt` from `1` to `0` failed exactly
+  `ergonomics_05-errors-prepared-input` and its `_verified` test.
+- Both files were restored, and all 16 tests passed again.

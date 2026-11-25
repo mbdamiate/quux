@@ -47,6 +47,7 @@ foreach(program IN LISTS quux_ergonomics_ready)
   quux_ergonomics_add_test(ergonomics_${program}_verified ${program} "ergonomics;verified"
     $<TARGET_FILE:quux-test> ${verify_option} run)
   # valgrind cannot run sanitized binaries: only the plain debug build (as in tests/smoke).
+  # Its error exit code is 99, not 1, because some programs exit with 1 on purpose (05).
   if(QUUX_ERGONOMICS_VALGRIND AND QUUX_SANITIZER STREQUAL "none"
      AND CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     quux_ergonomics_add_test(ergonomics_${program}_valgrind ${program} "ergonomics;valgrind"

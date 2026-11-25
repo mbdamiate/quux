@@ -110,7 +110,7 @@ every preset locally; the name check passes.
 
 ### Story completion
 
-- [ ] T018 [US1] Run program 10 on macOS, in the container and (after a push) in CI, and confirm that its messages are identical on all three targets. Any difference is a bug for T024 (research risk R5) (S)
+- [X] T018 [US1] Run program 10 on macOS, in the container and (after a push) in CI, and confirm that its messages are identical on all three targets. Any difference is a bug for T024 (research risk R5) (S)
 - [X] T019 [US1] Update `programs/ergonomics/README.md`: every row has its final status, its pair and its friction-note count. Confirm that `quux-name-check` passes and that every pending program's README lists exactly the stubs in its `main.qx` (SC-001, SC-003; FR-007) (data-model.md `Ergonomics program.status`, `Ergonomics program.pending reason`, `Friction note.identifier`) (S)
 
 **Checkpoint (stopping point 2)**: eight programs pass under `ergonomics`, two are `pending`, the
@@ -125,10 +125,10 @@ and a changed expectation is caught.
 
 **Independent Test**: quickstart scenarios 2, 4 and 6.
 
-- [ ] T020 [US2] In `tests/ergonomics/CMakeLists.txt`, add `ergonomics_<dir>_valgrind` for each ready program (`valgrind --error-exitcode=1 --leak-check=full quux`, labels `ergonomics;valgrind`) when valgrind is found, following `tests/smoke/CMakeLists.txt`. Run `tools/ci/run-valgrind.sh` in the container and confirm the programs pass (D-57) (S)
-- [ ] T021 [US2] Check that changes are detected (SC-007). For one runnable program, change one character of `expected-output.txt` and confirm that only that test fails, then restore it. Do the same for `expected-exit-status.txt`. Record the result in the PR description (S)
-- [ ] T022 [US2] Run `tools/local-check.sh` and confirm that `build/local-check.log` lists the `ergonomics_*`, `_verified` and (in the container) `_valgrind` tests for every preset, including the gcc build. After a push, confirm the same in the CI log (FR-008; D-57) (S)
-- [ ] T023 [US2] Run `ctest --preset release -L ergonomics` on macOS arm64 twice. Confirm identical pass results (SC-007), and record each program's time and data size in the **Timings** section of `programs/ergonomics/working-notes.md` for the report (D-63) (S)
+- [X] T020 [US2] In `tests/ergonomics/CMakeLists.txt`, add `ergonomics_<dir>_valgrind` for each ready program (`valgrind --error-exitcode=1 --leak-check=full quux`, labels `ergonomics;valgrind`) when valgrind is found, following `tests/smoke/CMakeLists.txt`. Run `tools/ci/run-valgrind.sh` in the container and confirm the programs pass (D-57) (S)
+- [X] T021 [US2] Check that changes are detected (SC-007). For one runnable program, change one character of `expected-output.txt` and confirm that only that test fails, then restore it. Do the same for `expected-exit-status.txt`. Record the result in the PR description (S)
+- [X] T022 [US2] Run `tools/local-check.sh` and confirm that `build/local-check.log` lists the `ergonomics_*`, `_verified` and (in the container) `_valgrind` tests for every preset, including the gcc build. After a push, confirm the same in the CI log (FR-008; D-57) (S)
+- [X] T023 [US2] Run `ctest --preset release -L ergonomics` on macOS arm64 twice. Confirm identical pass results (SC-007), and record each program's time and data size in the **Timings** section of `programs/ergonomics/working-notes.md` for the report (D-63) (S)
 
 **Checkpoint**: CI is green with the `ergonomics` tests on Linux x86_64; the local check passes.
 
