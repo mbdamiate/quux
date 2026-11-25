@@ -43,10 +43,10 @@ shares structure with the old one wherever possible.
 | `(get map key)` / `(get map key default)` | the value for `key`, or `nothing` / `default` when absent |
 | `(has-key? map key)` | whether `key` is present; for a set, whether the element is present |
 | `(element-at vector index)` | the element at `index`; raises `:index-out-of-range` outside `0 … count - 1` |
-| `(count collection)`, `(empty? collection)` | size; whether the size is zero |
-| `(first sequence)`, `(rest sequence)` | first element (or `nothing`); the remaining elements as a sequence |
+| `(count collection)`, `(empty? collection)` | size; whether the size is zero. For a string, the size is its length in **bytes** of UTF-8, not in characters (W27) |
+| `(first sequence)`, `(rest sequence)` | first element (or `nothing`); the remaining elements as a sequence, or `nothing` when none remain, so the end of a list is `nothing` |
 | `(as-sequence collection)` | an ordered view: vectors and lists in order; maps and sets in an order that is fixed for a given content |
-| `(transform function collection)` | a list of `(function element)` for each element |
+| `(transform function collection)` | a list of `(function element)` for each element, whatever the kind of `collection`; `(pour-into [] …)` gives a vector |
 | `(filter predicate collection)`, `(reject predicate collection)` | the elements that satisfy, or do not satisfy, the predicate |
 | `(reduce function initial collection)` | a left fold; the initial value is always required |
 | `(pour-into target collection)` | adds every element of `collection` to `target` |
@@ -82,6 +82,10 @@ account                                  ;=> {:owner "Ana" :balance 100}   ; unc
 
 (reduce + 0 (filter even? (range 0 10)))         ;=> 20
 (pour-into #{} [1 2 2 3])                        ;=> #{1 2 3}
+
+(rest (list 1))                                  ;=> nothing
+(transform increment [1 2])                      ;=> (list 2 3)
+(count "héllo")                                  ;=> 6   ; bytes: é takes two
 ```
 
 ## Errors

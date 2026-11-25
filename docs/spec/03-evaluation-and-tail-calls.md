@@ -22,6 +22,7 @@
    |---|---|
    | `(quote x)` | `x`, unevaluated |
    | `(if test then else)` | evaluates `then` unless `test` is `false` or `nothing` |
+   | `(if test then)` | the same; when the test fails, the value is `nothing` |
    | `(sequence e1 … en)` | evaluates in order, returns the value of `en` |
    | `(let [name value …] body …)` | sequential local bindings |
    | `(let-functions [(name [parameter …] body …) …] body …)` | local functions that may call each other |
@@ -50,7 +51,9 @@
    A vector pattern applied to a value that is not sequential, or a map pattern applied to a
    value that is not a map, raises `:wrong-type`.
 7. **Stack limit.** Calls that are not in tail position use stack. When their depth exceeds the
-   implementation's limit, the call raises `:stack-exhausted` instead of crashing.
+   implementation's limit, the call raises `:stack-exhausted` instead of crashing. In Phase 1
+   the limit is 10,000 nested calls, so a recursion that is not in tail position over a list of
+   more elements than that must be written with a tail call or `reduce`.
 
 ### Tail positions
 

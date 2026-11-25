@@ -37,6 +37,12 @@ with `;` and runs to the end of the line. A namespace-qualified symbol is writte
 `namespace/name` (see [14-modules.md](./14-modules.md)). Text the reader cannot read raises
 `:syntax` (section 12); an integer literal outside 64 bits raises `:overflow`.
 
+The printed form of a data value (with `to-string`, `print-line` or in the REPL) is text the
+reader reads back as an equal value: a float prints in the shortest form that reads back
+(`1e+10`), a list prints as `(1 2)`, and the empty list is `nothing`. A map or a set prints its
+elements in its iteration order (section 02), which depends only on its contents and which the
+program does not choose (feature 003, report entry E-27).
+
 ### Equality
 
 1. `equal?` MUST be structural for data values: two lists, vectors, maps or sets are equal when

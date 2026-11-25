@@ -87,6 +87,12 @@ simulated nodes in one process; Phase 5 produces them on real nodes.
   (catch (function [candidate] (equal? (error-kind candidate) :division-by-zero)) caught
     :handled))
 ;=> :handled
+
+;; a predicate that is always true catches every error
+(try
+  (element-at [] 0)
+  (catch (function [candidate] true) caught (error-kind caught)))
+;=> :index-out-of-range
 ```
 
 <!-- example-requires: concurrency -->

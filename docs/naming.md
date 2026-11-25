@@ -179,6 +179,31 @@ name by name by the owner on 2026-11-24.
 | J7. Tools | executables `quux`, `quux-test`, `quux-name-check`; REPL namespace `user` | D-46, D-47, D-52 | approved |
 | J8. Error kind | `:syntax` (the reader cannot read the text: unbalanced brackets, a reader shorthand, a malformed literal, an unknown escape, text that ends inside a form) | D-54, W11 (owner, 2026-11-25) | approved |
 
+## K. Proposed in feature 003 (core ergonomics study)
+
+Each row comes from one decision item of `docs/ergonomics-report.md` (K1 from K-01, and so on).
+A `proposed` name is used nowhere else: not in programs, the specification or the code (FR-012).
+The local helpers and stubs of the ergonomics programs keep their own names, which are not
+proposals (D-58).
+
+| Group | Names | Replaces or adds | Decision | Status |
+|---|---|---|---|---|
+| K1. Text | `split-lines`, `split-words`, `split-text`, `trim-whitespace`, `substring`, `position-in-text` | new | W12 | proposed |
+| K2. Reading data from text | `parse-data` | new | W13 | proposed |
+| K3. Paths in nested data | `get-at-path`, `put-at-path`, `modify-at-path`, `modify-value` | new | W14 | proposed |
+| K4. Searching | `find-first`, `find-position` | new | W15 | proposed |
+| K5. Effects for each element | `for-each` | new | W16 | proposed |
+| K6. Concatenation | `concatenate-all`, `flat-transform` | new | W17 | proposed |
+| K7. Formatting | `join-text`, `pad-start`, `pad-end`, `format-decimal` | new | W18 | proposed |
+| K8. Ordering | `sort`, `sort-by`, `compare-values` | new | W19 | proposed |
+| K9. Numbers | `to-floating-point`, `round`, `floor`, `ceiling`, `truncate`, `square-root`, `power-of`, `divide-floating-point` | new | W20 | proposed |
+| K10. Indexed transform | `transform-indexed` | new | W21 | proposed |
+| K11. Errors | `error-message`, `error-cause`; keys in core error data `:wrong-value`, `:argument-position`, `:function-name` | new | W22 | proposed |
+| K12. Macro expansion | `expand-macro`, `expand-macro-once` | new | W23 | proposed |
+| K13. `case` without a match | error kind `:no-matching-case` | new | W24 | proposed |
+| K14. Short map pattern | pattern key `:names` (`{:names [key left right]}`) | adds to J2 | W25 | proposed |
+| K15. Load-time checks | error kind `:name-clash` (`:syntax` reused for malformed special forms) | new | W26 | proposed |
+
 ## H. C code: abbreviations allowed as exceptions
 
 The default rule is full words in `snake_case`, with the prefix `quux_` on exported symbols

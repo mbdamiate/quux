@@ -479,7 +479,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Rationale**: section 03 leaves the limit to the implementation [FACT: section 12,
   `:stack-exhausted`]; the message states it, which helps [FACT: program 10]. Writing the number
   down for Phase 1 lets a user plan for it, and the VM may raise it [OPINION].
-- **Record**: section 03 (task T038)
+- **Record**: section 03
 
 ### E-27 — The printed form of values is not specified
 
@@ -491,7 +491,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Rationale**: sections 01 and 02 give `;=>` values but no printed forms [FACT: sections 01,
   02]. Stating that a map or set prints in an order the program does not control is enough; a
   sorted printer would cost every print [OPINION].
-- **Record**: sections 01 and 02 (task T038)
+- **Record**: sections 01 and 02
 
 ### E-28 — `count` on a string counts bytes
 
@@ -502,7 +502,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Rationale**: the specification does not say what `count` means for a string [FACT: section
   02]. Documenting bytes now is cheap; whether a later version counts characters is a decision of
   its own, recorded as an open question [OPINION].
-- **Record**: section 02 (task T038), W27
+- **Record**: section 02, W27
 
 ### E-29 — A program cannot load another file
 
@@ -536,7 +536,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Recommendation**: document
 - **Rationale**: the behavior is consistent [FACT: program 04] but not written down [FACT: section
   02].
-- **Record**: section 02 (task T038)
+- **Record**: section 02
 
 ### E-32 — Catching every error needs a predicate
 
@@ -546,7 +546,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Recommendation**: document
 - **Rationale**: the predicate form already covers it [FACT: section 12]; an example in section 12
   is enough [OPINION].
-- **Record**: section 12 (task T038)
+- **Record**: section 12
 
 ### E-33 — `if` without an else branch is accepted
 
@@ -556,7 +556,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Recommendation**: document
 - **Rationale**: section 03 shows only the three-part form [FACT: section 03]. The two-part form is
   useful with effects and costs nothing [OPINION].
-- **Record**: section 03 (task T038)
+- **Record**: section 03
 
 ### E-34 — A total takes `transform` and `(reduce + 0)`
 
@@ -575,7 +575,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Recommendation**: document
 - **Rationale**: one result kind is simple and consistent [OPINION]; section 02 should say it
   [FACT: section 02 does not].
-- **Record**: section 02 (task T038)
+- **Record**: section 02
 
 ### E-36 — Splitting a collection by a predicate
 
@@ -684,4 +684,227 @@ mistake), not under 10,000, so D-63 flags nothing; the limit itself is entry E-2
 
 ## Owner decision list
 
-Filled by task T036.
+Fifteen items, one per group of `add` recommendations. The names are in `docs/naming.md` section K
+with status `proposed`, and each item has an open question (W12–W26) in
+`docs/spec/open-questions.md`. The names are full words (Principle VIII). Where a Clojure name is
+also plain English (`sort`, `sort-by`), it is kept (D-64). Names that a program already uses for a
+local helper (`trim`, `change-at-path`, `pad-right`, `read-from-string`) are avoided, as are
+`concatenate` (a helper in reference program 08) and words that appear in the specification's
+prose (`compare`, `power`).
+
+An answer is `approve`, `reject: <reason>` or `defer: <reason>`. An item can be answered in
+parts, for example "approve, without `position-in-text`".
+
+### K-01 — String functions
+
+- **Proposal**:
+  - `(split-lines text)`: a vector of the lines, without line ends.
+  - `(split-words text)`: the parts separated by whitespace, without empty parts.
+  - `(split-text text separator)`: the parts between occurrences of the string `separator`.
+  - `(trim-whitespace text)`: without leading and trailing whitespace.
+  - `(substring text start end)`: the bytes from `start` up to `end` (see E-28).
+  - `(position-in-text text part)`: the index of the first occurrence of `part`, or `nothing`.
+- **Example**: `(split-text "ana,lisbon,82" ",")` ;=> `["ana" "lisbon" "82"]`
+- **Friction removed**: E-01
+- **Programs affected**: 02, 03, 06 (03 and 06 become runnable together with K-02)
+- **Alternatives**:
+  - keep as is: text must arrive already split, and programs 03 and 06 stay pending;
+  - one general `split-text` with a pattern instead of three functions: fewer names, but the
+    pattern needs a syntax of its own;
+  - a separate `text` namespace, like `clojure.string`: groups the names, but adds an import to
+    every text program.
+- **Owner answer**:
+
+### K-02 — Reading data from text
+
+- **Proposal**: `(parse-data text)`: the first value read from `text`. It raises `:syntax` when
+  the text is malformed, as the reader does.
+- **Example**: `(parse-data "{:id 7 :name \"ana\"}")` ;=> `{:id 7 :name "ana"}`
+- **Friction removed**: E-02
+- **Programs affected**: 06
+- **Alternatives**: keep as is (no program can read data from text); the name `read` (shorter, but
+  it suggests reading a file or stream).
+- **Owner answer**:
+
+### K-03 — Paths in nested data
+
+- **Proposal**:
+  - `(get-at-path collection path)`
+  - `(put-at-path collection path value)`
+  - `(modify-at-path collection path function)`
+  - `(modify-value collection key function)`, the one-level case.
+- **Example**:
+  `(modify-at-path inventory [:warehouses 1 :items 0 :quantity] increment)`, and
+  `(modify-value counts word increment)` where a missing key starts as `nothing`. A default can be
+  given with `(modify-value counts word (function [n] (+ (or n 0) 1)))`.
+- **Friction removed**: E-03, E-04
+- **Programs affected**: 01, 02
+- **Alternatives**:
+  - keep as is: every program with nested data writes the recursive helper;
+  - the names `update-at-path` and `update-value`: closer to Clojure, but `update` is the agent
+    operation (section 09).
+- **Owner answer**:
+
+### K-04 — Searching a collection
+
+- **Proposal**:
+  - `(find-first predicate collection)`: the first element for which `predicate` is true, or
+    `nothing`.
+  - `(find-position predicate collection)`: its index, or `nothing`.
+- **Example**: `(find-position (function [item] (equal? (get item :product) "nut")) items)`
+  ;=> `1`
+- **Friction removed**: E-05
+- **Programs affected**: 01
+- **Alternatives**: keep as is (a `reduce` over `range`); only `find-first`, with the index found
+  through `transform-indexed` (K-10).
+- **Owner answer**:
+
+### K-05 — Effects for each element
+
+- **Proposal**: `(for-each function collection)`: calls `function` on each element in order, for
+  its effects, and returns `nothing`.
+- **Example**: `(for-each print-line ["north" "south"])`, and with `range` for a counted loop.
+- **Friction removed**: E-06
+- **Programs affected**: 01, 02, 07
+- **Alternatives**: keep as is (a `reduce` with an ignored accumulator); a special form with
+  bindings, like Clojure's `doseq` (more syntax for the same effect).
+- **Owner answer**:
+
+### K-06 — Concatenation
+
+- **Proposal**:
+  - `(concatenate-all collections)`: one list with the elements of each collection in order.
+  - `(flat-transform function collection)`: `transform`, then concatenate the results.
+- **Example**: `(flat-transform (function [warehouse] (get warehouse :items)) warehouses)`
+- **Friction removed**: E-07
+- **Programs affected**: 01, 04
+- **Alternatives**: keep as is (`reduce` with `pour-into`); a variadic `concatenate`, which needs
+  another name because program 08 uses that one.
+- **Owner answer**:
+
+### K-07 — Formatting
+
+- **Proposal**:
+  - `(join-text separator collection)`: the elements as text, with `separator` between them.
+  - `(pad-start text width)` and `(pad-end text width)`: add spaces before or after, up to `width`.
+  - `(format-decimal number places)`: the number as text with `places` digits after the point.
+- **Example**: `(format-decimal 84.333 2)` ;=> `"84.33"`
+- **Friction removed**: E-08
+- **Programs affected**: 01, 02
+- **Alternatives**: keep as is (local helpers); one format function with a format string
+  (powerful, but a small language of its own).
+- **Owner answer**:
+
+### K-08 — Ordering
+
+- **Proposal**:
+  - `(compare-values a b)`: `-1`, `0` or `1`, for numbers and for strings (by bytes).
+  - `(sort collection)`: a vector in ascending order.
+  - `(sort-by key-function collection)`: the same, by the value of `key-function`.
+- **Example**: `(sort-by (function [pair] (element-at pair 1)) word-counts)`
+- **Friction removed**: E-09
+- **Programs affected**: 02, 09
+- **Alternatives**: keep as is (hand-written insertion sort); make `<` and `>` accept strings
+  (no new name, but R4 keeps them as numeric notation).
+- **Owner answer**:
+
+### K-09 — Numbers
+
+- **Proposal**:
+  - `(to-floating-point n)`: an integer as a float.
+  - `(round x)`, `(floor x)`, `(ceiling x)` and `(truncate x)`: a float as an integer. They raise
+    `:overflow` outside 64 bits.
+  - `(square-root x)` and `(power-of base exponent)`.
+  - `(divide-floating-point a b)`: always a float, so `/` stays exact (section 05).
+- **Example**: `(divide-floating-point (reduce + 0 scores) (count scores))` ;=> `84.33333333333333`
+- **Friction removed**: E-10, E-11, E-12
+- **Programs affected**: 02, 09
+- **Alternatives**:
+  - keep as is: `(* 1.0 n)`, and `try` around `/`;
+  - make `/` return a float when the quotient is not exact: simpler for a mean, but it changes
+    section 05, and the VM inherits it.
+- **Owner answer**:
+
+### K-10 — Transform with an index
+
+- **Proposal**: `(transform-indexed function collection)`: calls `(function index element)`.
+- **Example**: `(transform-indexed (function [index line] [(increment index) line]) lines)`
+- **Friction removed**: E-13
+- **Programs affected**: 02, 06
+- **Alternatives**: keep as is (`range` and `element-at`); let `transform` take several
+  collections, like Clojure's `map` (no new name, and it covers walking two collections side by
+  side).
+- **Owner answer**:
+
+### K-11 — Errors
+
+- **Proposal**:
+  - `(error-message error)`, next to `error-kind` and `error-data`.
+  - `(error kind message data cause)`: an optional fourth argument, read with
+    `(error-cause error)`.
+  - Core errors put the offending value and its place in `:data`: `:wrong-value`,
+    `:argument-position` and `:function-name`.
+- **Example**:
+  `(raise (error :user "invalid record" {:id 3} problem))`, then `(error-cause caught)` is
+  `problem`.
+- **Friction removed**: E-14, E-15, E-16
+- **Programs affected**: 05, 10
+- **Alternatives**: keep as is (`(get problem :message)`, and the original error is lost); the
+  location (file and line) is not part of this item, because section 12 leaves it to Phase 7.
+- **Owner answer**:
+
+### K-12 — Macro expansion
+
+- **Proposal**: `(expand-macro form)` (expands completely) and `(expand-macro-once form)` (one
+  step). Neither evaluates.
+- **Example**: `(expand-macro-once (quote (repeat-times [index 0 3] (print-line index))))`
+- **Friction removed**: E-17
+- **Programs affected**: 07
+- **Alternatives**: keep as is (run and read the effects); only `expand-macro`.
+- **Owner answer**:
+
+### K-13 — `case` without a matching clause
+
+- **Proposal**: a `case` with no default whose value matches no clause raises
+  `:no-matching-case`, with `{:value v}` in `:data`. A `case` with a default is unchanged.
+- **Example**: `(case :times :plus 1 :minus 2)` raises `:no-matching-case`.
+- **Friction removed**: E-18
+- **Programs affected**: 04, 08
+- **Alternatives**:
+  - keep as is (`nothing`, and the error surfaces far away);
+  - reuse `:wrong-type` (no new kind, but the kind says nothing about the cause).
+- **Inherited by**: Phase 3 (it changes the meaning of existing code).
+- **Owner answer**:
+
+### K-14 — Short map pattern
+
+- **Proposal**: in a map pattern, `:names` followed by a vector of symbols binds each symbol to the
+  value of the keyword with the same name.
+- **Example**: `(let [{:names [key left right]} tree] …)` binds `key` to `(get tree :key)`, and so
+  on.
+- **Friction removed**: E-19
+- **Programs affected**: 04
+- **Alternatives**: keep as is (J2, every name written twice); Clojure's `:keys` (shorter, but the
+  word means map keys, not the names bound).
+- **Inherited by**: Phase 3 (pattern syntax).
+- **Owner answer**:
+
+### K-15 — Two load-time checks
+
+The two parts are independent and can be answered separately.
+
+- **Proposal**:
+  1. A malformed special form raises `:syntax`, with the line of the form, like the reader.
+  2. An unqualified name defined in two imported namespaces raises `:name-clash` at load time,
+     naming both namespaces. A qualified name, or a definition in the namespace itself, is
+     unaffected. Section 14 rule 1 and its closed open point are made consistent either way.
+- **Example**: `(let [x 1 y] x)` raises `:syntax: line 4: malformed let: …`; in program 08,
+  `(describe shape)` would raise `:name-clash: describe is defined in geometry and report`.
+- **Friction removed**: E-20, E-21
+- **Programs affected**: 08, 10
+- **Alternatives**:
+  - keep as is (`:wrong-type` without a line; the first import wins silently);
+  - for part 2, a warning instead of an error (quux has no warnings yet);
+  - for part 2, keep "first import wins" and only fix the text of section 14.
+- **Inherited by**: Phase 3 (error kinds and name resolution).
+- **Owner answer**:
