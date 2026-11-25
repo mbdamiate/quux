@@ -283,7 +283,7 @@ T056 test_encoding.c   T057 test_simulation.c
 3. US3: programs 01, 02, 03, 08, 09.
 4. US4: programs 04, 05, 06, 07, 10.
 5. US5: programs 11, 12.
-6. Polish: evidence for the hypotheses and the starting reality of feature 003.
+6. Polish: evidence for the hypotheses and the starting reality of feature 004 (dependency gate).
 
 Each stopping point leaves something that runs (plan §2), and each ends with `tools/local-check.sh`
 and a green CI job.

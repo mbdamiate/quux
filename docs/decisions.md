@@ -75,3 +75,13 @@ These were fixed before planning and are encoded in the constitution:
 | D-52 | Line-based REPL and file runner, no line-editing library | 002 / Phase 1 | recommended | Phase 7 |
 | D-53 | Pre-push git hook runs every preset on macOS arm64 and in the Linux arm64 container and blocks the push on failure; skips label `pending` and presets recorded as unavailable in the container (with a warning); documentation-only pushes run only the name check | 002 / Phase 1 | adopted (owner) | all phases |
 | D-54 | Error kind `:syntax` for reader errors (naming J8, W11); an integer literal outside 64 bits stays `:overflow` | 002 / Phase 1 | adopted (owner) | Phase 3 |
+| D-55 | Ergonomics programs: one directory per program under `programs/ergonomics/` with `main.qx`, optional `input.txt`, `expected-output.txt`, optional `expected-exit-status.txt`, `README.md` | 003 / between Phase 1 and Phase 3 | recommended | Phase 3 |
+| D-56 | Test driver compares stdout and exit status exactly; new `quux-test run` with verifier options; file runner shared as `quux_session_run_file` | 003 | recommended | Phase 3 |
+| D-57 | No CI or local-check change: the `ergonomics` label is picked up by label exclusion; valgrind label on Linux debug; TIMEOUT 30 | 003 | recommended | — |
+| D-58 | Pending variants call local stubs that raise `:user` "missing: …"; expected output is the intended final output | 003 | recommended | — |
+| D-59 | Ten programs: 01 nested data, 02/03 text pair, 04 tree and token-vector parser, 05/06 error pair, 07 macros, 08 namespaces, 09 numerics, 10 common mistakes | 003 | recommended | — |
+| D-60 | Expected outputs derived from the specification before the first run; mismatches are bugs, spec ambiguities or program errors, never pasted over | 003 | recommended | Phase 3 |
+| D-61 | Stable IDs: friction notes `PNN-Fk`, report entries `E-NN`, mistakes `M-NN`, decision items `K-NN` | 003 | recommended | — |
+| D-62 | Add/rename recommendations become W-xx (from W12) and section K `proposed` rows; owner approvals become D-xx | 003 | recommended | Phase 3 |
+| D-63 | Performance evidence from CTest times in `release` on macOS arm64; over 1 s or `:stack-exhausted` under 10,000 elements is a finding | 003 | recommended | — |
+| D-64 | Other Lisps' idioms cited with links as evidence of need; quux names stay full-word and owner-approved | 003 | recommended | — |

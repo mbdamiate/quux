@@ -45,17 +45,18 @@ After `/speckit-plan`, append the new D-xx rows to `docs/decisions.md` and updat
 |---|---|---|---|---|
 | 001 | language-spec | 0 | **done** (branch `001-language-spec`, merged to `main`) | `01-phases-0-1.md` (Part A) |
 | 002 | blocking-prototype | 1 | **in progress** (spec + plan done; branch `002-blocking-prototype`) | `01-phases-0-1.md` (Part B) |
-| 003 | dependency-gate | 2 | prototype runs programs 1–10 + simulated 11–12 | `02-phase-2.md` |
-| 004 | vm-scheduler-gc | 3 | Phase 2 spikes done | `03-phases-3-4.md` |
-| 005 | async-io-timers | 4 | VM runs programs 1–9 | `03-phases-3-4.md` |
-| 006 | remote-futures | 5a | VM runs programs 1–10 | `04-phase-5.md` |
-| 007 | distributed-scopes | 5b | after 006 | `04-phase-5.md` |
-| 008 | content-addressed-code | 5c | after 006 | `04-phase-5.md` |
-| 009 | remote-agents | 5d | after 007 | `04-phase-5.md` |
-| 010 | distributed-data-parallelism | 5e | after 008 | `04-phase-5.md` |
-| 011 | distributed-actors (optional) | 5f | only if programs show the need | `04-phase-5.md` |
-| 012 | llvm-backend | 6 | close to Phase 6 | `05-phases-6-7.md` |
-| 013 | tooling | 7 | any time after 002 (embryonic tools grow along) | `05-phases-6-7.md` |
+| 003 | core-ergonomics | between 1 and 3 | **in progress** (spec + plan; branch `003-core-ergonomics`); after 002 User Story 2 is on `main` | — (added 2026-11-25; not in the original prompt set) |
+| 004 | dependency-gate | 2 | prototype runs programs 1–10 + simulated 11–12 | `02-phase-2.md` |
+| 005 | vm-scheduler-gc | 3 | Phase 2 spikes done | `03-phases-3-4.md` |
+| 006 | async-io-timers | 4 | VM runs programs 1–9 | `03-phases-3-4.md` |
+| 007 | remote-futures | 5a | VM runs programs 1–10 | `04-phase-5.md` |
+| 008 | distributed-scopes | 5b | after 007 | `04-phase-5.md` |
+| 009 | content-addressed-code | 5c | after 007 | `04-phase-5.md` |
+| 010 | remote-agents | 5d | after 008 | `04-phase-5.md` |
+| 011 | distributed-data-parallelism | 5e | after 009 | `04-phase-5.md` |
+| 012 | distributed-actors (optional) | 5f | only if programs show the need | `04-phase-5.md` |
+| 013 | llvm-backend | 6 | close to Phase 6 | `05-phases-6-7.md` |
+| 014 | tooling | 7 | any time after 002 (embryonic tools grow along) | `05-phases-6-7.md` |
 
 Phase 0 and Phase 1 are split: Phase 0's deliverable (specification by example + the 12
 programs + distribution-affecting decisions) is a document feature whose output becomes the
@@ -116,7 +117,15 @@ Success = all 12 programs run as automated tests on macOS arm64, Linux arm64 and
 C17 with GNU extensions (gnu17), CMake + Ninja presets, pthreads + stdatomic, Homebrew clang pinned, Docker Ubuntu LTS arm64 image (gcc, clang, cmake, ninja, valgrind) with source mounted as a volume; GitHub Actions CI on Linux x86_64 only, running the same presets (D-28, D-31). Define: C project structure (modules, internal API conventions, portability header, testing policy), Dockerfile and scripts, minimal special forms and primitives, minimal root/allocation convention (shadow stack or handles, decide and justify), the multi-node simulator design. First task is the toolchain smoke test. Continue D-xx numbering from docs/decisions.md. Risks table must include "x86_64 tested only in CI, no local reproduction" and "memory-ordering bugs masked on x86 TSO".
 ```
 
-### 003 — dependency-gate (Phase 2)
+### 003 — core-ergonomics (between Phase 1 and Phase 3)
+
+Added by the owner on 2026-11-25, after feature 002 User Story 2 (the sequential core) reached
+`main`. Ten everyday programs over the sequential core, a classified friction report and an owner
+decision list on names and library additions before the Phase 3 VM inherits the vocabulary. See
+`specs/003-core-ergonomics/` (spec, plan, research D-55..D-64). Feature 002 continues afterwards
+with its User Stories 3–5.
+
+### 004 — dependency-gate (Phase 2)
 
 **`/speckit-specify` input:**
 
@@ -129,9 +138,9 @@ Decide, for each need, adopt library / write / postpone: persistent structures, 
 
 **`/speckit-plan` input:** see `docs/planning-prompts/02-phase-2.md` `<mandatory_checks>` — all of it is the research phase of `/speckit-plan` (web research with links and dates; criteria matrix with weights).
 
-### 004 — vm-scheduler-gc (Phase 3) and 005 — async-io-timers (Phase 4)
+### 005 — vm-scheduler-gc (Phase 3) and 006 — async-io-timers (Phase 4)
 
-**`/speckit-specify` input (004):**
+**`/speckit-specify` input (005):**
 
 ```text
 VM with explicit per-task stack, work-stealing scheduler, task suspension and cancellation, shared-heap GC (Phase 3).
@@ -139,16 +148,16 @@ Starting reality: <FILL IN: spike results, libraries adopted, components written
 Programs 1–10 must run on the VM with the same results as the blocking prototype (the prototype is the test oracle). Cover: task state format, scheduler loop, deref (lock-free fast path when filled, suspension otherwise), scopes and cancellation, separate pool for blocking native calls, GC strategy for the shared heap using the root convention inherited from Phase 1 (safepoints, root map), per-task areas for non-escaping data (evaluate), and what is left ready so a future can be filled by a network message (inherited by Phase 5). Compare without discarding: CPS + trampoline, stackful coroutines, delimited continuations, state machines.
 ```
 
-**`/speckit-specify` input (005):**
+**`/speckit-specify` input (006):**
 
 ```text
 Timers, asynchronous I/O (kqueue on macOS, epoll on Linux, one poller layer), cooperative cancellation of I/O operations, integration with the blocking pool (Phase 4). Programs 6 and 10 run over real async I/O. Evaluate when and how an actor layer on top of agents and futures would be added, what it requires of the runtime and GC, and under which conditions it is not worth it.
 ```
 
-### 006–011 — distribution (Phase 5a–5f)
+### 007–012 — distribution (Phase 5a–5f)
 
 One feature per sub-stage. Each `/speckit-specify` input starts with
-`Starting reality: <decisions/divergences since 004–005>` and then the sub-stage goal from
+`Starting reality: <decisions/divergences since 005–006>` and then the sub-stage goal from
 `docs/planning-prompts/00-base.md` (Phase 5 list). Each `/speckit-plan` must cover, or say in
 one line why it does not apply: protocol (message format, ids of nodes/tasks/scopes/agents,
 remote future lifecycle), failure semantics (at-most / at-least / effectively-once),
@@ -158,16 +167,16 @@ security (node authentication, executing received code, insecure deserialization
 tests (deterministic simulation reusing the Phase 1 node simulator, Docker containers on a
 virtual network with injected failures). Never hide that a call is remote.
 
-- 006 remote-futures (5a): `spawn-on`, value serialization, transport, promise pipelining. Examine H6.
-- 007 distributed-scopes (5b): cross-node cancellation, heartbeats and leases, orphan-task cancellation, remote resource release. Examine H6.
-- 008 content-addressed-code (5c): function hash with dependencies, per-node code cache, fetch-missing protocol, reloading and macros. Revisit H4.
-- 009 remote-agents (5d): single owner, idempotent operations with op ids, delivery semantics. Examine H5.
-- 010 distributed-data-parallelism (5e): partitioning persistent structures, dmap/dfilter/dreduce, lineage recomputation, streams between machines. Program 11 and 12 on real nodes.
-- 011 distributed-actors (5f, optional): only if the reference programs show the need; spec first states what would decide it.
+- 007 remote-futures (5a): `spawn-on`, value serialization, transport, promise pipelining. Examine H6.
+- 008 distributed-scopes (5b): cross-node cancellation, heartbeats and leases, orphan-task cancellation, remote resource release. Examine H6.
+- 009 content-addressed-code (5c): function hash with dependencies, per-node code cache, fetch-missing protocol, reloading and macros. Revisit H4.
+- 010 remote-agents (5d): single owner, idempotent operations with op ids, delivery semantics. Examine H5.
+- 011 distributed-data-parallelism (5e): partitioning persistent structures, dmap/dfilter/dreduce, lineage recomputation, streams between machines. Program 11 and 12 on real nodes.
+- 012 distributed-actors (5f, optional): only if the reference programs show the need; spec first states what would decide it.
 
-### 012 — llvm-backend (Phase 6) and 013 — tooling (Phase 7)
+### 013 — llvm-backend (Phase 6) and 014 — tooling (Phase 7)
 
-**`/speckit-specify` input (012):**
+**`/speckit-specify` input (013):**
 
 ```text
 Own IR and LLVM backend through the LLVM C API (Phase 6).
@@ -175,7 +184,7 @@ Starting reality: <FILL IN>.
 First user story: a minimal LLVM C API spike that generates and runs a simple function. Then: IR design (SSA/CPS/ANF; representation of suspension points, cancellation, remote calls, safepoints), optimizations, native task suspension strategy (own state machines, LLVM coroutine intrinsics, separate stacks, or native only for non-suspending functions) and its GC trade-offs, native TCO with musttail on arm64 macOS and Linux, AOT vs JIT under macOS Apple Silicon restrictions, libLLVM linking vs emitting textual IR/bitcode for an external clang/llc, and native code as a node-local artifact derived from the content hash. The VM remains as REPL, debugger, reloading and test oracle.
 ```
 
-**`/speckit-specify` input (013):**
+**`/speckit-specify` input (014):**
 
 ```text
 Tooling (Phase 7): REPL, debugger for tasks/scopes/nodes, test runner, network-failure simulation, packages. Prioritize what would have made earlier phases easier and promote the embryonic tools that already exist (REPL from 002, node simulator from 002, sanitizer presets).
