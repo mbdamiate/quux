@@ -26,3 +26,7 @@ Thumbs.db
 
 # Local Claude settings
 .claude/settings.local.json
+
+# Build trees per preset and the pre-push check log (feature 002)
+build-*/
+build/local-check.log

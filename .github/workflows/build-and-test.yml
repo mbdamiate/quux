@@ -1,0 +1,109 @@
+# CI on Linux x86_64 only (D-31). macOS arm64 and Linux arm64 are checked locally before every
+# push by the pre-push hook (D-53). Tests labelled `pending` do not pass yet and are skipped.
+name: build-and-test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      test_name:
+        description: "Regular expression of the CTest test names to re-run (empty: all)"
+        required: false
+        default: ""
+      repeat:
+        description: "How many times each selected test must pass (ctest --repeat until-fail)"
+        required: false
+        default: "1"
+      preset:
+        description: "Preset to use for the re-run"
+        required: false
+        default: "tsan"
+
+permissions:
+  contents: read
+
+jobs:
+  presets:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [debug, asan-ubsan, tsan, release]
+    env:
+      QUUX_C_COMPILER: clang-22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: tools/ci/install-toolchain.sh
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }} --label-exclude pending
+      - name: valgrind
+        if: matrix.preset == 'debug'
+        run: tools/ci/run-valgrind.sh build/debug
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.preset }}
+          path: |
+            build/${{ matrix.preset }}/Testing/Temporary/
+            build/${{ matrix.preset }}/**/*.report.qx
+          if-no-files-found: ignore
+
+  gcc:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-26.04
+    env:
+      QUUX_C_COMPILER: gcc
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: tools/ci/install-toolchain.sh
+      - name: Build and test with gcc (debug, warnings as errors)
+        run: |
+          cmake -S . -B build/gcc-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build/gcc-debug
+          ctest --test-dir build/gcc-debug --label-exclude pending --output-on-failure
+
+  format:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: tools/ci/install-toolchain.sh
+      - name: clang-format check
+        run: |
+          files=$(git ls-files '*.c' '*.h' | grep -v '^third_party/' || true)
+          if [ -n "$files" ]; then clang-format-22 --dry-run --Werror $files; fi
+
+  rerun:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-26.04
+    env:
+      QUUX_C_COMPILER: clang-22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: tools/ci/install-toolchain.sh
+      # Inputs are passed through the environment, never interpolated into the script.
+      - name: Configure and build
+        env:
+          RERUN_PRESET: ${{ inputs.preset }}
+        run: |
+          cmake --preset "$RERUN_PRESET"
+          cmake --build --preset "$RERUN_PRESET"
+      - name: Re-run selected tests
+        env:
+          RERUN_PRESET: ${{ inputs.preset }}
+          RERUN_TEST_NAME: ${{ inputs.test_name }}
+          RERUN_REPEAT: ${{ inputs.repeat }}
+        run: |
+          ctest --preset "$RERUN_PRESET" --label-exclude pending \
+            --tests-regex "$RERUN_TEST_NAME" --repeat "until-fail:$RERUN_REPEAT"

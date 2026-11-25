@@ -1,0 +1,47 @@
+---
+# Naming (constitution VIII, D-33, D-47): snake_case in full words; exported functions and global
+# variables carry the quux_ prefix; types are quux_<noun>; macros are QUUX_<WORDS>.
+# Abbreviations are checked separately by quux-name-check --c against docs/naming.md section H.
+Checks: >
+  -*,
+  readability-identifier-naming,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  cert-err33-c,
+  clang-analyzer-*,
+  concurrency-*,
+  misc-unused-parameters
+WarningsAsErrors: 'readability-identifier-naming'
+HeaderFilterRegex: '(source|tests)/.*'
+CheckOptions:
+  - key: readability-identifier-naming.FunctionCase
+    value: lower_case
+  - key: readability-identifier-naming.GlobalFunctionPrefix
+    value: quux_
+  - key: readability-identifier-naming.IgnoreMainLikeFunctions
+    value: true
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.GlobalVariablePrefix
+    value: quux_
+  - key: readability-identifier-naming.ParameterCase
+    value: lower_case
+  - key: readability-identifier-naming.StructCase
+    value: lower_case
+  - key: readability-identifier-naming.StructPrefix
+    value: quux_
+  - key: readability-identifier-naming.TypedefCase
+    value: lower_case
+  - key: readability-identifier-naming.TypedefPrefix
+    value: quux_
+  - key: readability-identifier-naming.EnumCase
+    value: lower_case
+  - key: readability-identifier-naming.EnumPrefix
+    value: quux_
+  - key: readability-identifier-naming.EnumConstantCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.EnumConstantPrefix
+    value: QUUX_
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+...

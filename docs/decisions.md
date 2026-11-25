@@ -49,3 +49,28 @@ These were fixed before planning and are encoded in the constitution:
 5. C is the only implementation language.
 6. Own IR with explicit suspension/cancellation points → LLVM via C API; the VM remains.
 | D-28 | Linux x86_64 added as a target, built and tested only in GitHub Actions CI; macOS arm64 and Linux arm64 stay local; native x86_64 backend decided in Phase 6 (constitution v1.2.0) | 001 / Phase 0 | adopted (owner) | Phase 1, Phase 2, Phase 3, Phase 6 |
+| D-29 | Compiler pin: clang 22 everywhere (Homebrew `llvm@22`, Ubuntu 26.04 `clang-22`), gcc as second compiler, `-std=gnu17` | 002 / Phase 1 | recommended | Phase 2, Phase 6 |
+| D-30 | Linux container: Ubuntu 26.04 LTS arm64, source mounted at `/work`; sanitizer adjustments recorded in `docs/toolchain-record.md` | 002 / Phase 1 | recommended | Phase 2, Phase 5 |
+| D-31 | CI on GitHub Actions only on Linux x86_64 (`ubuntu-26.04`), four presets, valgrind and gcc builds; arm64 targets checked locally; single-test re-run for CI-only failures | 002 / Phase 1 | adopted (owner) | all phases |
+| D-32 | Modules with one public header and reuse tags (keep / adapt / replace); executor interface as the VM seam (H1) | 002 / Phase 1 | recommended | Phase 3, Phase 4, Phase 5 |
+| D-33 | C conventions: `quux_<module>_<words>`, explicit `quux_context`, fallible functions return `bool` + pending error, no `longjmp` | 002 / Phase 1 | recommended | Phase 3 |
+| D-34 | Precise roots: per-task shadow stack of root frames holding addresses, global roots, write-barrier hook, root verifier (H2); amended: free all allocations at shutdown, `:resource-exhausted` on allocation failure | 002 / Phase 1 | recommended | Phase 3, Phase 6 |
+| D-35 | Tagged 64-bit value: heap pointer, 61-bit small integers, constants; boxed large integers and floats | 002 / Phase 1 | recommended | Phase 3, Phase 6 |
+| D-36 | Lists, 32-way vector trie, canonical CHAMP maps/sets with canonical collision nodes and cached node value hashes | 002 / Phase 1 | recommended | Phase 3, Phase 5 |
+| D-37 | Provisional hashes: XXH3-64 fixed seed (value), portable BLAKE3 (content), vendored behind `quux_hashing_*` | 002 / Phase 1 | provisional | Phase 2 (H10), Phase 5 |
+| D-38 | Full expansion, then a tree walker with a tail-call loop; depth limit raises `:stack-exhausted` | 002 / Phase 1 | recommended | Phase 3 |
+| D-39 | `:rest` parameter marker (W4); vector and map patterns in `let` and parameters, lowered by the expander (W5) | 002 / Phase 1 | adopted (owner Q1, Q2; map spelling approved in naming J2) | Phase 3 |
+| D-40 | Blocking executor: thread per future, park on condition variable, global wait-for graph for `:deadlock`, `:resource-exhausted` on thread failure | 002 / Phase 1 | recommended | Phase 3 (H8) |
+| D-41 | Agents: FIFO queue, on-demand worker thread, `update-once` applied-operations map | 002 / Phase 1 | recommended | Phase 3, Phase 5 |
+| D-42 | Streams per D-17; foreign advances counted as H11 evidence | 002 / Phase 1 | recommended | Phase 4, Phase 5 |
+| D-43 | Fixed chunk size (512) and fixed reduction tree for parallel operations | 002 / Phase 1 | recommended | Phase 3 (H12), Phase 5 |
+| D-44 | Blocking POSIX input/output through `poll` with a per-task wake-up pipe for cancellation | 002 / Phase 1 | recommended | Phase 4 |
+| D-45 | Simulator: nodes with root scopes; every inter-node interaction is an encoded message on one network thread; drops, latency, crashes from `conditions.qx` | 002 / Phase 1 | recommended | Phase 5, Phase 7 |
+| D-46 | `quux-test` (program, examples, unit), process per program, watchdog, report; CTest labels | 002 / Phase 1 | recommended | all phases |
+| D-47 | `quux-name-check` with the quux reader; clang-tidy naming; clang-format check | 002 / Phase 1 | recommended | all phases |
+| D-48 | Portability layer: the only place with platform headers and `#if` on system or architecture; no semaphores, barriers or `<threads.h>` | 002 / Phase 1 | recommended | Phase 3, Phase 4, Phase 6 |
+| D-49 | Primary error stays in completion order in Phase 1; race evidence recorded (H9) | 002 / Phase 1 | adopted (owner Q3) | Phase 7 |
+| D-50 | Kind predicates (`list?`, `vector?`, `map?`, …, `floating-point?`) approved in `docs/naming.md` J3 (W6) | 002 / Phase 1 | adopted (owner) | all phases |
+| D-51 | Error kinds `:stack-exhausted` and `:resource-exhausted` (naming J4) | 002 / Phase 1 | adopted (owner) | Phase 3 |
+| D-52 | Line-based REPL and file runner, no line-editing library | 002 / Phase 1 | recommended | Phase 7 |
+| D-53 | Pre-push git hook runs every preset on macOS arm64 and in the Linux arm64 container and blocks the push on failure; skips label `pending` and presets recorded as unavailable in the container (with a warning); documentation-only pushes run only the name check | 002 / Phase 1 | adopted (owner) | all phases |

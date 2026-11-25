@@ -166,6 +166,18 @@ name by name by the owner on 2026-11-24.
 
 ---
 
+## J. Added in feature 002 (owner review, 2026-11-25)
+
+| Group | Names | Decision | Status |
+|---|---|---|---|
+| J1. Rest parameter marker | `:rest` (`[agent function :rest arguments]`) | D-39, W4 (owner answer Q1: C, 2026-11-25) | approved |
+| J2. Map pattern spelling | `{name-symbol key …}` in `let` and parameter lists, e.g. `{balance :balance owner :owner}`; no new word | D-39, W5 | approved |
+| J3. Kind predicates | `list?`, `vector?`, `map?`, `set?`, `keyword?`, `symbol?`, `string?`, `integer?`, `floating-point?`, `boolean?`, `function?`, `future?`, `agent?`, `scope?`, `stream?`, `error?` | D-50, W6 | approved |
+| J4. Error kinds | `:stack-exhausted`, `:resource-exhausted` | D-51 | approved |
+| J5. Harness report keys | `:program`, `:seed`, `:target`, `:system`, `:architecture`, `:preset`, `:assertions`, `:assertion`, `:held`, `:observed`, `:result`, `:pass`, `:fail`, `:notes`, `:primary-error-raced`, `:foreign-stream-advances`, `:fetches` | D-46 | approved |
+| J6. Simulator message kinds | `:spawn-request`, `:spawn-result`, `:agent-update`, `:acknowledgement` (already approved in I7), `:stream-pull`, `:stream-cell`, `:cancel`, `:state-request`, `:state-reply` | D-45 | approved |
+| J7. Tools | executables `quux`, `quux-test`, `quux-name-check`; REPL namespace `user` | D-46, D-47, D-52 | approved |
+
 ## H. C code: abbreviations allowed as exceptions
 
 The default rule is full words in `snake_case`, with the prefix `quux_` on exported symbols
