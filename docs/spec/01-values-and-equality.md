@@ -34,7 +34,8 @@ they are described in sections 06, 07, 09 and 13.
 The source syntax is made of S-expressions with the literals above. There are **no reader
 shorthands**: no `'x`, `` `x ``, `~x`, `~@x` or `@x` (naming rules R5 and R6). A comment starts
 with `;` and runs to the end of the line. A namespace-qualified symbol is written
-`namespace/name` (see [14-modules.md](./14-modules.md)).
+`namespace/name` (see [14-modules.md](./14-modules.md)). Text the reader cannot read raises
+`:syntax` (section 12); an integer literal outside 64 bits raises `:overflow`.
 
 ### Equality
 

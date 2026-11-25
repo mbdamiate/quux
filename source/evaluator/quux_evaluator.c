@@ -644,8 +644,7 @@ bool quux_evaluate_text(quux_context *context, const char *text, size_t length,
             break;
         }
         if (status == QUUX_READ_INCOMPLETE) {
-            done = quux_raise(context, "wrong-type",
-                              "syntax error at line %zu: unexpected end of text", reader.line);
+            done = quux_raise(context, "syntax", "line %zu: unexpected end of text", reader.line);
             break;
         }
         if (status == QUUX_READ_ERROR || !quux_evaluate_form(context, form, &value)) {

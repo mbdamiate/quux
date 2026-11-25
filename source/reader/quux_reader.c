@@ -55,10 +55,10 @@ void quux_reader_skip_blank(quux_reader *reader) {
     }
 }
 
-/* Syntax errors use :wrong-type until a dedicated kind is approved (open-questions W11). */
+/* Text the reader cannot read raises :syntax (D-54). */
 static quux_read_status syntax_error(quux_context *context, const quux_reader *reader,
                                      const char *message) {
-    (void)quux_raise(context, "wrong-type", "syntax error at line %zu: %s", reader->line, message);
+    (void)quux_raise(context, "syntax", "line %zu: %s", reader->line, message);
     return QUUX_READ_ERROR;
 }
 
