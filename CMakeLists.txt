@@ -73,3 +73,5 @@ endif()
 
 # Tests
 add_subdirectory(tests/smoke)
+add_subdirectory(tests/repl)
+add_subdirectory(tests/examples)

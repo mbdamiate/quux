@@ -96,10 +96,12 @@ void quux_memory_shutdown(quux_heap *heap) {
 void quux_memory_close_frame(quux_root_stack *roots, quux_root_frame *frame) {
 #ifndef NDEBUG
     if (roots->top != frame) {
+        /* The open inner frame belongs to a function that already returned, so its record is
+         * not read: only this function's name is reported. */
         fprintf(stderr,
-                "quux: root frame of %s closed while a frame of %s is still open "
-                "(missing QUUX_ROOT_FRAME_END)\n",
-                frame->function_name, roots->top != NULL ? roots->top->function_name : "(none)");
+                "quux: root frame of %s closed while an inner frame is still open "
+                "(a callee returned without QUUX_ROOT_FRAME_END)\n",
+                frame->function_name);
         abort();
     }
 #endif
