@@ -1,0 +1,4 @@
+xxHash v0.8.4 (xxhash.h, single header, XXH3 64-bit)
+Source: https://github.com/Cyan4973/xxHash/tree/v0.8.4 (downloaded 2026-11-25)
+License: BSD 2-Clause (LICENSE)
+Used through quux_hashing_value only (decision D-37).

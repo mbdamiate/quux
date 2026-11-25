@@ -51,6 +51,8 @@
 | | `:undefined-name` | a symbol without a binding | Phase 1 |
 | | `:index-out-of-range` | `element-at` outside the vector | Phase 1 |
 | | `:resource-closed` | reading from or writing to a closed file or connection | Phase 1 |
+| | `:stack-exhausted` | non-tail calls nested deeper than the implementation's limit (section 03) | Phase 1 |
+| | `:resource-exhausted` | a thread or memory allocation failed | Phase 1 |
 | Numerics | `:overflow` | integer result outside 64 bits | Phase 1 |
 | | `:inexact-division` | `/` on integers without an exact quotient | Phase 1 |
 | | `:division-by-zero` | integer division by zero | Phase 1 |
