@@ -1,0 +1,42 @@
+;; Reference program 12 — a remote agent with idempotent operations, resent after a network
+;; failure; a stream between two nodes that keeps backpressure
+(namespace programs.remote-agent-stream)
+
+;; ---------- part 1: idempotent updates of a remote agent
+;; A lost acknowledgement makes the send fail with :transport. The program resends with the
+;; same operation identifier; update-once applies it only once.
+(define-function send-with-retry [account identifier amount]
+  (try
+    (with-scope [attempt-scope]
+      (wait-for (update-once account identifier + amount)))
+    (catch :transport problem
+      (send-with-retry account identifier amount))))
+
+(define-function deposit-all [account amounts]
+  (reduce (function [ignored amount]
+            (send-with-retry account amount amount)        ; the identifier is the amount
+            nothing)
+          nothing
+          amounts))
+
+;; ---------- part 2: a stream produced on :a and consumed on :b
+(define-function produce-forever [sink]
+  (let-functions [(produce-from [number]
+                    (emit sink number)
+                    (produce-from (increment number)))]
+    (produce-from 0)))
+
+(define-function consume [total number]
+  (tag :consume nothing)                                   ; 50 ms per item (injected)
+  (+ total number))
+
+(define-function main [input]
+  (with-scope [scope]
+    (let [account (wait-for (spawn-on (node :b) (tag :account (agent 0))))]
+      (deposit-all account (range 1 11))
+      (let [numbers    (tag :producer (make-stream produce-forever {:maximum-ahead 1}))
+            stream-sum (wait-for (spawn-on (node :b)
+                                   (wait-for (stream-reduce consume 0
+                                               (stream-take (get input :items) numbers)))))]
+        {:balance    (wait-for (spawn-on (node :b) (state account)))
+         :stream-sum stream-sum}))))

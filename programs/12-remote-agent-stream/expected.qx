@@ -1,0 +1,6 @@
+[(returns {:balance 55 :stream-sum 190})    ; 1 + … + 10 deposited once each; 0 + … + 19 consumed
+ (applied-once 7)                           ; operation 7 was sent twice and applied once
+ (agent-final :account 55)
+ (maximum-ahead :producer 1)                ; backpressure holds across the network
+ (elapsed-at-least 1000)                    ; paced by the consumer on :b: 20 × 50 ms
+ (elapsed-under 5000)]

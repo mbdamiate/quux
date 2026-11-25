@@ -27,7 +27,7 @@ must exist by the end of Phase 1.
 | Collections | `list vector map-of set-of prepend add put remove-key get has-key? count empty? first rest as-sequence transform filter reject reduce pour-into range element-at to-string` | D-03 |
 | Futures | `future`, `spawn`, `wait-for`, `state`, `cancel!`, `check-cancellation`, `sleep` | D-07..D-09 |
 | Combinators | `all`, `first-success`, `then`, `with-timeout` | D-12 |
-| Agents | `agent`, `update`, `transact`, `state` | D-15, D-16 |
+| Agents | `agent`, `update`, `transact`, `update-once`, `state` | D-15, D-16 |
 | Streams | `make-stream`, `emit`, `stream-transform`, `stream-filter`, `stream-take`, `stream-reduce`, `close!`, `file-lines` | D-17 |
 | Parallelism | `parallel-transform`, `parallel-reduce`, `fork-join` | D-18 |
 | Errors | `error`, `error-kind`, `error-data`, `unique-symbol` (macros) | D-13, D-06 |

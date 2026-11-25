@@ -44,6 +44,15 @@ Harness conventions:
   the result of `main` using `equal?`. Programs that use it define both functions.
 - `never` evaluates its predicate form in the program's namespace after every committed agent
   update and at the end of the run.
+- With `:nodes`, the harness creates one simulated node per entry (Phase 1) or one container
+  per entry (Phase 5), and runs `main` on the **first** node listed.
+- `:crash-after {:completed n}` crashes the node at the moment its `n`-th `spawn-on` task
+  completes. That result is still delivered; no later result leaves the node. From then on,
+  every message to the node is lost, and its pending futures fail with `:node-unreachable`.
+- `:network :drop` loses the matching message: `:message :acknowledgement` matches the replies to
+  agent updates, and `:occurrence n` selects the `n`-th such message between the two nodes.
+- `(applied-once identifier)` holds when the update sent with `update-once` and that operation
+  identifier was applied exactly once, whatever the number of sends.
 
 ## `expected.qx` assertion forms
 

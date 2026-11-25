@@ -1,0 +1,6 @@
+{:input   {:items 20}
+ :nodes   [{:name :a} {:name :b}]
+ :network {:drop [{:from :b :to :a :message :acknowledgement :occurrence 7}]
+           :latency-milliseconds 5}
+ :delays  {:consume 50}
+ :bounds  {:wall-clock-milliseconds 10000}}

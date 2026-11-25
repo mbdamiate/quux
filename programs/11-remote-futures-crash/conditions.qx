@@ -1,0 +1,6 @@
+{:input  {:size 80000 :partitions 8}
+ :nodes  [{:name :a}
+          {:name :b :crash-after {:completed 2}}]
+ :delays {:partition 50}
+ :network {:latency-milliseconds 5}
+ :bounds {:wall-clock-milliseconds 10000}}

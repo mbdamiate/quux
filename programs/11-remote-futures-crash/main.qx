@@ -1,0 +1,47 @@
+;; Reference program 11 — remote futures on two nodes; a node crashes midway; lost work is
+;; recomputed
+(namespace programs.remote-futures-crash)
+
+(define-function square [n] (* n n))
+
+(define-function partition-sum [bounds]
+  (tag :partition
+       (reduce + 0 (transform square (range (element-at bounds 0) (element-at bounds 1))))))
+
+(define-function partitions [size partition-count]
+  (let [width (quotient size partition-count)]
+    (pour-into [] (transform (function [index] [(* index width) (* (increment index) width)])
+                             (range 0 partition-count)))))
+
+;; Each remote attempt runs in its own scope: a failed child always fails its scope, so the
+;; error is caught outside that scope (section 07).
+(define-function attempt-on [target bounds]
+  (try
+    (with-scope [attempt-scope]
+      (wait-for (spawn-on target (partition-sum bounds))))
+    (catch :node-unreachable problem :lost)))
+
+(define-function compute-partition [assignment recomputed]
+  (let [target (element-at assignment 0)
+        bounds (element-at assignment 1)
+        result (attempt-on target bounds)]
+    (if (equal? result :lost)
+      (sequence
+        (wait-for (update recomputed increment))
+        (with-scope [retry-scope]
+          (wait-for (spawn-on (node :a) (partition-sum bounds)))))   ; recompute on the survivor
+      result)))
+
+(define-function main [input]
+  (let [all-partitions (partitions (get input :size) (get input :partitions))
+        assignments    (transform (function [index]
+                                    [(if (even? index) (node :a) (node :b))
+                                     (element-at all-partitions index)])
+                                  (range 0 (count all-partitions)))
+        recomputed     (agent 0)]
+    (with-scope [scope]
+      (let [sums (wait-for (all (transform (function [assignment]
+                                             (future (compute-partition assignment recomputed)))
+                                           assignments)))]
+        {:total      (reduce + 0 sums)
+         :recomputed (state recomputed)}))))

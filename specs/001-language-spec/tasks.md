@@ -179,7 +179,7 @@ unchanged on simulated nodes.
 error seen when its node is unreachable, from section 13 alone. Programs 11 and 12 pass
 quickstart steps 2 and 3.
 
-- [ ] T032 [US3] Complete `docs/spec/13-serialization-and-identity.md` (M).
+- [X] T032 [US3] Complete `docs/spec/13-serialization-and-identity.md` (M).
   - Content:
     - D-19: content hashing, de Bruijn indices, hashing per strongly connected component, closure = hash plus environment.
     - D-20: the three serialization classes, `serializable?`, `:not-serializable` at the sender.
@@ -188,16 +188,16 @@ quickstart steps 2 and 3.
   - Copies the table "Equality, hash and serialization" from data-model.md.
   - Cites data-model.md `Function / Closure.function-hash`, `Function / Closure.name` (metadata, never hashed), `Function / Closure.captured-environment`, `Scope.identifier` and `Local resource` (flag `local-resource`).
   - Marks H4's remaining part as "Open — closed in Phase 5c".
-- [ ] T033 [US3] Add the distribution kinds (`:node-unreachable`, `:transport`, `:remote`, `:not-serializable`) with examples to `docs/spec/12-errors.md` (S). Depends on T017.
-- [ ] T034 [P] [US3] Write `programs/11-remote-futures-crash/` (L).
+- [X] T033 [US3] Add the distribution kinds (`:node-unreachable`, `:transport`, `:remote`, `:not-serializable`) with examples to `docs/spec/12-errors.md` (S). Depends on T017.
+- [X] T034 [P] [US3] Write `programs/11-remote-futures-crash/` (L).
   - `main.qx`: work split with `spawn-on` across `(node :a)` and `(node :b)`, plus a recomputation path when a partition fails with `:node-unreachable`.
   - `conditions.qx`: `:nodes [{:name :a} {:name :b :crash-after {:completed 4}}]`.
   - `expected.qx`: `returns` equal to the result of a run with no failure, and the futures for node b fail with `:node-unreachable`.
-- [ ] T035 [P] [US3] Write `programs/12-remote-agent-stream/` (L).
+- [X] T035 [P] [US3] Write `programs/12-remote-agent-stream/` (L).
   - Part 1: a remote agent with an operation identifier on every `update`; `conditions.qx` drops the acknowledgement of operation 7; `expected.qx` has `(applied-once 7)` and the `agent-final` of a run with no failure.
   - Part 2: a stream from node a to node b with a slow consumer; `expected.qx` has `(maximum-ahead :producer 1)` across the network.
   - Records that how operation identifiers are stored is H5 (Phase 5d).
-- [ ] T036 [US3] Run [quickstart.md](./quickstart.md) steps 2 and 3 for programs 11 and 12, and confirm that the source contains no fault-injection code (D-25) (S).
+- [X] T036 [US3] Run [quickstart.md](./quickstart.md) steps 2 and 3 for programs 11 and 12, and confirm that the source contains no fault-injection code (D-25) (S).
 
 **Checkpoint**: all 12 programs exist. The decisions that Phase 5 inherits are written down
 normatively.

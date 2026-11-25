@@ -63,7 +63,8 @@
 | | `:remote` | an error raised on another node; its `:cause` keeps the original kind | Phase 1 (simulated), Phase 5 |
 | | `:not-serializable` | a value that cannot leave its node was sent; raised at the sender | Phase 1 |
 
-US3 (task T033) adds examples for the distribution kinds; their full semantics are in section 13.
+The full semantics of the distribution kinds are in section 13. Phase 1 produces them on
+simulated nodes in one process; Phase 5 produces them on real nodes.
 
 ## Examples
 
@@ -94,6 +95,40 @@ US3 (task T033) adds examples for the distribution kinds; their full semantics a
     [(error-kind caught) (count (get caught :suppressed))]))
 ;=> [:user 1] or [:timeout 1]   ; the two failures race (section 07, rule 9)
 ```
+
+### Distribution kinds
+
+```quux
+;; a node that crashed: its futures fail with :node-unreachable
+(try
+  (with-scope [scope]
+    (wait-for (spawn-on (node :b) (* 6 7))))     ; node :b has crashed
+  (catch :node-unreachable problem (error-kind problem)))
+;=> :node-unreachable
+
+;; an error raised on the remote node arrives as :remote, keeping the original kind
+(try
+  (with-scope [scope]
+    (wait-for (spawn-on (node :b) (quotient 1 0))))
+  (catch :remote problem (error-kind (get problem :cause))))
+;=> :division-by-zero
+
+;; a lost message: the program decides whether to retry (no implicit retries)
+(define-function send-with-retry [account identifier amount]
+  (try
+    (with-scope [attempt] (wait-for (update-once account identifier + amount)))
+    (catch :transport problem (send-with-retry account identifier amount))))
+
+;; a local resource cannot leave its node
+(with-scope [scope]
+  (let [file (open-file "lines.txt")]
+    (wait-for (spawn-on (node :b) (read-line file)))))
+;!! :not-serializable   ; raised at the sender, before anything is sent
+```
+
+The recovery from `:node-unreachable` with a nested scope is shown in reference program 11: a
+failed child always fails its scope (section 07), so each remote attempt runs in its own scope,
+and the error is caught outside that scope.
 
 ## Errors
 

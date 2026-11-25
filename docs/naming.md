@@ -144,6 +144,7 @@ name by name by the owner on 2026-11-24.
 | (new, found while writing sections 02 and 05) | `:division-by-zero`, `:index-out-of-range` | approved |
 | (new, found while writing sections 04 and 11) | namespace `core` (holds the core forms); `fork-join` split markers `:leaf`, `:split` | approved |
 | (new, found while writing programs 05, 06, 08 and 10) | `connect`, `parse-integer`, error kind `:resource-closed`, harness reference function `sequential-main` | approved |
+| (new, found while writing program 12) | `update-once` (agent update applied at most once per operation identifier) | approved |
 | `fn-hash` | `function-hash` | approved |
 | `serializable?`, `node`, `spawn-on`, `tag` | unchanged | approved |
 | `open-file`, `listen`, `accept`, `read-line`, `write-line` | unchanged | approved |
