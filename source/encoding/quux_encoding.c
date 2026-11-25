@@ -639,8 +639,8 @@ bool quux_function_content_hash(quux_context *context, quux_value function,
         return true;
     }
     if (object->kind != QUUX_KIND_CLOSURE) {
-        return quux_raise(context, "wrong-type", "function-hash expects a function, got a %s",
-                          quux_kind_name((quux_kind)object->kind));
+        return quux_raise(context, "wrong-type", "function-hash expects a function, got %s",
+                          quux_kind_phrase((quux_kind)object->kind));
     }
     quux_object *lambda = quux_checked_object(object->values[QUUX_CLOSURE_LAMBDA]);
     if (load_content_hash(lambda, digest)) {

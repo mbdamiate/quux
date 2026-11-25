@@ -69,8 +69,8 @@ static bool bind_pattern(quux_context *context, quux_value pattern, quux_value v
     case QUUX_OPERATION_PATTERN_VECTOR: {
         if (!quux_is_sequential(value)) {
             return quux_raise(context, "wrong-type",
-                              "a vector pattern needs a list or a vector, got a %s",
-                              quux_kind_name(quux_kind_of(value)));
+                              "a vector pattern needs a list or a vector, got %s",
+                              quux_kind_phrase(quux_kind_of(value)));
         }
         bool has_rest = quux_code_field(code, 0) != 0;
         uint32_t positional = code->value_count - (has_rest ? 1 : 0);
@@ -107,8 +107,8 @@ static bool bind_pattern(quux_context *context, quux_value pattern, quux_value v
     }
     case QUUX_OPERATION_PATTERN_MAP: {
         if (!quux_is_kind(value, QUUX_KIND_MAP)) {
-            return quux_raise(context, "wrong-type", "a map pattern needs a map, got a %s",
-                              quux_kind_name(quux_kind_of(value)));
+            return quux_raise(context, "wrong-type", "a map pattern needs a map, got %s",
+                              quux_kind_phrase(quux_kind_of(value)));
         }
         bool done = true;
         quux_value element = quux_nothing;
@@ -184,10 +184,22 @@ static bool call_primitive(quux_context *context, quux_value primitive, quux_val
     primitive_shape shape = read_primitive(object);
     uint32_t count = quux_checked_object(arguments)->value_count;
     if (count < shape.minimum || count > shape.maximum) {
+        /* the same form as a program function's message (friction P10-F2) */
         quux_value name = object->values[QUUX_PRIMITIVE_NAME];
-        return quux_raise(context, "wrong-argument-count", "%.*s does not take %u argument%s",
-                          (int)quux_name_length(name), quux_name_bytes(name), count,
-                          count == 1 ? "" : "s");
+        char expected[64];
+        if (shape.maximum == QUUX_VARIADIC) {
+            snprintf(expected, sizeof expected, "at least %u argument%s", shape.minimum,
+                     shape.minimum == 1 ? "" : "s");
+        } else if (shape.minimum == shape.maximum) {
+            snprintf(expected, sizeof expected, "%u argument%s", shape.minimum,
+                     shape.minimum == 1 ? "" : "s");
+        } else if (shape.maximum == shape.minimum + 1) {
+            snprintf(expected, sizeof expected, "%u or %u arguments", shape.minimum, shape.maximum);
+        } else {
+            snprintf(expected, sizeof expected, "%u to %u arguments", shape.minimum, shape.maximum);
+        }
+        return quux_raise(context, "wrong-argument-count", "%.*s expects %s, got %u",
+                          (int)quux_name_length(name), quux_name_bytes(name), expected, count);
     }
     return shape.function(context, quux_checked_object(arguments)->values, count, result);
 }
@@ -209,7 +221,7 @@ bool quux_apply(quux_context *context, quux_value function, quux_value arguments
         return call_primitive(context, function, arguments, result);
     }
     if (kind != QUUX_KIND_CLOSURE) {
-        return quux_raise(context, "wrong-type", "a %s is not a function", quux_kind_name(kind));
+        return quux_raise(context, "wrong-type", "%s is not a function", quux_kind_phrase(kind));
     }
     quux_value frame = quux_nothing;
     QUUX_ROOT_FRAME(context, &function, &arguments, &frame);
@@ -571,8 +583,8 @@ bool quux_evaluate(quux_context *context, quux_value code, quux_value environmen
                 goto finished;
             }
             if (kind != QUUX_KIND_CLOSURE) {
-                done = quux_raise(context, "wrong-type", "a %s is not a function",
-                                  quux_kind_name(kind));
+                done = quux_raise(context, "wrong-type", "%s is not a function",
+                                  quux_kind_phrase(kind));
                 goto finished;
             }
             /* A proper tail call: replace the code and environment, keep the C frame. */
@@ -594,8 +606,8 @@ bool quux_evaluate(quux_context *context, quux_value code, quux_value environmen
             if (done) {
                 done = quux_is_kind(value, QUUX_KIND_ERROR)
                            ? quux_raise_value(context, value)
-                           : quux_raise(context, "wrong-type", "raise expects an error, got a %s",
-                                        quux_kind_name(quux_kind_of(value)));
+                           : quux_raise(context, "wrong-type", "raise expects an error, got %s",
+                                        quux_kind_phrase(quux_kind_of(value)));
             }
             goto finished;
         case QUUX_OPERATION_BUILD_LIST:

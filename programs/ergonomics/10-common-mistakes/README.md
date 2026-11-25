@@ -27,8 +27,10 @@ returns `12` and exits with status 0. The exact text is in `expected-output.txt`
 **How the expected output was derived** (D-60): the error kinds were written by hand from the
 specification. The specification does not define messages, so the messages were written from the
 interpreter's behavior seen while writing the earlier programs, and confirmed by running. One
-predicted message was wrong: for `reduce` with two arguments the core says
-`reduce does not take 2 arguments`, not `reduce expects 3 arguments, got 2` (see P10-F2).
+predicted message was wrong at first: for `reduce` with two arguments the core said
+`reduce does not take 2 arguments`, not `reduce expects 3 arguments, got 2` (see P10-F2). After
+the owner review, the messages were fixed (P10-F1, P10-F2; report section "Bugs found"), and the
+three changed lines (mistakes 6, 8 and 12) now read as first predicted.
 
 ## Status
 
