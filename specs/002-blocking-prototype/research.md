@@ -295,8 +295,8 @@ fact yet.
 - **Rationale**: owner's answers of 2026-11-25 (Q1: C, Q2: B). The map pattern uses only
   existing syntax (a map literal) and existing names, so it adds no reader rule and no new word
   `[OPINION]`. Lowering in the expander keeps the evaluator unchanged and lets the VM inherit it.
-- **Names**: the spelling of the map pattern is a syntax form, not a new name; it is entered in
-  `docs/naming.md` as `proposed` for the owner's confirmation before sections 03 and 11 use it.
+- **Names**: the spelling of the map pattern is a syntax form, not a new name; the owner approved
+  it on 2026-11-25 (`docs/naming.md` J2).
 - **Alternatives**: `& rest` (Lisp heritage, rejected by the owner); Clojure's `{:keys [a b]}`
   (adds the word `keys` with a special meaning; can be added later as a shorthand).
 - **Inherited by**: Phase 3 (unchanged; lowered before the VM).
@@ -473,8 +473,8 @@ fact yet.
 
 ### D-50 — Kind predicates (W6)
 
-- **Decision**: the following predicates are entered in `docs/naming.md` as `proposed`, and
-  are used only after the owner approves them: `list?`, `vector?`, `map?`, `set?`, `keyword?`,
+- **Decision**: the following predicates were approved by the owner on 2026-11-25
+  (`docs/naming.md` J3): `list?`, `vector?`, `map?`, `set?`, `keyword?`,
   `symbol?`, `string?`, `integer?`, `floating-point?`, `boolean?`, `function?`, `future?`,
   `agent?`, `scope?`, `stream?`, `error?`. (`nothing?` is already approved.)
 - **Rationale**: section 11 needs at least `vector?`; the full family is proposed at once so
@@ -483,8 +483,8 @@ fact yet.
 
 ### D-51 — Error kinds for resource limits
 
-- **Decision**: two error kinds are proposed in `docs/naming.md` and added to section 12 after
-  approval: `:stack-exhausted` (non-tail recursion deeper than the limit, D-38) and
+- **Decision**: two error kinds, approved by the owner on 2026-11-25 (`docs/naming.md` J4) and
+  added to section 12 by task T007: `:stack-exhausted` (non-tail recursion deeper than the limit, D-38) and
   `:resource-exhausted` (thread creation or memory allocation failed, D-40).
 - **Rationale**: the spec's edge cases require both conditions to be error values, not
   crashes; no existing kind covers them.

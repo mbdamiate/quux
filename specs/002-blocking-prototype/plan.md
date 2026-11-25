@@ -50,7 +50,7 @@ The plan's main technical choices are recorded in [research.md](./research.md) a
 | V. Small verifiable milestones; sanitizers as gates | Toolchain smoke test is the first task; every story ends in tests that run; ASan+UBSan, TSan, LSan and valgrind are CI gates; the project can stop after any story. | PASS |
 | VI. No durations | Only S/M/L sizes and dependency order. | PASS |
 | VII. Evidence and traceability | D-29..D-53 recorded; version facts checked on the web with links on 2026-11-25; "to verify" items are confirmed by the smoke test and written to `docs/toolchain-record.md`. | PASS |
-| VIII. Readable names | C identifiers in full words with `quux_`, checked by clang-tidy and `quux-name-check` (D-47); new quux names (D-39 map pattern, D-50, D-51) enter `docs/naming.md` as `proposed` and are used only after approval. | PASS (with pending approvals) |
+| VIII. Readable names | C identifiers in full words with `quux_`, checked by clang-tidy and `quux-name-check` (D-47); new quux names (D-39 map pattern, D-50, D-51, report keys, message kinds, tool names) were approved by the owner in `docs/naming.md` section J on 2026-11-25. | PASS |
 
 Post-design re-check: PASS. The design adds two vendored libraries (D-37). They are provisional,
 are isolated behind `quux_hashing_*`, and are confirmed or replaced at the Phase 2 dependency

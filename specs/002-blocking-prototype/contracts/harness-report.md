@@ -31,8 +31,7 @@ the watchdog prints `result  timeout after <n> ms`.
 ```
 
 The keys of the data form are harness-internal. They are not quux language names, but they
-still follow R1 (full words), and they are listed in `docs/naming.md` section J as `proposed`
-before first use.
+still follow R1 (full words), and they are approved in `docs/naming.md` section J (J5).
 
 ## Evidence fields
 

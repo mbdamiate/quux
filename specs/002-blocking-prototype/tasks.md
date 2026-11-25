@@ -53,7 +53,7 @@ ends in something that runs.
 
 **Purpose**: decisions that must be settled before code uses them.
 
-- [ ] T006 Owner review of the `proposed` names in `docs/naming.md` section J (J2 map pattern, J3 kind predicates, J4 error kinds, J5 report keys, J6 message kinds, J7 tool names); record each answer as `approved` or `rejected`, and update D-39, D-50 and D-51 in `docs/decisions.md` and research.md (S)
+- [X] T006 Owner review of the `proposed` names in `docs/naming.md` section J (J2 map pattern, J3 kind predicates, J4 error kinds, J5 report keys, J6 message kinds, J7 tool names); record each answer as `approved` or `rejected`, and update D-39, D-50 and D-51 in `docs/decisions.md` and research.md (S)
 - [ ] T007 Update `docs/spec/03-evaluation-and-tail-calls.md` (`:rest`, vector and map patterns, `:stack-exhausted`), `docs/spec/11-data-parallelism.md` (destructuring now specified) and `docs/spec/12-errors.md` (`:stack-exhausted`, `:resource-exhausted`), closing W4, W5 and W6 in `docs/spec/open-questions.md`; depends on T006 (M)
 
 **Checkpoint**: names settled; US1 can start in parallel with T006/T007, and US2 needs them.

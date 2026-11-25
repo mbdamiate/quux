@@ -59,7 +59,7 @@ These were fixed before planning and are encoded in the constitution:
 | D-36 | Lists, 32-way vector trie, canonical CHAMP maps/sets with canonical collision nodes and cached node value hashes | 002 / Phase 1 | recommended | Phase 3, Phase 5 |
 | D-37 | Provisional hashes: XXH3-64 fixed seed (value), portable BLAKE3 (content), vendored behind `quux_hashing_*` | 002 / Phase 1 | provisional | Phase 2 (H10), Phase 5 |
 | D-38 | Full expansion, then a tree walker with a tail-call loop; depth limit raises `:stack-exhausted` | 002 / Phase 1 | recommended | Phase 3 |
-| D-39 | `:rest` parameter marker (W4); vector and map patterns in `let` and parameters, lowered by the expander (W5) | 002 / Phase 1 | adopted (owner Q1, Q2); map spelling proposed | Phase 3 |
+| D-39 | `:rest` parameter marker (W4); vector and map patterns in `let` and parameters, lowered by the expander (W5) | 002 / Phase 1 | adopted (owner Q1, Q2; map spelling approved in naming J2) | Phase 3 |
 | D-40 | Blocking executor: thread per future, park on condition variable, global wait-for graph for `:deadlock`, `:resource-exhausted` on thread failure | 002 / Phase 1 | recommended | Phase 3 (H8) |
 | D-41 | Agents: FIFO queue, on-demand worker thread, `update-once` applied-operations map | 002 / Phase 1 | recommended | Phase 3, Phase 5 |
 | D-42 | Streams per D-17; foreign advances counted as H11 evidence | 002 / Phase 1 | recommended | Phase 4, Phase 5 |
@@ -70,7 +70,7 @@ These were fixed before planning and are encoded in the constitution:
 | D-47 | `quux-name-check` with the quux reader; clang-tidy naming; clang-format check | 002 / Phase 1 | recommended | all phases |
 | D-48 | Portability layer: the only place with platform headers and `#if` on system or architecture; no semaphores, barriers or `<threads.h>` | 002 / Phase 1 | recommended | Phase 3, Phase 4, Phase 6 |
 | D-49 | Primary error stays in completion order in Phase 1; race evidence recorded (H9) | 002 / Phase 1 | adopted (owner Q3) | Phase 7 |
-| D-50 | Kind predicates (`list?`, `vector?`, `map?`, …, `floating-point?`) proposed in `docs/naming.md` (W6) | 002 / Phase 1 | proposed | all phases |
-| D-51 | Error kinds `:stack-exhausted` and `:resource-exhausted` proposed | 002 / Phase 1 | proposed | Phase 3 |
+| D-50 | Kind predicates (`list?`, `vector?`, `map?`, …, `floating-point?`) approved in `docs/naming.md` J3 (W6) | 002 / Phase 1 | adopted (owner) | all phases |
+| D-51 | Error kinds `:stack-exhausted` and `:resource-exhausted` (naming J4) | 002 / Phase 1 | adopted (owner) | Phase 3 |
 | D-52 | Line-based REPL and file runner, no line-editing library | 002 / Phase 1 | recommended | Phase 7 |
 | D-53 | Pre-push git hook runs every preset on macOS arm64 and in the Linux arm64 container and blocks the push on failure; skips label `pending` and presets recorded as unavailable in the container (with a warning); documentation-only pushes run only the name check | 002 / Phase 1 | adopted (owner) | all phases |
