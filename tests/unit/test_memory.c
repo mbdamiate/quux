@@ -24,11 +24,19 @@ static void frames_are_balanced(quux_unit_state *state) {
     quux_runtime_destroy(runtime);
 }
 
+/* gcc rightly reports the dangling frame this test leaves on purpose. */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdangling-pointer"
+#endif
 static void leave_frame_open(quux_context *context) {
     quux_value value = quux_nothing;
     QUUX_ROOT_FRAME(context, &value);
     /* deliberately missing QUUX_ROOT_FRAME_END */
 }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 static void unclosed_frame_is_detected(quux_unit_state *state) {
 #ifdef NDEBUG

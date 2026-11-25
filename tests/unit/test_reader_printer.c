@@ -4,10 +4,10 @@
 
 #include <string.h>
 
-typedef struct fixture {
+typedef struct test_fixture {
     quux_runtime *runtime;
     quux_context context;
-} fixture;
+} test_fixture;
 
 static void round_trips(quux_unit_state *state, quux_context *context, const char *text,
                         const char *expected) {
@@ -31,7 +31,7 @@ static void round_trips(quux_unit_state *state, quux_context *context, const cha
 }
 
 static void literals_round_trip(quux_unit_state *state) {
-    fixture fixture = {quux_runtime_create(), {0}};
+    test_fixture fixture = {quux_runtime_create(), {0}};
     quux_context_initialize(&fixture.context, fixture.runtime);
     quux_context *context = &fixture.context;
     round_trips(state, context, "(1 [2 3] :key symbol \"text\")", "(1 [2 3] :key symbol \"text\")");
@@ -54,7 +54,7 @@ static void literals_round_trip(quux_unit_state *state) {
 }
 
 static void canonical_map_printing(quux_unit_state *state) {
-    fixture fixture = {quux_runtime_create(), {0}};
+    test_fixture fixture = {quux_runtime_create(), {0}};
     quux_context_initialize(&fixture.context, fixture.runtime);
     quux_context *context = &fixture.context;
     quux_value left = quux_nothing;
@@ -77,7 +77,7 @@ static void canonical_map_printing(quux_unit_state *state) {
 }
 
 static void shorthands_rejected(quux_unit_state *state) {
-    fixture fixture = {quux_runtime_create(), {0}};
+    test_fixture fixture = {quux_runtime_create(), {0}};
     quux_context_initialize(&fixture.context, fixture.runtime);
     quux_context *context = &fixture.context;
     quux_value value = quux_nothing;

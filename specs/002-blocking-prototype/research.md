@@ -533,6 +533,8 @@ fact yet.
     written in the next commit message.
   - Before the C build exists (the first smoke-test task), the hook runs only the `names` check
     and the preset configuration step.
+  - *Added during US2:* the check also builds and tests a gcc `debug` build in the container,
+    because gcc found warnings that clang missed and CI was the only place running gcc.
 - **Rationale**: CI runs only on x86_64 (D-31), and arm64 (macOS and Linux) is where
   memory-ordering bugs show first (risk R2). A hook makes the local check automatic instead of a
   habit `[OPINION]`. A versioned hook directory keeps the hook under review like any other code.

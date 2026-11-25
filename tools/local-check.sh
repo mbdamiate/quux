@@ -3,7 +3,7 @@
 # container, with every test except those labelled `pending`. CI covers only Linux x86_64 (D-31),
 # so this script is what the pre-push hook runs.
 #
-#   tools/local-check.sh                       full check
+#   tools/local-check.sh                       full check (every preset, plus a gcc debug build in the container)
 #   tools/local-check.sh --repeat N            also run the `concurrent` tests N times under tsan
 #   tools/local-check.sh --documentation-only  only the name check (no C or .qx change)
 #
@@ -113,6 +113,17 @@ else
             failures=$((failures + 1))
         fi
     done
+    # gcc catches warnings that clang does not (D-29); CI runs the same build on x86_64.
+    if run_logged docker run --rm --volume "$repository_root:/work" \
+        --volume quux-container-build:/work/build --workdir /work \
+        --env QUUX_C_COMPILER=gcc quux-development:latest sh -c \
+        'cmake -S . -B build/gcc-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug >/dev/null &&
+         cmake --build build/gcc-debug && ctest --test-dir build/gcc-debug --label-exclude pending'; then
+        report "linux-arm64-container" "gcc debug" "pass"
+    else
+        report "linux-arm64-container" "gcc debug" "FAIL"
+        failures=$((failures + 1))
+    fi
 fi
 
 if [ "$failures" -gt 0 ]; then

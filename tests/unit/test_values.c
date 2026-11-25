@@ -3,23 +3,23 @@
 
 #include <string.h>
 
-typedef struct fixture {
+typedef struct test_fixture {
     quux_runtime *runtime;
     quux_context context;
-} fixture;
+} test_fixture;
 
-static void open_fixture(fixture *fixture) {
+static void open_fixture(test_fixture *fixture) {
     fixture->runtime = quux_runtime_create();
     quux_context_initialize(&fixture->context, fixture->runtime);
 }
 
-static void close_fixture(fixture *fixture) {
+static void close_fixture(test_fixture *fixture) {
     quux_context_finish(&fixture->context);
     quux_runtime_destroy(fixture->runtime);
 }
 
 static void integers_small_and_boxed(quux_unit_state *state) {
-    fixture fixture;
+    test_fixture fixture;
     open_fixture(&fixture);
     quux_value number = quux_nothing;
     QUUX_CHECK(state, quux_make_integer(&fixture.context, 42, &number));
@@ -37,7 +37,7 @@ static void integers_small_and_boxed(quux_unit_state *state) {
 }
 
 static void floats_are_boxed(quux_unit_state *state) {
-    fixture fixture;
+    test_fixture fixture;
     open_fixture(&fixture);
     quux_value number = quux_nothing;
     QUUX_CHECK(state, quux_make_float(&fixture.context, 2.5, &number));
@@ -47,7 +47,7 @@ static void floats_are_boxed(quux_unit_state *state) {
 }
 
 static void symbols_and_keywords_are_interned(quux_unit_state *state) {
-    fixture fixture;
+    test_fixture fixture;
     open_fixture(&fixture);
     quux_value first = quux_symbol(&fixture.context, "print-line");
     quux_value second = quux_symbol(&fixture.context, "print-line");
@@ -72,7 +72,7 @@ static void symbols_and_keywords_are_interned(quux_unit_state *state) {
 }
 
 static void errors_are_values(quux_unit_state *state) {
-    fixture fixture;
+    test_fixture fixture;
     open_fixture(&fixture);
     QUUX_CHECK(state, !quux_raise(&fixture.context, "overflow", "%d too large", 7));
     QUUX_CHECK(state, quux_pending_error_is(&fixture.context, "overflow"));

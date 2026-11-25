@@ -1,23 +1,23 @@
 #include "quux_collections.h"
 #include "quux_unit_test.h"
 
-typedef struct fixture {
+typedef struct test_fixture {
     quux_runtime *runtime;
     quux_context context;
-} fixture;
+} test_fixture;
 
-static void open_fixture(fixture *fixture) {
+static void open_fixture(test_fixture *fixture) {
     fixture->runtime = quux_runtime_create();
     quux_context_initialize(&fixture->context, fixture->runtime);
 }
 
-static void close_fixture(fixture *fixture) {
+static void close_fixture(test_fixture *fixture) {
     quux_context_finish(&fixture->context);
     quux_runtime_destroy(fixture->runtime);
 }
 
 static void vector_across_level_boundaries(quux_unit_state *state) {
-    fixture fixture;
+    test_fixture fixture;
     open_fixture(&fixture);
     quux_context *context = &fixture.context;
     quux_value vector = quux_nothing;
@@ -59,7 +59,7 @@ static bool build_map(quux_context *context, int64_t count, int64_t step, quux_v
 }
 
 static void champ_is_insertion_order_independent(quux_unit_state *state) {
-    fixture fixture;
+    test_fixture fixture;
     open_fixture(&fixture);
     quux_context *context = &fixture.context;
     quux_value forward = quux_nothing;
@@ -80,7 +80,7 @@ static void champ_is_insertion_order_independent(quux_unit_state *state) {
 }
 
 static void champ_canonical_after_removals(quux_unit_state *state) {
-    fixture fixture;
+    test_fixture fixture;
     open_fixture(&fixture);
     quux_context *context = &fixture.context;
     quux_value small = quux_nothing;
@@ -101,7 +101,7 @@ static void champ_canonical_after_removals(quux_unit_state *state) {
 }
 
 static void lists_and_vectors_differ(quux_unit_state *state) {
-    fixture fixture;
+    test_fixture fixture;
     open_fixture(&fixture);
     quux_context *context = &fixture.context;
     quux_value list = quux_nothing;
