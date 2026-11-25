@@ -94,7 +94,7 @@ fact yet.
   targets already run natively on the development machine. Ubuntu 26.04 x86_64 images are
   generally available
   `[FACT: https://github.blog/changelog/2026-09-17-ubuntu-26-generally-available-and-latest-migration]`;
-  the exact label is re-checked when the workflow is written (to verify).
+  the label was confirmed by CI run 45616559024 on 2026-11-25 (`docs/toolchain-record.md`).
 - **Reproducing x86_64-only failures** (H7): there is no local x86_64 machine and emulation is
   not a test environment (constitution). Every test is addressable by name, every run prints
   the random seeds it used (scope identifiers, D-21), and a manual `workflow_dispatch` input
