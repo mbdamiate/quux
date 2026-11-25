@@ -1,0 +1,6 @@
+3
+!! :division-by-zero: quotient of 1 by zero
+square
+144
+"text"
+{:a [1 2]}

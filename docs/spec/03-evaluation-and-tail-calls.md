@@ -6,7 +6,7 @@
 
 ## Answer
 
-**Decision:** D-05 (tail calls), D-01 (syntax)
+**Decision:** D-05 (tail calls), D-01 (syntax), D-38 (stack limit), D-39 (rest parameters and patterns)
 
 ### Evaluation
 
@@ -31,6 +31,26 @@
    | `(raise error)` | raises an error value |
 
 4. Only `false` and `nothing` count as false in a test.
+
+### Parameters and patterns
+
+5. **Rest parameter.** In a parameter vector, the keyword `:rest` before the last parameter
+   collects the remaining arguments into a list (`nothing` when there are none):
+   `(function [agent update-function :rest arguments] …)`. A function with a rest parameter
+   accepts any number of arguments at least equal to the number of names before `:rest`.
+6. **Patterns.** Wherever a name is bound (parameters, `let`, `let-functions` parameters,
+   `let-parallel`), a pattern may stand in place of the name:
+   - a **vector pattern** `[first-name second-name :rest others]` binds names to the elements of
+     any sequential value (list or vector) by position; missing elements bind `nothing`, and
+     `:rest` binds the remaining elements as a list;
+   - a **map pattern** `{name key …}` binds each symbol to `(get value key)`, `nothing` when the
+     key is absent, for example `{balance :balance owner :owner}`;
+   - patterns nest, for example `[[start end] :rest others]`.
+
+   A vector pattern applied to a value that is not sequential, or a map pattern applied to a
+   value that is not a map, raises `:wrong-type`.
+7. **Stack limit.** Calls that are not in tail position use stack. When their depth exceeds the
+   implementation's limit, the call raises `:stack-exhausted` instead of crashing.
 
 ### Tail positions
 
@@ -74,6 +94,21 @@ These positions are **not** tail positions:
     (sum-to (decrement n) (+ accumulator n))))
 (sum-to 1000000 0)                         ;=> 500000500000
 
+(define-function count-arguments [first-argument :rest others]
+  (increment (count others)))
+(count-arguments 1 2 3)                    ;=> 3
+(count-arguments 1)                        ;=> 1
+
+(let [[start end] [10 20]
+      {balance :balance owner :owner} {:balance 100 :owner "ana"}]
+  [start end balance owner])               ;=> [10 20 100 "ana"]
+
+(let [[head :rest tail] (list 1 2 3)]
+  [head tail])                             ;=> [1 (list 2 3)]
+
+(let [{missing :missing} {}] missing)      ;=> nothing
+(let [[x] 42] x)                           ;!! :wrong-type
+
 (undefined-thing 1)                        ;!! :undefined-name
 ((function [x] x) 1 2)                     ;!! :wrong-argument-count
 (42 1)                                     ;!! :wrong-type
@@ -88,14 +123,12 @@ inside the `let-functions` body only.
 |---|---|
 | `:undefined-name` | a symbol has no binding |
 | `:wrong-argument-count` | a function receives the wrong number of arguments |
-| `:wrong-type` | the operator of a call is not a function |
+| `:wrong-type` | the operator of a call is not a function, or a pattern does not match the kind of its value |
+| `:stack-exhausted` | non-tail calls nested deeper than the implementation's limit |
 
 ## Open points
 
-- Variadic parameters (`& rest`) are used by `update` and `transact` (section 09), but the
-  parameter syntax is not fixed yet. **Open — closed in Phase 1.**
-- Destructuring of vectors in parameter lists and `let` (`[[start end]]`), used in section 11.
-  **Open — closed in Phase 1.**
+- None. Rest parameters (W4) and destructuring (W5) were closed in Phase 1 by D-39.
 
 ## Used by programs
 

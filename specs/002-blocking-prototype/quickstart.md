@@ -38,7 +38,7 @@ listed in `docs/toolchain-record.md`.
 ## 2. Core language (story 2)
 
 ```bash
-build/debug/quux
+build/debug/source/main/quux
 ```
 
 Type `(+ 1 2)` and expect `3`. Type `(quotient 1 0)` and expect `!! :division-by-zero: …`, with
@@ -52,13 +52,16 @@ Expected: every module test passes, and every `;=>` / `;!!` example in `docs/spe
 (SC-004). Run the same suite with the root verifier:
 
 ```bash
-build/debug/quux-test --verify-roots examples docs/spec
+build/asan-ubsan/source/main/quux-test --verify-roots examples docs/spec
 ```
+
+The CTest label `verified` runs each ready section with the root verifier (every allocation,
+or amortized for section 03).
 
 ## 3. Reference programs (stories 3–5)
 
 ```bash
-build/asan-ubsan/quux-test program programs/03-timeout-and-errors
+build/asan-ubsan/source/main/quux-test program programs/03-timeout-and-errors
 ```
 
 Expected: a [report](./contracts/harness-report.md) ending in `result  pass`. Run all 12:

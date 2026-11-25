@@ -101,7 +101,10 @@ identity), D-22 (explicit remote calls), D-03 (content hash), D-06 (hashing afte
 (define-function adder [n] (function [x] (+ x n)))
 (equal? (function-hash (adder 1)) (function-hash (adder 2)))       ;=> true
 (equal? (adder 1) (adder 2))                                       ;=> false
+```
 
+<!-- example-requires: distribution -->
+```quux
 ;; serialization classes
 (serializable? {:balance 100})                                     ;=> true
 (with-scope [scope]
@@ -109,7 +112,10 @@ identity), D-22 (explicit remote calls), D-03 (content hash), D-06 (hashing afte
 (with-scope [scope]
   (let [file (open-file "lines.txt")]
     (serializable? (function [] (read-line file)))))               ;=> false
+```
 
+<!-- example-requires: simulated-nodes -->
+```quux
 ;; sending a local resource fails at the sender
 (with-scope [scope]
   (let [file (open-file "lines.txt")]

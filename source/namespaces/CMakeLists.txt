@@ -1,0 +1,3 @@
+add_library(quux_namespaces STATIC quux_namespaces.c)
+target_include_directories(quux_namespaces PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(quux_namespaces PUBLIC quux_collections)

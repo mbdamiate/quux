@@ -200,6 +200,13 @@ fact yet.
   collection and is harder to make safe across threads); handles/indirection table (one extra
   load per access, more invasive API); reference counting (cycles through closures and
   namespaces, and atomic counts on shared immutable data are expensive).
+- **Implementation note (US2)**: the verifier **releases** unreachable objects instead of only
+  poisoning them (under ASan a later use is a heap-use-after-free report; otherwise a released
+  object carries a poison kind that `quux_checked_object` rejects). Releasing keeps long loops
+  (one million iterations in section 03) within memory and makes verification cost amortized.
+  Two modes: every allocation (unit tests, small example sections) and amortized (every
+  live/4 allocations). The first run of the every-allocation mode found one missing root in
+  the analyzer, fixed before commit.
 - **Limit**: the verifier runs only while one task is running; concurrent verification needs
   safepoints, which belong to Phase 3 (risk R6 in the plan). FR-027 states this limit.
 - **Amendment (after `/speckit-analyze`, finding C1)**: the memory module records every
@@ -296,8 +303,11 @@ fact yet.
   - A sequence shorter than a vector pattern binds `nothing` to the missing names; a value
     that is not a sequence (for a vector pattern) or not a map (for a map pattern) raises
     `:wrong-type`.
-  - The expander lowers patterns to plain `let` bindings with `element-at`, `rest`-like slicing
-    and `get`, so the evaluator and the content hash see only core forms.
+  - Patterns are resolved by the analyzer, the step of the expander that turns expanded forms
+    into code: each pattern becomes a pattern node that binds slots directly. *Implementation
+    note (US2):* this replaced the planned lowering into `element-at` and `get` calls, which
+    would have needed helper functions with names outside `docs/naming.md` (a missing element
+    must bind `nothing`, while `element-at` raises). The content hash covers the pattern nodes.
 - **Rationale**: owner's answers of 2026-11-25 (Q1: C, Q2: B). The map pattern uses only
   existing syntax (a map literal) and existing names, so it adds no reader rule and no new word
   `[OPINION]`. Lowering in the expander keeps the evaluator unchanged and lets the VM inherit it.
@@ -523,6 +533,8 @@ fact yet.
     written in the next commit message.
   - Before the C build exists (the first smoke-test task), the hook runs only the `names` check
     and the preset configuration step.
+  - *Added during US2:* the check also builds and tests a gcc `debug` build in the container,
+    because gcc found warnings that clang missed and CI was the only place running gcc.
 - **Rationale**: CI runs only on x86_64 (D-31), and arm64 (macOS and Linux) is where
   memory-ordering bugs show first (risk R2). A hook makes the local check automatic instead of a
   habit `[OPINION]`. A versioned hook directory keeps the hook under review like any other code.

@@ -12,13 +12,15 @@ Decisions: D-32 (modules and reuse tags), D-33 (conventions), D-48 (portability)
    CMake. The allowed direction is:
 
    ```text
-   portability → memory → values → hashing → collections → reader/printer → expander
-     → namespaces → encoding → evaluator → concurrency (→ executor interface)
+   portability → memory → values → hashing → collections → reader/printer → namespaces
+     → expander → encoding → evaluator → concurrency (→ executor interface)
      → executor_blocking, input_output, simulation → harness → main
    ```
 
    `concurrency` never includes `executor_blocking`; it receives an executor through the
-   interface below.
+   interface below. `namespaces` comes before `expander` because the analyzer resolves global
+   names and macros while it expands (changed during US2); the expander calls macros through a
+   hook installed by the evaluator.
 4. Only `portability` includes `<pthread.h>`, `<time.h>`, `<unistd.h>`, `<sys/random.h>` and
    contains `#if` on the operating system or the architecture (H7).
 

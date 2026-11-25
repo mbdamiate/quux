@@ -1,0 +1,7 @@
+(+ 1 2)
+(quotient 1 0)
+(define-function square [x]
+  (* x x))
+(square 12)
+"text"
+{:a [1 2]}

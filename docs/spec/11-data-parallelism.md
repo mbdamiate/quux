@@ -59,7 +59,7 @@
 ```
 
 Reference program 08 contains the complete fork/join examples. `split-range` destructures its
-argument; destructuring in parameter lists is an open point of section 03.
+argument with a vector pattern (section 03, rule 6).
 
 ## Errors
 
@@ -72,8 +72,6 @@ argument; destructuring in parameter lists is an open point of section 03.
 
 - H12: a fixed tree limits how well work-stealing balances irregular work (unbalanced trees in
   program 08). **Open — closed in Phase 3.**
-- Kind predicates (`vector?`, `map?`, `list?` …) are not in the glossary yet. **Open — closed in
-  Phase 1** (to be proposed in `docs/naming.md` when program 08 is written).
 - Distributed partitioning that follows the same tree. **Open — closed in Phase 5e.**
 
 ## Used by programs
