@@ -149,15 +149,15 @@ note classified and recommended.
 exactly one `E-NN`, and every `E-NN` has a source.
 
 - [X] T025 [US3] **Owner review checkpoint** (FR-009a). Present the ten programs and their friction tables to the owner. Record the owner's additions (`Origin: owner`), disputes (`Review: disputed: <reason>`) and withdrawals (`Review: withdrawn`), and set every other note to `kept`. No classification starts before this task is done (data-model.md `Friction note.origin`, `Friction note.review status`) (S)
-- [ ] T026 [US3] Create `docs/ergonomics-report.md` with the six sections of contracts/friction-report.md. Fill **Method**: the program list and status, how the expected outputs were derived (D-60), the review checkpoint's results, and placeholders for the counts (S)
-- [ ] T027 [US3] Merge the reviewed notes into `E-NN` entries: one per distinct friction, listing all its `PNN-Fk` (and `M-NN`) sources. Write **Observed** with a minimal quux excerpt for each (SC-004) (M)
-- [ ] T028 [US3] Classify each entry as exactly one of: missing function, awkward name, missing syntax or pattern, error message quality, or performance surprise. Mistakes marked "partly" or "no" become `error message quality` entries (FR-010, FR-010a) (data-model.md `Report entry.class`, `Mistake.pointed to the cause`) (S)
-- [ ] T029 [US3] Write each entry's **Recommendation** (add, rename, document, keep as is) and **Rationale**. Label every claim. For comparisons with Clojure, Scheme or Racket, check the source documentation on the web when writing and link it as `[FACT: link]`. Proposed names are new full-word names, never copied foreign names unless they meet Principle VIII (D-64) (data-model.md `Report entry.recommendation`, `Report entry.rationale`, `Report entry.record`) (L)
-- [ ] T030 [P] [US3] Fill the **Mistakes log** from the **Mistakes** section of `programs/ergonomics/working-notes.md` (FR-010a) (S)
-- [ ] T031 [P] [US3] Fill **Bugs found** from T024's list, with the fix commits and regression tests (S)
-- [ ] T032 [P] [US3] Fill **Performance** from T023's table, flagging anything over 1 second or any `:stack-exhausted` under 10,000 elements (D-63) (S)
-- [ ] T033 [US3] Complete the counts in **Method**, and run quickstart scenario 8. Every `kept`/`disputed` note is in exactly one entry and every entry has a source (SC-004) (S)
-- [ ] T034 [US3] Delete `programs/ergonomics/working-notes.md`, now that its content is in the report, and update the program READMEs' "Mistakes made while writing" to point to the report's `M-NN` IDs (S)
+- [X] T026 [US3] Create `docs/ergonomics-report.md` with the six sections of contracts/friction-report.md. Fill **Method**: the program list and status, how the expected outputs were derived (D-60), the review checkpoint's results, and placeholders for the counts (S)
+- [X] T027 [US3] Merge the reviewed notes into `E-NN` entries: one per distinct friction, listing all its `PNN-Fk` (and `M-NN`) sources. Write **Observed** with a minimal quux excerpt for each (SC-004) (M)
+- [X] T028 [US3] Classify each entry as exactly one of: missing function, awkward name, missing syntax or pattern, error message quality, or performance surprise. Mistakes marked "partly" or "no" become `error message quality` entries (FR-010, FR-010a) (data-model.md `Report entry.class`, `Mistake.pointed to the cause`) (S)
+- [X] T029 [US3] Write each entry's **Recommendation** (add, rename, document, keep as is) and **Rationale**. Label every claim. For comparisons with Clojure, Scheme or Racket, check the source documentation on the web when writing and link it as `[FACT: link]`. Proposed names are new full-word names, never copied foreign names unless they meet Principle VIII (D-64) (data-model.md `Report entry.recommendation`, `Report entry.rationale`, `Report entry.record`) (L)
+- [X] T030 [P] [US3] Fill the **Mistakes log** from the **Mistakes** section of `programs/ergonomics/working-notes.md` (FR-010a) (S)
+- [X] T031 [P] [US3] Fill **Bugs found** from T024's list, with the fix commits and regression tests (S)
+- [X] T032 [P] [US3] Fill **Performance** from T023's table, flagging anything over 1 second or any `:stack-exhausted` under 10,000 elements (D-63) (S)
+- [X] T033 [US3] Complete the counts in **Method**, and run quickstart scenario 8. Every `kept`/`disputed` note is in exactly one entry and every entry has a source (SC-004) (S)
+- [X] T034 [US3] Delete `programs/ergonomics/working-notes.md`, now that its content is in the report, and update the program READMEs' "Mistakes made while writing" to point to the report's `M-NN` IDs (S)
 
 **Checkpoint (stopping point 4, first half)**: the report is complete except for the decision
 list.

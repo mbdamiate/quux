@@ -47,4 +47,4 @@ specification before the first run. The first run matched.
 
 ## Mistakes made while writing
 
-- M-01 (see `docs/ergonomics-report.md`).
+- M-01, in the [mistakes log](../../../docs/ergonomics-report.md#mistakes-log) of the report (entry E-22).

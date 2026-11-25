@@ -51,4 +51,4 @@ three changed lines (mistakes 6, 8 and 12) now read as first predicted.
 
 ## Mistakes made while writing
 
-- M-02 to M-08 (load-time and scratch mistakes, see `docs/ergonomics-report.md`).
+- M-02 to M-08 (load-time and scratch mistakes), in the [mistakes log](../../../docs/ergonomics-report.md#mistakes-log) of the report (entries E-20, E-39 and E-40; M-04 pointed to the cause).
