@@ -177,6 +177,7 @@ name by name by the owner on 2026-11-24.
 | J5. Harness report keys | `:program`, `:seed`, `:target`, `:system`, `:architecture`, `:preset`, `:assertions`, `:assertion`, `:held`, `:observed`, `:result`, `:pass`, `:fail`, `:notes`, `:primary-error-raced`, `:foreign-stream-advances`, `:fetches` | D-46 | approved |
 | J6. Simulator message kinds | `:spawn-request`, `:spawn-result`, `:agent-update`, `:acknowledgement` (already approved in I7), `:stream-pull`, `:stream-cell`, `:cancel`, `:state-request`, `:state-reply` | D-45 | approved |
 | J7. Tools | executables `quux`, `quux-test`, `quux-name-check`; REPL namespace `user` | D-46, D-47, D-52 | approved |
+| J8. Error kind | `:syntax` (the reader cannot read the text: unbalanced brackets, a reader shorthand, a malformed literal, an unknown escape, text that ends inside a form) | D-54, W11 (owner, 2026-11-25) | approved |
 
 ## H. C code: abbreviations allowed as exceptions
 

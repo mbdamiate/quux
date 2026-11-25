@@ -82,10 +82,11 @@ static void shorthands_rejected(quux_unit_state *state) {
     quux_context *context = &fixture.context;
     quux_value value = quux_nothing;
     QUUX_ROOT_FRAME(context, &value);
-    const char *rejected[] = {"'x", "`(a b)", "~x", "@future", "#(x)"};
+    const char *rejected[] = {"'x",    "`(a b)",   "~x", "@future", "#(x)",  ")",
+                              "(1 2]", "\"a\\q\"", ":",  "{:a}",    "1.2.3", "(1 2"};
     for (size_t i = 0; i < sizeof rejected / sizeof rejected[0]; i++) {
         QUUX_CHECK(state, !quux_read_one(context, rejected[i], strlen(rejected[i]), &value));
-        QUUX_CHECK(state, quux_pending_error_is(context, "wrong-type"));
+        QUUX_CHECK(state, quux_pending_error_is(context, "syntax"));
         context->pending_error = quux_nothing;
     }
     quux_reader reader;

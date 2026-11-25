@@ -48,6 +48,7 @@
 | Program | `:user` | the program raises its own error | Phase 1 |
 | | `:wrong-argument-count` | wrong number of arguments | Phase 1 |
 | | `:wrong-type` | a value of the wrong kind | Phase 1 |
+| | `:syntax` | the reader cannot read the text (unbalanced brackets, a reader shorthand, a malformed literal, text that ends inside a form) | Phase 1 |
 | | `:undefined-name` | a symbol without a binding | Phase 1 |
 | | `:index-out-of-range` | `element-at` outside the vector | Phase 1 |
 | | `:resource-closed` | reading from or writing to a closed file or connection | Phase 1 |

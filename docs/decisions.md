@@ -74,3 +74,4 @@ These were fixed before planning and are encoded in the constitution:
 | D-51 | Error kinds `:stack-exhausted` and `:resource-exhausted` (naming J4) | 002 / Phase 1 | adopted (owner) | Phase 3 |
 | D-52 | Line-based REPL and file runner, no line-editing library | 002 / Phase 1 | recommended | Phase 7 |
 | D-53 | Pre-push git hook runs every preset on macOS arm64 and in the Linux arm64 container and blocks the push on failure; skips label `pending` and presets recorded as unavailable in the container (with a warning); documentation-only pushes run only the name check | 002 / Phase 1 | adopted (owner) | all phases |
+| D-54 | Error kind `:syntax` for reader errors (naming J8, W11); an integer literal outside 64 bits stays `:overflow` | 002 / Phase 1 | adopted (owner) | Phase 3 |

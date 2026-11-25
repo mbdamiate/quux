@@ -553,6 +553,21 @@ fact yet.
   specification `[OPINION]`.
 - **Inherited by**: Phase 7.
 
+### D-54 — Error kind for reader errors (W11)
+
+- **Decision** (owner, 2026-11-25; `docs/naming.md` J8): the reader raises `:syntax` when it
+  cannot read the text: an unbalanced closing bracket, a reader shorthand (`'x`, `@x`, …), a
+  `#` outside `#{`, an empty keyword, a malformed number, an unknown string escape, a map
+  literal with an odd number of forms, or text that ends inside a form. The message starts
+  with the line number. An integer literal that does not fit in 64 bits stays `:overflow`,
+  because the text is well formed and only the value is out of range.
+- **Alternatives considered**: keep `:wrong-type` (rejected: a `catch` meant for values of the
+  wrong kind would also catch reading errors); `:syntax-error` or `:malformed` (rejected: the
+  other kinds do not repeat "error", and `:syntax` names the layer that failed).
+- **Rationale**: until US2 the reader used `:wrong-type` with a "syntax error" message as a
+  placeholder; fixing it before US3 avoids more tests and examples depending on it.
+- **Inherited by**: Phase 3 (the VM's compiler reads the same text).
+
 ## Hypotheses after this research
 
 | Hypothesis | Status after planning | Closed by |
