@@ -84,53 +84,6 @@ static int run_repl(quux_context *context, void *data) {
     return 0;
 }
 
-typedef struct file_run {
-    const char *path;
-    const char *input;
-} file_run;
-
-static int run_file(quux_context *context, void *data) {
-    file_run *run = data;
-    size_t length = 0;
-    char *text = quux_session_read_file(run->path, &length);
-    if (text == NULL) {
-        fprintf(stderr, "quux: cannot read %s\n", run->path);
-        return 2;
-    }
-    quux_value value = quux_nothing;
-    quux_value input = quux_nothing;
-    quux_value main_function = quux_nothing;
-    quux_value definition = quux_nothing;
-    QUUX_ROOT_FRAME(context, &value, &input, &main_function, &definition);
-    int status = 0;
-    bool done = quux_evaluate_text(context, text, length, &value);
-    if (done && run->input != NULL) {
-        done = quux_read_one(context, run->input, strlen(run->input), &input);
-    }
-    if (done) {
-        done = quux_namespace_resolve(context, context->current_namespace,
-                                      quux_symbol(context, "main"), &definition);
-        if (done && quux_is_nothing(definition)) {
-            fprintf(stderr, "quux: %s does not define main\n", run->path);
-            status = 2;
-        } else if (done) {
-            main_function = quux_definition_field(definition, QUUX_DEFINITION_VALUE);
-            done = quux_call1(context, main_function, input, &value);
-            if (done) {
-                quux_print_to_stream(context, stdout, value, QUUX_PRINT_READABLE);
-                fputs("\n", stdout);
-            }
-        }
-    }
-    if (!done) {
-        quux_session_print_error(context, stdout, context->pending_error);
-        status = 1;
-    }
-    QUUX_ROOT_FRAME_END(context);
-    free(text);
-    return status;
-}
-
 int main(int argument_count, char **arguments) {
     if (argument_count == 1) {
         return quux_session_run(run_repl, NULL);
@@ -141,6 +94,6 @@ int main(int argument_count, char **arguments) {
         fprintf(stderr, "usage: quux [FILE.qx [INPUT]]\n");
         return 2;
     }
-    file_run run = {arguments[1], argument_count == 3 ? arguments[2] : NULL};
-    return quux_session_run(run_file, &run);
+    return quux_session_run_file(arguments[1], argument_count == 3 ? arguments[2] : NULL,
+                                 QUUX_VERIFY_OFF);
 }

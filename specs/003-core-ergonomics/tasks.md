@@ -46,9 +46,9 @@ Story 5 is out of scope (clarification Q1).
 
 **Purpose**: the directories, the index and the templates every program uses.
 
-- [ ] T001 Create `programs/ergonomics/README.md`: the index table (number, directory, area, variant and partner, status, number of friction notes) with the ten rows of D-59 marked `planned`, and the note that these programs are not the phase acceptance suite (contracts/program-layout.md) (S)
-- [ ] T002 [P] Create `programs/ergonomics/working-notes.md`, a working file with three sections: **Mistakes** (the columns of data-model.md `Mistake.identifier`, `Mistake.code`, `Mistake.kind and message`, `Mistake.pointed to the cause`, `Mistake.program`, `Mistake.load time`), **Bugs found** (T024) and **Timings** (T023) (S)
-- [ ] T003 [P] Create `tests/ergonomics/CMakeLists.txt` with empty lists `quux_ergonomics_ready` and `quux_ergonomics_pending`, and add `add_subdirectory(tests/ergonomics)` to `CMakeLists.txt` (D-56) (S)
+- [X] T001 Create `programs/ergonomics/README.md`: the index table (number, directory, area, variant and partner, status, number of friction notes) with the ten rows of D-59 marked `planned`, and the note that these programs are not the phase acceptance suite (contracts/program-layout.md) (S)
+- [X] T002 [P] Create `programs/ergonomics/working-notes.md`, a working file with three sections: **Mistakes** (the columns of data-model.md `Mistake.identifier`, `Mistake.code`, `Mistake.kind and message`, `Mistake.pointed to the cause`, `Mistake.program`, `Mistake.load time`), **Bugs found** (T024) and **Timings** (T023) (S)
+- [X] T003 [P] Create `tests/ergonomics/CMakeLists.txt` with empty lists `quux_ergonomics_ready` and `quux_ergonomics_pending`, and add `add_subdirectory(tests/ergonomics)` to `CMakeLists.txt` (D-56) (S)
 
 ---
 
@@ -59,10 +59,10 @@ program task depends on this phase.
 
 **⚠️ CRITICAL**: no program can be checked automatically until this phase is complete.
 
-- [ ] T004 Move `run_file` and `file_run` from `source/main/quux.c` into `source/harness/quux_session.c` as `quux_session_run_file(path, input_text)`, declared in `source/harness/quux_session.h`; `quux` calls it, and the behavior stays identical. The existing `repl_session` test and a manual run of a file with and without input confirm that the output and the exit statuses 0, 1 and 2 are unchanged (D-56) (S)
-- [ ] T005 Add the `run FILE.qx [INPUT]` mode to `source/main/quux_test.c`. It accepts `--verify-roots` and `--verify-roots-every-allocation`, calls `quux_session_run_file`, and extends the usage text. Add the mode to `specs/002-blocking-prototype/contracts/command-line.md`. Add a unit-level check in `tests/repl/` (or a CTest in `tests/ergonomics/`) that `quux-test run` and `quux` give identical output for one small file (D-56; contracts/test-driver.md) (S)
-- [ ] T006 Write `tests/ergonomics/run_program_test.cmake`. It runs `RUNNER <dir>/main.qx [input.txt contents]`, compares the output byte for byte with `expected-output.txt` and the exit status with `expected-exit-status.txt` (default 0), and on a failure prints the expected and actual output and both statuses (contracts/test-driver.md) (S)
-- [ ] T007 In `tests/ergonomics/CMakeLists.txt`, register for each ready program `ergonomics_<dir>` (`quux`, label `ergonomics`) and `ergonomics_<dir>_verified` (`quux-test --verify-roots-every-allocation run`, labels `ergonomics;verified`, or `--verify-roots` when the program's README says `Verifier: amortized`, per data-model.md `Ergonomics program.verifier mode`). Register each pending program as `ergonomics_<dir>` with label `pending`. Every test gets `TIMEOUT 30` (D-56, D-57) (S)
+- [X] T004 Move `run_file` and `file_run` from `source/main/quux.c` into `source/harness/quux_session.c` as `quux_session_run_file(path, input_text)`, declared in `source/harness/quux_session.h`; `quux` calls it, and the behavior stays identical. The existing `repl_session` test and a manual run of a file with and without input confirm that the output and the exit statuses 0, 1 and 2 are unchanged (D-56) (S)
+- [X] T005 Add the `run FILE.qx [INPUT]` mode to `source/main/quux_test.c`. It accepts `--verify-roots` and `--verify-roots-every-allocation`, calls `quux_session_run_file`, and extends the usage text. Add the mode to `specs/002-blocking-prototype/contracts/command-line.md`. Add a unit-level check in `tests/repl/` (or a CTest in `tests/ergonomics/`) that `quux-test run` and `quux` give identical output for one small file (D-56; contracts/test-driver.md) (S)
+- [X] T006 Write `tests/ergonomics/run_program_test.cmake`. It runs `RUNNER <dir>/main.qx [input.txt contents]`, compares the output byte for byte with `expected-output.txt` and the exit status with `expected-exit-status.txt` (default 0), and on a failure prints the expected and actual output and both statuses (contracts/test-driver.md) (S)
+- [X] T007 In `tests/ergonomics/CMakeLists.txt`, register for each ready program `ergonomics_<dir>` (`quux`, label `ergonomics`) and `ergonomics_<dir>_verified` (`quux-test --verify-roots-every-allocation run`, labels `ergonomics;verified`, or `--verify-roots` when the program's README says `Verifier: amortized`, per data-model.md `Ergonomics program.verifier mode`). Register each pending program as `ergonomics_<dir>` with label `pending`. Every test gets `TIMEOUT 30` (D-56, D-57) (S)
 
 **Checkpoint**: an empty ready list configures cleanly in every preset; `quux-test run` works.
 
@@ -91,7 +91,7 @@ output; two are pending with named missing pieces. Each has its "Friction observ
 
 ### First program (end-to-end check of the pipeline)
 
-- [ ] T008 [US1] Program 01, nested data, in `programs/ergonomics/01-nested-data/`. It updates maps inside vectors inside maps (for example an inventory by warehouse), with `put`, `get`, `transform`, `reduce`, `thread-first` and `thread-last`, and prints the results with `print-line` and `to-string` (FR-001 area 1) (M)
+- [X] T008 [US1] Program 01, nested data, in `programs/ergonomics/01-nested-data/`. It updates maps inside vectors inside maps (for example an inventory by warehouse), with `put`, `get`, `transform`, `reduce`, `thread-first` and `thread-last`, and prints the results with `print-line` and `to-string` (FR-001 area 1) (M)
 
 **Checkpoint (stopping point 1)**: `ergonomics_01-nested-data` and its `_verified` variant pass in
 every preset locally; the name check passes.

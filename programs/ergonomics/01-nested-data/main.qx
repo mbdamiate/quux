@@ -1,0 +1,95 @@
+;; 01 — Nested data: the inventory of two warehouses, as maps inside vectors inside a map.
+;; The program reads and changes values deep inside the structure, sums stock values with
+;; thread-last pipelines, and chains changes with thread-first. Every change returns a new
+;; inventory; the original is unchanged.
+
+(define inventory
+  {:warehouses [{:name "north"
+                 :items [{:product "bolt" :quantity 120 :price 2}
+                         {:product "nut" :quantity 300 :price 1}]}
+                {:name "south"
+                 :items [{:product "bolt" :quantity 40 :price 2}
+                         {:product "washer" :quantity 0 :price 1}]}]})
+
+;; The value found by following a path of map keys and vector indexes.
+(define-function value-at-path [collection path]
+  (reduce (function [current key] (get current key)) collection path))
+
+;; A copy of collection where the value at path is replaced by (change old-value).
+(define-function change-at-path [collection path change]
+  (if (empty? path)
+    (change collection)
+    (let [[key :rest remaining] path]
+      (put collection key (change-at-path (get collection key) remaining change)))))
+
+;; The index of the first item whose product is `product`, or nothing.
+(define-function index-of-product [items product]
+  (reduce (function [found index]
+            (if (and (nothing? found)
+                     (equal? (get (element-at items index) :product) product))
+              index
+              found))
+          nothing
+          (range 0 (count items))))
+
+;; Adds `amount` (possibly negative) to the quantity of one product in one warehouse.
+(define-function restock [inventory warehouse-index product amount]
+  (let [items (value-at-path inventory [:warehouses warehouse-index :items])
+        index (index-of-product items product)]
+    (change-at-path inventory
+                    [:warehouses warehouse-index :items index :quantity]
+                    (function [quantity] (+ quantity amount)))))
+
+;; The value of a warehouse's stock: quantity times price, summed.
+(define-function stock-value [warehouse]
+  (thread-last (get warehouse :items)
+               (transform (function [item] (* (get item :quantity) (get item :price))))
+               (reduce + 0)))
+
+;; Every item of every warehouse, in one vector.
+(define-function all-items [inventory]
+  (thread-last (get inventory :warehouses)
+               (transform (function [warehouse] (get warehouse :items)))
+               (reduce (function [items more-items] (pour-into items more-items)) [])))
+
+;; "warehouse/product" for each item with quantity zero.
+(define-function out-of-stock [inventory]
+  (reduce (function [found warehouse]
+            (pour-into found
+                       (thread-last (get warehouse :items)
+                                    (filter (function [item] (zero? (get item :quantity))))
+                                    (transform (function [item]
+                                                 (to-string (get warehouse :name) "/"
+                                                            (get item :product)))))))
+          []
+          (get inventory :warehouses)))
+
+;; The quantity of one product, summed over every warehouse.
+(define-function total-quantity [inventory product]
+  (thread-last (all-items inventory)
+               (filter (function [item] (equal? (get item :product) product)))
+               (transform (function [item] (get item :quantity)))
+               (reduce + 0)))
+
+;; One line per warehouse.
+(define-function report [inventory]
+  (reduce (function [ignored warehouse]
+            (print-line (to-string (get warehouse :name) ": "
+                                   (count (get warehouse :items)) " products, stock value "
+                                   (stock-value warehouse))))
+          nothing
+          (get inventory :warehouses)))
+
+(define-function main [input]
+  (print-line (to-string "warehouses: " (count (get inventory :warehouses))))
+  (report inventory)
+  (print-line (to-string "out of stock: " (out-of-stock inventory)))
+  (let [updated (thread-first inventory
+                              (restock 1 "washer" 50)
+                              (restock 0 "nut" -100))]
+    (report updated)
+    (print-line (to-string "out of stock: " (out-of-stock updated)))
+    (print-line (to-string "bolts in all warehouses: " (total-quantity updated "bolt")))
+    (print-line (to-string "original washer quantity: "
+                           (value-at-path inventory [:warehouses 1 :items 1 :quantity])))
+    (value-at-path updated [:warehouses 1 :items 1])))
