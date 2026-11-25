@@ -1,0 +1,5 @@
+[(returns [:user :timeout])                 ; A propagates the child's error; B times out
+ (future-error :failing :user)
+ (future-error :slow :cancelled)            ; the sibling was cancelled
+ (future-error :long-computation :cancelled); the timed-out computation was cancelled
+ (elapsed-under 1000)]

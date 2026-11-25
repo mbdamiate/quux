@@ -1,0 +1,2 @@
+{:input  {:size 1000000}
+ :bounds {:wall-clock-milliseconds 600000}}

@@ -52,6 +52,7 @@ shares structure with the old one wherever possible.
 | `(pour-into target collection)` | adds every element of `collection` to `target` |
 | `(range start end)` | the integers from `start` up to, but not including, `end` |
 | `(to-string value)` | a printed representation |
+| `(parse-integer text)` | the integer written in decimal in `text`; raises `:wrong-type` if `text` is not a valid integer, and `:overflow` if it does not fit in 64 bits |
 
 The iteration order of a map or set is a function of its contents only. Two equal maps iterate
 in the same order, on every run and on every node.

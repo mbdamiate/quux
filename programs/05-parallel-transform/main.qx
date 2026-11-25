@@ -1,0 +1,25 @@
+;; Reference program 05 — parallel-transform over a large persistent vector, deterministic
+(namespace programs.parallel-transform)
+
+(define-function square [n] (* n n))
+
+(define-function numbers [input]
+  (pour-into [] (range 0 (get input :size))))
+
+(define-function float-sum [values]
+  ;; the reference for floats is the fixed reduction tree (D-18), in both versions
+  (parallel-reduce + 0.0 (parallel-transform (function [n] (/ n 3.0)) values)))
+
+(define-function main [input]
+  (let [values  (numbers input)
+        squares (parallel-transform square values)]
+    {:squares     squares
+     :integer-sum (parallel-reduce + 0 squares)
+     :float-sum   (float-sum values)}))
+
+(define-function sequential-main [input]
+  (let [values  (numbers input)
+        squares (pour-into [] (transform square values))]
+    {:squares     squares
+     :integer-sum (reduce + 0 squares)
+     :float-sum   (float-sum values)}))

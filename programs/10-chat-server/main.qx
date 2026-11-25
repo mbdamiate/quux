@@ -1,0 +1,107 @@
+;; Reference program 10 — chat server: one scope per connection, room state in an agent
+(namespace programs.chat-server)
+
+;; ---------- writing to every connection; a closed connection is skipped
+(define-function write-ignoring-closed [connection line]
+  (try
+    (write-line connection line)
+    (catch (function [problem]
+             (or (equal? (error-kind problem) :resource-closed)
+                 (equal? (error-kind problem) :transport)))
+           problem
+      nothing)))
+
+(define-function write-to-all [connections line]
+  (reduce (function [ignored connection] (write-ignoring-closed connection line) nothing)
+          nothing
+          connections))
+
+;; ---------- room updates (run one at a time: the commit order is the delivery order)
+(define-function register [room connection]
+  (let [registered (put room :connections (add (get room :connections) connection))]
+    (when (equal? (count (get registered :connections)) (get room :expected-clients))
+      (write-to-all (get registered :connections) "start"))
+    registered))
+
+(define-function deliver [room line]
+  (write-to-all (get room :connections) line)
+  (put room :log (add (get room :log) line)))
+
+;; ---------- server side of one connection
+(define-function read-messages [room connection connection-scope]
+  (let [line (read-line connection)]
+    (if (nothing? line)
+      (sequence (cancel! connection-scope)        ; the client went away: end this connection
+                (check-cancellation))
+      (sequence (wait-for (update room deliver line))
+                (read-messages room connection connection-scope)))))
+
+(define-function serve-connection [room outcomes connection]
+  (let [name (read-line connection)]
+    (wait-for (update room register connection))
+    (let [outcome (try
+                    (with-scope [connection-scope]
+                      (future (tag :connection-reader
+                                   (read-messages room connection connection-scope)))
+                      :ended)
+                    (catch :cancelled problem :cancelled))]
+      (wait-for (update outcomes put name outcome)))))
+
+(define-function accept-forever [listener room outcomes]
+  (let [connection (accept listener)]
+    (future (serve-connection room outcomes connection))
+    (accept-forever listener room outcomes)))
+
+;; ---------- clients (in the same process, through real connections)
+(define-function wait-for-start [connection]
+  (if (equal? (read-line connection) "start")
+    nothing
+    (wait-for-start connection)))
+
+(define-function read-lines [connection remaining received]
+  (if (zero? remaining)
+    received
+    (read-lines connection (decrement remaining) (add received (read-line connection)))))
+
+(define-function run-client [port client expected-messages]
+  (let [connection (connect "localhost" port)]
+    (write-line connection (get client :name))
+    (wait-for-start connection)
+    (if (get client :disconnect-abruptly)
+      (sequence
+        (reduce (function [ignored message] (write-line connection message) nothing)
+                nothing (get client :messages))
+        (close! connection)                       ; leaves without reading anything
+        {:name (get client :name) :received []})
+      (sequence
+        (tag :others-send nothing)                ; lets the leaving client go first
+        (reduce (function [ignored message] (write-line connection message) nothing)
+                nothing (get client :messages))
+        {:name     (get client :name)
+         :received (read-lines connection expected-messages [])}))))
+
+(define-function run-all-clients [input outcomes]
+  (with-scope [clients-scope]
+    (let [results (wait-for
+                    (all (transform (function [client]
+                                      (future (run-client (get input :port) client
+                                                          (get input :expected-messages))))
+                                    (get input :clients))))]
+      (tag :settle nothing)                       ; lets the server record the disconnection
+      {:received (reduce (function [received result]
+                           (put received (get result :name) (get result :received)))
+                         {} results)
+       :outcomes (state outcomes)})))
+
+;; ---------- the server runs until the clients are done; first-success then cancels it
+(define-function main [input]
+  (with-scope [scope]
+    (let [listener (listen (get input :port))
+          room     (tag :room (agent {:connections []
+                                      :log []
+                                      :expected-clients (count (get input :clients))}))
+          outcomes (agent {})]
+      (wait-for
+        (first-success
+          [(future (with-scope [server-scope] (accept-forever listener room outcomes)))
+           (future (run-all-clients input outcomes))])))))

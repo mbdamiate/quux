@@ -1,0 +1,4 @@
+[(same-as-sequential)
+ (deterministic 5)                          ; same value and hash, including :float-sum, on 5 runs
+ (returns-satisfying (function [result]
+                       (equal? (get result :integer-sum) 333332833333500000)))]

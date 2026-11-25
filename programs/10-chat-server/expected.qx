@@ -1,0 +1,10 @@
+[(returns-satisfying
+   (function [result]
+     (let [first-client  (get (get result :received) "client-1")
+           second-client (get (get result :received) "client-2")]
+       (and (equal? (count first-client) 5)                 ; every message arrived
+            (equal? first-client second-client)             ; the same total order for everyone
+            (equal? (first first-client) "leaving now")     ; the leaving client went first
+            (equal? (get result :outcomes) {"client-3" :cancelled})))))
+ (future-error :connection-reader :cancelled)               ; every connection scope ended by cancellation
+ (elapsed-under 2000)]

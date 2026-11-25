@@ -1,0 +1,2 @@
+{:delays {:replica-1 300 :replica-2 50 :replica-3 200}
+ :bounds {:wall-clock-milliseconds 1000}}

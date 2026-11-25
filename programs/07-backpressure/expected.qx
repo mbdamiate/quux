@@ -1,0 +1,4 @@
+[(returns 190)                              ; 0 + 1 + … + 19
+ (maximum-ahead :producer 1)                ; the producer never runs more than 1 item ahead
+ (elapsed-at-least 1000)                    ; paced by the consumer: 20 × 50 ms
+ (elapsed-under 3000)]

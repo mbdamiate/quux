@@ -1,0 +1,3 @@
+[(returns {:accepted 5 :refused 5 :balance 0})
+ (agent-final :account 0)
+ (never (negative? (state account)))]       ; checked after every committed update

@@ -1,0 +1,20 @@
+;; Reference program 07 — fast producer, slow consumer: backpressure by pull
+(namespace programs.backpressure)
+
+(define-function produce-forever [sink]
+  (let-functions [(produce-from [number]
+                    (tag :produce nothing)          ; 1 ms per item (injected)
+                    (emit sink number)
+                    (produce-from (increment number)))]
+    (produce-from 0)))
+
+(define-function consume [total number]
+  (tag :consume nothing)                            ; 50 ms per item (injected)
+  (+ total number))
+
+(define-function main [input]
+  (with-scope [scope]
+    (wait-for
+      (stream-reduce consume 0
+        (stream-take (get input :items)
+          (tag :producer (make-stream produce-forever {:maximum-ahead 1})))))))

@@ -26,6 +26,9 @@ Rules:
 2. `let-parallel` is the sequential-looking form: the body reads like sequential code, but the
    bindings run in parallel. No async marker exists anywhere: any function can wait.
 3. A combinator never retries anything.
+4. The futures that a combinator cancels because it no longer needs them end `:failed` with
+   `:cancelled`, but they do **not** fail their scope (section 07, rule 8). Without this rule,
+   `first-success` would always fail the scope that holds its losers.
 
 ## Examples
 

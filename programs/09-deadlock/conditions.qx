@@ -1,0 +1,2 @@
+{:delays {:a-starts 50 :b-starts 50}
+ :bounds {:wall-clock-milliseconds 1000}}

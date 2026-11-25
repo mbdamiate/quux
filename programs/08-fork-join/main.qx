@@ -1,0 +1,76 @@
+;; Reference program 08 — recursive fork/join: tree sum, parallel quicksort, failure in a subtask
+(namespace programs.fork-join)
+
+;; ---------- sequential reference for any split/combine pair
+(define-function sequential-solve [split combine problem]
+  (let [step (split problem)]
+    (if (equal? (element-at step 0) :leaf)
+      (element-at step 1)
+      (let [results (transform (function [sub-problem] (sequential-solve split combine sub-problem))
+                               (rest step))]
+        (reduce combine (first results) (rest results))))))
+
+;; ---------- tree sum: 2^16 values, leaves of 256 values
+(define leaf-size 256)
+
+(define-function split-range [bounds]
+  (let [start (element-at bounds 0)
+        end   (element-at bounds 1)]
+    (if (<= (- end start) leaf-size)
+      [:leaf (reduce + 0 (range start end))]
+      (let [middle (quotient (+ start end) 2)]
+        [:split [start middle] [middle end]]))))
+
+;; ---------- quicksort: small vectors are sorted sequentially inside one leaf
+(define-function split-for-sort [values]
+  (if (<= (count values) 1)
+    [:leaf values]
+    (let [pivot   (element-at values 0)
+          smaller (pour-into [] (filter (function [value] (< value pivot)) values))
+          same    (pour-into [] (filter (function [value] (equal? value pivot)) values))
+          larger  (pour-into [] (filter (function [value] (> value pivot)) values))]
+      (if (and (empty? smaller) (empty? larger))
+        [:leaf values]
+        [:split smaller same larger]))))
+
+(define-function concatenate [left right]
+  (pour-into left right))
+
+(define-function split-for-parallel-sort [values]
+  (if (<= (count values) 64)
+    [:leaf (sequential-solve split-for-sort concatenate values)]
+    (split-for-sort values)))
+
+;; ---------- failure: the leaf that contains 40000 fails; the leaf that contains 60000 is slow
+(define-function within-bounds? [bounds value]
+  (and (<= (element-at bounds 0) value) (< value (element-at bounds 1))))
+
+(define-function split-with-failure [bounds]
+  (let [step (split-range bounds)]
+    (conditional
+      (and (equal? (element-at step 0) :leaf) (within-bounds? bounds 40000))
+        (tag :faulty-leaf (raise (error :user "faulty leaf" {:bounds bounds})))
+      (and (equal? (element-at step 0) :leaf) (within-bounds? bounds 60000))
+        [:leaf (tag :slow-leaf (element-at step 1))]
+      true
+        step)))
+
+;; ---------- inputs
+(define-function sample-values [size]
+  (pour-into [] (transform (function [index] (modulo (* index 7919) 10007))
+                           (range 0 size))))
+
+(define-function outcome [solve]
+  (try (solve) (catch :user problem (error-kind problem))))
+
+(define-function main [input]
+  (let [size (get input :tree-size)]
+    {:tree-sum (fork-join split-range + [0 size])
+     :sorted   (fork-join split-for-parallel-sort concatenate (sample-values (get input :sort-size)))
+     :failure  (outcome (function [] (fork-join split-with-failure + [0 size])))}))
+
+(define-function sequential-main [input]
+  (let [size (get input :tree-size)]
+    {:tree-sum (sequential-solve split-range + [0 size])
+     :sorted   (sequential-solve split-for-sort concatenate (sample-values (get input :sort-size)))
+     :failure  (outcome (function [] (sequential-solve split-with-failure + [0 size])))}))

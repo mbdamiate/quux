@@ -1,0 +1,18 @@
+;; Reference program 06 — stream of lines from a file with asynchronous transform, filter, take
+(namespace programs.file-line-stream)
+
+(define-function multiple-of-seven? [number]
+  (zero? (modulo number 7)))
+
+(define-function print-and-collect [collected number]
+  (print-line number)
+  (add collected number))
+
+(define-function main [input]
+  (with-scope [scope]
+    (wait-for
+      (stream-reduce print-and-collect []
+        (stream-take 5
+          (stream-filter multiple-of-seven?
+            (stream-transform parse-integer
+              (tag :lines (file-lines (get input :file))))))))))

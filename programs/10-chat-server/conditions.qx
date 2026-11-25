@@ -1,0 +1,7 @@
+{:input  {:port 7070
+          :expected-messages 5
+          :clients [{:name "client-1" :messages ["hello from 1" "bye from 1"]}
+                    {:name "client-2" :messages ["hello from 2" "bye from 2"]}
+                    {:name "client-3" :messages ["leaving now"] :disconnect-abruptly true}]}
+ :delays {:others-send 100 :settle 200}
+ :bounds {:wall-clock-milliseconds 5000}}

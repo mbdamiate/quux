@@ -1,0 +1,23 @@
+;; Reference program 04 — bank account with an agent and atomic withdrawal
+(namespace programs.bank-account-agent)
+
+(define account (tag :account (agent 100)))
+
+;; test and act in the same function: never debits more than the balance
+(define-function withdraw [balance amount]
+  (if (>= balance amount)
+    [(- balance amount) :accepted]
+    [balance :insufficient-funds]))
+
+(define-function count-replies [replies reply]
+  (count (filter (function [candidate] (equal? candidate reply)) replies)))
+
+(define-function main [input]
+  (with-scope [scope]
+    (let [withdrawals (transform (function [index]
+                                   (future (wait-for (transact account withdraw 20))))
+                                 (range 0 (get input :withdrawals)))
+          replies     (wait-for (all withdrawals))]
+      {:accepted (count-replies replies :accepted)
+       :refused  (count-replies replies :insufficient-funds)
+       :balance  (state account)})))

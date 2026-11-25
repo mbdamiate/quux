@@ -27,6 +27,24 @@ Decisions: D-25 (fault injection lives outside the source), D-26 (formats).
 
 Unknown keys are an error in the harness, so typos never silently disable an injection.
 
+Harness conventions:
+
+- `(tag :name expression)` evaluates `expression` and returns its value. When conditions are
+  loaded, an entry in `:delays` waits that many milliseconds **before** the expression is
+  evaluated, and an entry in `:fail` raises an error of the given `:kind` after
+  `:after-milliseconds`, **instead of** evaluating it. A tag applies every time its expression
+  is evaluated. Injected waits are cancellation points, like `sleep`.
+- A tag evaluated inside a future, directly or through the functions it calls, names the
+  innermost future that evaluates it, for `future-state` and `future-error`. A tag around an `agent` or `make-stream` call names that agent or stream for
+  `agent-final` and `maximum-ahead`. When a tag is evaluated several times, the assertion must
+  hold for every instance.
+- `:generate :numbered-lines` writes the lines `1`, `2`, … `:count`, one decimal number per
+  line.
+- `same-as-sequential` runs `sequential-main` with the same input and compares its result with
+  the result of `main` using `equal?`. Programs that use it define both functions.
+- `never` evaluates its predicate form in the program's namespace after every committed agent
+  update and at the end of the run.
+
 ## `expected.qx` assertion forms
 
 The value is a vector. Each element is one assertion, and all of them must hold.

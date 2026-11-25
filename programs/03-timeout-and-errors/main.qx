@@ -1,0 +1,24 @@
+;; Reference program 03 — timeout and error propagation inside a scope
+(namespace programs.timeout-and-errors)
+
+;; Scenario A: a child fails after 50 ms; its sibling would run for 10 s.
+(define-function failing-child-scenario []
+  (with-scope [scope]
+    (let-parallel [a (tag :failing nothing)
+                   b (tag :slow nothing)]
+      [a b])))
+
+;; Scenario B: a computation of 5 s inside a timeout of 100 ms.
+(define-function timeout-scenario []
+  (with-scope [scope]
+    (wait-for (with-timeout 100 (function [] (tag :long-computation :late))))))
+
+(define-function outcome [scenario]
+  (try
+    (scenario)
+    (catch (function [candidate] true) problem
+      (error-kind problem))))
+
+(define-function main [input]
+  [(outcome failing-child-scenario)
+   (outcome timeout-scenario)])

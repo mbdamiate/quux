@@ -119,44 +119,44 @@ data, and a design note.
 **Independent Test**: [quickstart.md](./quickstart.md) steps 2 and 3 (limited to 01–10). A
 reader can write each test without asking a question.
 
-- [ ] T021 [P] [US2] Write `programs/01-parallel-search/` (M).
+- [X] T021 [P] [US2] Write `programs/01-parallel-search/` (M).
   - `main.qx`: `let-parallel` or `all` over a user lookup and an orders lookup.
   - `conditions.qx`: delays of 100 and 150 ms.
   - `expected.qx`: `returns-satisfying`, `(elapsed-at-least 150)`, `(elapsed-under 250)`, `future-state :filled` for both.
-- [ ] T022 [P] [US2] Write `programs/02-first-response-wins/` (S).
+- [X] T022 [P] [US2] Write `programs/02-first-response-wins/` (S).
   - `main.qx`: `first-success` over three replicas.
   - `conditions.qx`: delays of 300, 50 and 200 ms.
   - `expected.qx`: the 50 ms answer is returned; the other two end with `future-error … :cancelled`.
-- [ ] T023 [P] [US2] Write `programs/03-timeout-and-errors/` (S).
+- [X] T023 [P] [US2] Write `programs/03-timeout-and-errors/` (S).
   - Two cases: the example in contracts/reference-program.md, and a `with-timeout` of 100 ms over 5 s that raises `:timeout`.
   - Use `main.qx` with one entry per case, or two documented directories.
-- [ ] T024 [P] [US2] Write `programs/04-bank-account-agent/` (M).
+- [X] T024 [P] [US2] Write `programs/04-bank-account-agent/` (M).
   - `main.qx`: `transact` with a check-and-debit function.
   - `conditions.qx`: 10 withdrawals of 20 against a balance of 100.
   - `expected.qx`: exactly 5 successes, the final balance from `agent-final` is 0, and `(never (negative? balance))`.
   - Cites data-model.md `Agent.queue`.
-- [ ] T025 [P] [US2] Write `programs/05-parallel-transform/` (S).
+- [X] T025 [P] [US2] Write `programs/05-parallel-transform/` (S).
   - A vector of 1,000,000 integers with a pure function.
   - `expected.qx`: `same-as-sequential`, `(deterministic 5)`.
   - Includes a float reduction case for D-18.
-- [ ] T026 [P] [US2] Write `programs/06-file-line-stream/` (M).
+- [X] T026 [P] [US2] Write `programs/06-file-line-stream/` (M).
   - `file-lines` → `stream-transform` → `stream-filter` → `stream-take` 5.
   - `conditions.qx`: a generated `lines.txt` of 10,000 lines.
   - `expected.qx`: `output-lines` with the first 5 matches, and a bound on the lines read: at most `:maximum-ahead` + 1 lines past the 5th match.
   - Also write `docs/spec/appendix-input-output.md`. It defines `open-file`, `file-lines`, `listen`, `accept`, `read-line`, `write-line` and `print-line` (the cancellation points, and the errors on a closed resource). The appendix is not one of the 14 topics.
-- [ ] T027 [P] [US2] Write `programs/07-backpressure/` (S).
+- [X] T027 [P] [US2] Write `programs/07-backpressure/` (S).
   - A producer at 1 ms per item and a consumer at 50 ms per item.
   - `expected.qx`: `(maximum-ahead :producer 1)`.
   - Cites data-model.md `Stream.maximum-ahead`.
-- [ ] T028 [P] [US2] Write `programs/08-fork-join/` (M).
+- [X] T028 [P] [US2] Write `programs/08-fork-join/` (M).
   - A tree sum over 2^16 leaves and a parallel quicksort with `fork-join`.
   - `expected.qx`: `same-as-sequential`.
   - A failure case: a subtask fails, the root raises, and the pending subtasks end `:cancelled`.
-- [ ] T029 [P] [US2] Write `programs/09-deadlock/` (S).
+- [X] T029 [P] [US2] Write `programs/09-deadlock/` (S).
   - A waits for B and B waits for A, in one scope.
   - `expected.qx`: `(raises :deadlock)`, both futures with `:deadlock`, `elapsed-under`.
   - Cites data-model.md `Future.state`.
-- [ ] T030 [US2] Write `programs/10-chat-server/` (L).
+- [X] T030 [US2] Write `programs/10-chat-server/` (L).
   - One scope per connection, with the room state in an agent.
   - `conditions.qx`: 3 simulated clients, one of which disconnects abruptly.
   - `expected.qx`:
@@ -164,7 +164,7 @@ reader can write each test without asking a question.
     - all clients see the same total order, which is the room agent's commit order;
     - the disconnected client's scope tasks end `:cancelled`.
   - Depends on T014 and T015 (agents and streams), and on T026 (I/O appendix).
-- [ ] T031 [US2] Run [quickstart.md](./quickstart.md) steps 2 and 3 for programs 01–10, and fix the gaps (S).
+- [X] T031 [US2] Run [quickstart.md](./quickstart.md) steps 2 and 3 for programs 01–10, and fix the gaps (S).
 
 **Checkpoint**: US1 and US2 together form the local acceptance suite for feature 002.
 

@@ -1,0 +1,15 @@
+;; Reference program 09 — deadlock between futures (A waits for B, B waits for A)
+(namespace programs.deadlock)
+
+;; An agent holds both futures so that each can find the other. The injected waits at
+;; :a-starts and :b-starts give the main task time to store both futures first.
+(define-function main [input]
+  (with-scope [scope]
+    (let [holder (agent {})
+          a (future (tag :a-starts nothing)
+                    (tag :a (wait-for (get (state holder) :b))))
+          b (future (tag :b-starts nothing)
+                    (tag :b (wait-for (get (state holder) :a))))]
+      (wait-for (update holder put :a a))
+      (wait-for (update holder put :b b))
+      [(wait-for a) (wait-for b)])))

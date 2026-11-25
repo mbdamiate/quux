@@ -1,0 +1,3 @@
+{:input  {:user 7}
+ :delays {:user-lookup 100 :orders-lookup 150}
+ :bounds {:wall-clock-milliseconds 1000}}

@@ -32,8 +32,8 @@ must exist by the end of Phase 1.
 | Parallelism | `parallel-transform`, `parallel-reduce`, `fork-join` | D-18 |
 | Errors | `error`, `error-kind`, `error-data`, `unique-symbol` (macros) | D-13, D-06 |
 | Identity and distribution | `function-hash`, `serializable?`, `node`, `spawn-on` | D-19..D-22 |
-| I/O (programs 6 and 10 only) | `open-file`, `listen`, `accept`, `read-line`, `write-line`, `print-line` | — |
-| Test support | `tag` | D-25 |
+| I/O (programs 6 and 10 only) | `open-file`, `file-lines`, `listen`, `accept`, `connect`, `read-line`, `write-line`, `close!`, `print-line`, `parse-integer` | appendix |
+| Test support | `tag`, `sequential-main` (defined by programs) | D-25 |
 
 `tag` is an identity function at run time when no conditions are loaded.
 

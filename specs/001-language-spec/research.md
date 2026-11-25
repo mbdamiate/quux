@@ -240,6 +240,11 @@ Phase 2 gate (feature 003), as the constitution requires.
     handler must unpack groups.
   - Lowest child index wins: deterministic, but the cancellation that the first failure causes
     can turn into the reported error. Rejected `[OPINION]`.
+- **Amendment (implementation of US2, 2026-11-24)**: the cancellations that a combinator
+  causes (the losers of `first-success`, the inner computation of `with-timeout`, the rest of
+  `all` after a failure) are dropped like the scope's own cancellations, so they do not fail the
+  scope. Programs 02 and 10 depend on this rule. See `docs/spec/07-scopes-and-cancellation.md`,
+  rule 8.
 - **Inherited by**: Phase 3, Phase 5 (5b).
 
 ### D-12 — Combinators and the async macro
@@ -286,8 +291,8 @@ Phase 2 gate (feature 003), as the constitution requires.
 - **Alternatives**:
   - Typed exception hierarchies: these need a class system.
   - Result values without exceptions: they make code that waits on many futures verbose `[OPINION]`.
-- **Amendment (implementation of US1, 2026-11-24)**: the kinds `:division-by-zero` and
-  `:index-out-of-range` were added (approved in `docs/naming.md`). See `docs/spec/12-errors.md`.
+- **Amendment (implementation of US1 and US2, 2026-11-24)**: the kinds `:division-by-zero`,
+  `:index-out-of-range` and `:resource-closed` were added (approved in `docs/naming.md`). See `docs/spec/12-errors.md`.
 - **Inherited by**: Phase 1, Phase 3, Phase 5.
 
 ### D-14 — Deadlock detection

@@ -1,0 +1,4 @@
+[(raises :deadlock)                         ; detected, propagated through the scope
+ (future-error :a :deadlock)
+ (future-error :b :deadlock)
+ (elapsed-under 1000)]                      ; never hangs

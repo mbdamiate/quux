@@ -1,0 +1,9 @@
+;; Reference program 02 — the first response wins; the others are cancelled
+(namespace programs.first-response-wins)
+
+(define-function main [input]
+  (with-scope [scope]
+    (wait-for
+      (first-success [(future (tag :replica-1 :answer-from-replica-1))
+                      (future (tag :replica-2 :answer-from-replica-2))
+                      (future (tag :replica-3 :answer-from-replica-3))]))))

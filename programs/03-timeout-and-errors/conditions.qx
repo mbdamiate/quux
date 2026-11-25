@@ -1,0 +1,3 @@
+{:fail   {:failing {:kind :user :after-milliseconds 50}}
+ :delays {:slow 10000 :long-computation 5000}
+ :bounds {:wall-clock-milliseconds 1000}}

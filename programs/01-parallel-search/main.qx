@@ -1,0 +1,14 @@
+;; Reference program 01 — parallel search combined with all
+(namespace programs.parallel-search)
+
+(define-function lookup-user [identifier]
+  (tag :user-lookup {:identifier identifier :name "Ana"}))
+
+(define-function lookup-orders [identifier]
+  (tag :orders-lookup [{:order 1 :total 30} {:order 2 :total 45}]))
+
+(define-function main [input]
+  (with-scope [scope]
+    (let-parallel [user   (lookup-user (get input :user))
+                   orders (lookup-orders (get input :user))]
+      {:user user :orders orders})))

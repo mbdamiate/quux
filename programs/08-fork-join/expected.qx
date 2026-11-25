@@ -1,0 +1,5 @@
+[(same-as-sequential)
+ (returns-satisfying (function [result]
+                       (and (equal? (get result :tree-sum) 2147450880)
+                            (equal? (get result :failure) :user))))
+ (future-error :slow-leaf :cancelled)]      ; the slow subtask was cancelled by the failure

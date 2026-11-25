@@ -42,7 +42,13 @@ D-14 (deadlock detection), D-21 (scope identity; see section 13)
 7. The **primary error** is the first failure that is not a cancellation, in order of
    completion. Every later failure that is not a cancellation, and that happens before the join
    ends, is attached to the primary error under `:suppressed`.
-8. Cancellation errors caused by the scope's own cancellation are dropped.
+8. Cancellation errors are dropped, and do not fail the scope, when they were caused by:
+   - the scope's own cancellation; or
+   - a combinator that cancels futures it no longer needs: the losers of `first-success`, the
+     inner computation of `with-timeout`, and the remaining futures of `all` after a failure
+     (section 08).
+
+   Every other `:cancelled` failure of a child fails the scope like any other error.
 9. Because the order of completion between racing failures is not deterministic, tests MUST
    accept any of the racing errors as primary (`raises-one-of`) and may check the others with
    `suppressed-includes` (hypothesis H9).

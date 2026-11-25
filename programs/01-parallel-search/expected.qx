@@ -1,0 +1,6 @@
+[(returns {:user   {:identifier 7 :name "Ana"}
+           :orders [{:order 1 :total 30} {:order 2 :total 45}]})
+ (elapsed-at-least 150)                     ; at least the longer lookup
+ (elapsed-under 250)                        ; well below the 250 ms sum: the lookups ran in parallel
+ (future-state :user-lookup :filled)
+ (future-state :orders-lookup :filled)]

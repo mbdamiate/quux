@@ -1,0 +1,5 @@
+[(returns :answer-from-replica-2)
+ (future-state :replica-2 :filled)
+ (future-error :replica-1 :cancelled)
+ (future-error :replica-3 :cancelled)
+ (elapsed-under 150)]                       ; the losers were cancelled, not waited for
