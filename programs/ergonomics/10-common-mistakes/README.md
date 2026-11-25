@@ -39,13 +39,13 @@ predicted message was wrong: for `reduce` with two arguments the core says
 
 | ID | Location | What was awkward | Workaround | Origin | Review |
 |---|---|---|---|---|---|
-| P10-F1 | mistakes 6 and 8 | Messages do not adapt the article to the word: `expects a integer`, `got a nothing`, and in program 05's case `got a error`. | none | writer | unreviewed |
-| P10-F2 | mistakes 1 and 12 | Wrong argument counts are reported in two styles: a program's function says `deposit expects 2 arguments, got 1`, while a core function says `reduce does not take 2 arguments` without saying how many it takes. | none | writer | unreviewed |
-| P10-F3 | every mistake | No run-time message says where the mistake is: no file, line or calling function (section 12 leaves stack traces open until Phase 7). In a larger program, `+ expects a number, got a nothing` (mistake 6) gives no clue which `+`. | Read the code | writer | unreviewed |
-| P10-F4 | mistake 5 | Calling a keyword as a function, a habit from Clojure, gives `a keyword is not a function`, with no hint that `get` is the way to read a key. | none | writer | unreviewed |
-| P10-F5 | mistake 9 | Non-tail recursion stops at a depth of 10,000: a simple recursive count over a list of 20,000 elements raises `:stack-exhausted`. The message states the limit, which helps. | Write it with a tail call or `reduce` | writer | unreviewed |
-| P10-F6 | load-time mistakes M-02, M-03, M-06, M-07 | A malformed special form (`let` with an odd binding vector, parameters in a list, `unquote` outside `quasi-quote`) raises `:wrong-type` with no line number, while text the reader cannot read raises `:syntax` with a line number. Two kinds and two levels of detail for "this code is malformed". | Read the code | writer | unreviewed |
-| P10-F7 | scratch file | `(if test then)` without an else branch is accepted and returns `nothing` when the test fails, although section 03 shows only the three-part form. | none | writer | unreviewed |
+| P10-F1 | mistakes 6 and 8 | Messages do not adapt the article to the word: `expects a integer`, `got a nothing`, and in program 05's case `got a error`. | none | writer | kept |
+| P10-F2 | mistakes 1 and 12 | Wrong argument counts are reported in two styles: a program's function says `deposit expects 2 arguments, got 1`, while a core function says `reduce does not take 2 arguments` without saying how many it takes. | none | writer | kept |
+| P10-F3 | every mistake | No run-time message says where the mistake is: no file, line or calling function (section 12 leaves stack traces open until Phase 7). In a larger program, `+ expects a number, got a nothing` (mistake 6) gives no clue which `+`. | Read the code | writer | kept |
+| P10-F4 | mistake 5 | Calling a keyword as a function, a habit from Clojure, gives `a keyword is not a function`, with no hint that `get` is the way to read a key. | none | writer | kept |
+| P10-F5 | mistake 9 | Non-tail recursion stops at a depth of 10,000: a simple recursive count over a list of 20,000 elements raises `:stack-exhausted`. The message states the limit, which helps. | Write it with a tail call or `reduce` | writer | kept |
+| P10-F6 | load-time mistakes M-02, M-03, M-06, M-07 | A malformed special form (`let` with an odd binding vector, parameters in a list, `unquote` outside `quasi-quote`) raises `:wrong-type` with no line number, while text the reader cannot read raises `:syntax` with a line number. Two kinds and two levels of detail for "this code is malformed". | Read the code | writer | kept |
+| P10-F7 | scratch file | `(if test then)` without an else branch is accepted and returns `nothing` when the test fails, although section 03 shows only the three-part form. | none | writer | kept |
 
 ## Mistakes made while writing
 

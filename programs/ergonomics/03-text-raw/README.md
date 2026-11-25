@@ -43,7 +43,7 @@ Padding is not a stub: it can be written in quux, as program 02 does (friction P
 
 | ID | Location | What was awkward | Workaround | Origin | Review |
 |---|---|---|---|---|---|
-| P03-F1 | `split-into-lines`, `split-on-whitespace`, `split-on-separator`, `trim` | The four string functions an everyday text task needs do not exist, and none of them can be written in quux: there is no way to take a character or a part of a string, or to look for a character in it. | Stubs (the program is pending) | writer | unreviewed |
-| P03-F2 | the whole program | Programs 02 and 03 share most of their code, but a program cannot load another file, so the code is copied. Namespaces (section 14) organize names inside one file only. | Copy | writer | unreviewed |
-| P03-F3 | `rows-of`, `words-of` | `transform` returns a list, so getting a vector back takes `pour-into []` around it. Here a list would also do, but rows are vectors in program 02, and keeping the same kind needs the extra call. | `pour-into []` | writer | unreviewed |
-| P03-F4 | `split-at-empty-line` | Splitting a sequence at the first element that satisfies a predicate (Clojure's `split-with`) needs a `reduce` with a three-key state map. | `reduce` with `{:before :after :found}` | writer | unreviewed |
+| P03-F1 | `split-into-lines`, `split-on-whitespace`, `split-on-separator`, `trim` | The four string functions an everyday text task needs do not exist, and none of them can be written in quux: there is no way to take a character or a part of a string, or to look for a character in it. | Stubs (the program is pending) | writer | kept |
+| P03-F2 | the whole program | Programs 02 and 03 share most of their code, but a program cannot load another file, so the code is copied. Namespaces (section 14) organize names inside one file only. | Copy | writer | kept |
+| P03-F3 | `rows-of`, `words-of` | `transform` returns a list, so getting a vector back takes `pour-into []` around it. Here a list would also do, but rows are vectors in program 02, and keeping the same kind needs the extra call. | `pour-into []` | writer | kept |
+| P03-F4 | `split-at-empty-line` | Splitting a sequence at the first element that satisfies a predicate (Clojure's `split-with`) needs a `reduce` with a three-key state map. | `reduce` with `{:before :after :found}` | writer | kept |

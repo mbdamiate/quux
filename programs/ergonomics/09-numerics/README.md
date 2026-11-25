@@ -40,9 +40,9 @@ matched.
 
 | ID | Location | What was awkward | Workaround | Origin | Review |
 |---|---|---|---|---|---|
-| P09-F1 | `sort-numbers`, `insert-in-order` | No sort function (as in P02-F4). A median needs a hand-written insertion sort, built from two `filter` calls per element. | Insertion sort | writer | unreviewed |
-| P09-F2 | `main` | No square root or power function, so the standard deviation cannot be computed; the program stops at the variance. | Leave it out | writer | unreviewed |
-| P09-F3 | `divide`, `mean`, `median` | A mean of integers needs `try` around `/` to catch `:inexact-division` and retry in floating point: an error used for ordinary control flow. The result's kind then depends on the data (`18` but `15.5`). | `divide` helper | writer | unreviewed |
-| P09-F4 | `divide`, `main` | No function converts between integers and floats in either direction: an integer becomes a float only through `(* 1.0 n)`, and a float cannot be rounded, truncated or floored to an integer (as in P02-F5 and P02-F6). | `(* 1.0 n)` | writer | unreviewed |
-| P09-F5 | `greatest-common-divisor`, `fraction` | There are no rationals (section 05, open until after Phase 3) and no greatest common divisor in the core, so fraction arithmetic is written by hand. | Local helpers | writer | unreviewed |
-| P09-F6 | `value-or-error-kind` | Catching every error needs a predicate that always returns true, `(catch (function [problem] true) problem …)`; there is no catch-all form. | The predicate | writer | unreviewed |
+| P09-F1 | `sort-numbers`, `insert-in-order` | No sort function (as in P02-F4). A median needs a hand-written insertion sort, built from two `filter` calls per element. | Insertion sort | writer | kept |
+| P09-F2 | `main` | No square root or power function, so the standard deviation cannot be computed; the program stops at the variance. | Leave it out | writer | kept |
+| P09-F3 | `divide`, `mean`, `median` | A mean of integers needs `try` around `/` to catch `:inexact-division` and retry in floating point: an error used for ordinary control flow. The result's kind then depends on the data (`18` but `15.5`). | `divide` helper | writer | kept |
+| P09-F4 | `divide`, `main` | No function converts between integers and floats in either direction: an integer becomes a float only through `(* 1.0 n)`, and a float cannot be rounded, truncated or floored to an integer (as in P02-F5 and P02-F6). | `(* 1.0 n)` | writer | kept |
+| P09-F5 | `greatest-common-divisor`, `fraction` | There are no rationals (section 05, open until after Phase 3) and no greatest common divisor in the core, so fraction arithmetic is written by hand. | Local helpers | writer | kept |
+| P09-F6 | `value-or-error-kind` | Catching every error needs a predicate that always returns true, `(catch (function [problem] true) problem …)`; there is no catch-all form. | The predicate | writer | kept |
