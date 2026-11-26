@@ -186,8 +186,8 @@ with an open W-xx entry), and every report entry with add or rename links its re
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T041 [P] Update `docs/speckit-roadmap.md`: mark 003 done, and add to feature 004's input ("Starting reality") a pointer to the decision list and the approved additions that a later feature will implement (S)
-- [ ] T042 [P] Add a note to `specs/002-blocking-prototype/tasks.md`, at the task that adds the reference-program test loop, that the loop must match `programs/[0-9][0-9]-*` or list the programs, so that it does not pick up `programs/ergonomics/` (research risk R1) (S)
+- [X] T041 [P] Update `docs/speckit-roadmap.md`: mark 003 done, and add to feature 004's input ("Starting reality") a pointer to the decision list and the approved additions that a later feature will implement (S)
+- [X] T042 [P] Add a note to `specs/002-blocking-prototype/tasks.md`, at the task that adds the reference-program test loop, that the loop must match `programs/[0-9][0-9]-*` or list the programs, so that it does not pick up `programs/ergonomics/` (research risk R1) (S)
 - [ ] T043 Run all of quickstart.md (scenarios 1–9) and `tools/local-check.sh`. Push, confirm CI green, and open the pull request to `main` with the SC-001..SC-007 evidence in its description (FR-015) (S)
 
 ---

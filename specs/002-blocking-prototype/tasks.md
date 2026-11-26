@@ -135,6 +135,7 @@ under `--verify-roots`; one million tail calls with bounded stack.
 
 - [ ] T038 [P] [US3] Write `tests/unit/test_concurrency.c`: single state transition under a race, scope join, cancellation at `wait-for` and `sleep`, `shield-from-cancellation`, primary and suppressed errors, a two-task deadlock raising `:deadlock` with `:cycle` (M)
 - [ ] T039 [US3] Implement the program mode of `quux-test` in `source/harness/`: parse `conditions.qx` and `expected.qx` with the reader, reject unknown keys and assertion forms (FR-025), `tag` with delays and failures, watchdog on `:bounds`, report per contracts/harness-report.md with data-model.md `Program run.program`, `Program run.conditions`, `Program run.assertions`, `Program run.outcome`, `Program run.tag_events`, `Program run.elapsed_milliseconds`, `Program run.primary_error_raced`; register the 12 programs with label `pending`; each later task moves a program to `programs` (and `concurrent`) when it passes (L)
+  - **Note from feature 003 (research risk R1):** `programs/ergonomics/` holds the ergonomics programs, which have their own CTest registration (`tests/ergonomics/`) and no `conditions.qx`. The loop that registers the reference programs must list the 12 programs or match `programs/[0-9][0-9]-*`, so that it does not pick up `programs/ergonomics/`.
 - [ ] T040 [P] [US3] Write `tests/unit/test_harness.c`: an unknown key and an unknown assertion are rejected; the watchdog stops a non-terminating program with exit status 3 (S)
 
 ### Implementation for User Story 3

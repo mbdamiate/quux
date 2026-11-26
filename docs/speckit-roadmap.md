@@ -45,7 +45,7 @@ After `/speckit-plan`, append the new D-xx rows to `docs/decisions.md` and updat
 |---|---|---|---|---|
 | 001 | language-spec | 0 | **done** (branch `001-language-spec`, merged to `main`) | `01-phases-0-1.md` (Part A) |
 | 002 | blocking-prototype | 1 | **in progress** (spec + plan done; branch `002-blocking-prototype`) | `01-phases-0-1.md` (Part B) |
-| 003 | core-ergonomics | between 1 and 3 | **in progress** (spec + plan; branch `003-core-ergonomics`); after 002 User Story 2 is on `main` | — (added 2026-11-25; not in the original prompt set) |
+| 003 | core-ergonomics | between 1 and 3 | **done** (branch `003-core-ergonomics`, pull request to `main`): report `docs/ergonomics-report.md`, decisions D-65..D-79 | — (added 2026-11-25; not in the original prompt set) |
 | 004 | dependency-gate | 2 | prototype runs programs 1–10 + simulated 11–12 | `02-phase-2.md` |
 | 005 | vm-scheduler-gc | 3 | Phase 2 spikes done | `03-phases-3-4.md` |
 | 006 | async-io-timers | 4 | VM runs programs 1–9 | `03-phases-3-4.md` |
@@ -122,8 +122,17 @@ C17 with GNU extensions (gnu17), CMake + Ninja presets, pthreads + stdatomic, Ho
 Added by the owner on 2026-11-25, after feature 002 User Story 2 (the sequential core) reached
 `main`. Ten everyday programs over the sequential core, a classified friction report and an owner
 decision list on names and library additions before the Phase 3 VM inherits the vocabulary. See
-`specs/003-core-ergonomics/` (spec, plan, research D-55..D-64). Feature 002 continues afterwards
+`specs/003-core-ergonomics/` (spec, plan, research D-55..D-79). Feature 002 continues afterwards
 with its User Stories 3–5.
+
+**Result:** eight programs run under the `ergonomics` label and two stay `pending` until the
+string and reading functions exist. The report classifies 55 friction notes and 8 mistakes into
+40 entries. The owner approved all fifteen decision items (D-65..D-79, `docs/naming.md` section
+K): string, path, search, ordering, formatting, numeric, error and macro-expansion additions, a
+short map pattern, and three behavior changes (`case` without a match raises
+`:no-matching-case`, malformed special forms raise `:syntax` with a line, a name defined in two
+imports raises `:name-clash`). None is implemented yet. Five interpreter bugs found by the
+programs were fixed.
 
 ### 004 — dependency-gate (Phase 2)
 
@@ -131,7 +140,7 @@ with its User Stories 3–5.
 
 ```text
 Dependency gate and toolchain validation (Phase 2).
-Starting reality: <FILL IN: smoke test results (ASan, TSan, LSan, valgrind, Docker adjustments), prototype components kept/discarded, where it hurt (allocation, node hashing, errors, concurrency), libraries already tried, C standard and compilers actually used, divergences from 002's plan>.
+Starting reality: the core vocabulary additions approved in feature 003 (D-65..D-79, the owner decision list in docs/ergonomics-report.md, names in docs/naming.md section K) are not implemented yet; a feature before or with the Phase 3 VM implements them, and the two pending ergonomics programs (03, 06) turn on when the string and reading functions exist. <FILL IN: smoke test results (ASan, TSan, LSan, valgrind, Docker adjustments), prototype components kept/discarded, where it hurt (allocation, node hashing, errors, concurrency), libraries already tried, C standard and compilers actually used, divergences from 002's plan>.
 
 Decide, for each need, adopt library / write / postpone: persistent structures, multi-threaded GC for a shared heap, work-stealing scheduler, lexer/parser, REPL line editing, async I/O over kqueue and epoll, TCP/QUIC transport, binary serialization, cryptographic hash for content addressing, node-to-node authentication, LLVM via C API (only: enter now or postpone, and which major to pin). Run 3 to 5 bounded spikes (e.g. minimal multi-threaded GC, work-stealing deque, hash + serialization of persistent nodes, echo over the chosen transport), each with an acceptance criterion. Revise the base toolchain with the smoke-test data and say what evidence would change each adopt-or-write decision.
 ```
