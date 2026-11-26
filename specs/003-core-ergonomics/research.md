@@ -263,6 +263,118 @@ What `main` (commit `c8b54a6`) gives the study, checked in the repository on 202
   a recommendation.
 - **Inherited by**: none.
 
+## Owner decisions on the decision list (task T040)
+
+The owner approved all fifteen items of the decision list in `docs/ergonomics-report.md` on
+2026-11-25, without changes. Each item becomes one decision. The full proposal, example and
+alternatives of each are in the report; the names are approved in `docs/naming.md` section K. No
+name is implemented by feature 003: a later feature implements them (FR-012).
+
+## D-65 — String functions (K-01)
+
+- **Decision**: `split-lines`, `split-words`, `split-text`, `trim-whitespace`, `substring` (by bytes), `position-in-text`.
+- **Evidence**: report entries E-01.
+- **Closes**: W12.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-66 — Reading data from text (K-02)
+
+- **Decision**: `parse-data`: the first value read from a string; raises `:syntax` when the text is malformed.
+- **Evidence**: report entries E-02.
+- **Closes**: W13.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-67 — Paths in nested data (K-03)
+
+- **Decision**: `get-at-path`, `put-at-path`, `modify-at-path`, `modify-value`.
+- **Evidence**: report entries E-03, E-04.
+- **Closes**: W14.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-68 — Searching (K-04)
+
+- **Decision**: `find-first`, `find-position`.
+- **Evidence**: report entries E-05.
+- **Closes**: W15.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-69 — Effects for each element (K-05)
+
+- **Decision**: `for-each`, a function that returns `nothing`.
+- **Evidence**: report entries E-06.
+- **Closes**: W16.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-70 — Concatenation (K-06)
+
+- **Decision**: `concatenate-all`, `flat-transform`.
+- **Evidence**: report entries E-07.
+- **Closes**: W17.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-71 — Formatting (K-07)
+
+- **Decision**: `join-text`, `pad-start`, `pad-end`, `format-decimal`.
+- **Evidence**: report entries E-08.
+- **Closes**: W18.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-72 — Ordering (K-08)
+
+- **Decision**: `compare-values` (numbers, and strings by bytes), `sort`, `sort-by`; `<` and `>` stay numeric (R4).
+- **Evidence**: report entries E-09.
+- **Closes**: W19.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-73 — Numbers (K-09)
+
+- **Decision**: `to-floating-point`, `round`, `floor`, `ceiling`, `truncate` (raising `:overflow` outside 64 bits), `square-root`, `power-of`, `divide-floating-point`; `/` stays exact (section 05).
+- **Evidence**: report entries E-10, E-11, E-12.
+- **Closes**: W20.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-74 — Indexed transform (K-10)
+
+- **Decision**: `transform-indexed`, calling `(function index element)`.
+- **Evidence**: report entries E-13.
+- **Closes**: W21.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-75 — Errors (K-11)
+
+- **Decision**: `error-message`, `error-cause`, an optional fourth argument `cause` to `error`, and core errors carrying `:wrong-value`, `:argument-position` and `:function-name` in `:data`.
+- **Evidence**: report entries E-14, E-15, E-16.
+- **Closes**: W22.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-76 — Macro expansion (K-12)
+
+- **Decision**: `expand-macro`, `expand-macro-once`, neither evaluating.
+- **Evidence**: report entries E-17.
+- **Closes**: W23.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-77 — `case` without a match (K-13)
+
+- **Decision**: a `case` with no default and no matching clause raises `:no-matching-case` with `{:value v}`.
+- **Evidence**: report entries E-18.
+- **Closes**: W24.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-78 — Short map pattern (K-14)
+
+- **Decision**: `{:names [a b]}` in a map pattern binds each symbol to the keyword of the same name.
+- **Evidence**: report entries E-19.
+- **Closes**: W25.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
+## D-79 — Load-time checks (K-15)
+
+- **Decision**: a malformed special form raises `:syntax` with the form's line; an unqualified name defined in two imported namespaces raises `:name-clash` at load time; section 14 rule 1 and its open point are made consistent.
+- **Evidence**: report entries E-20, E-21.
+- **Closes**: W26.
+- **Inherited by**: Phase 3 (the VM inherits the core vocabulary and its error behavior).
+
 ## Risks found during research
 
 | # | Risk | Probability | Impact | Mitigation |

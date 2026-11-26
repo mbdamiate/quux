@@ -104,7 +104,7 @@ resolved by fixes; then `document` and `keep as is`.
   [FACT: links]. A small set (split on lines, on whitespace, on a separator; trim; a part of a
   string; the position of a substring) covers both pending programs [OPINION]. Size S–M in the
   interpreter [ESTIMATE].
-- **Record**: W12
+- **Record**: W12, D-65
 - **Decision item**: K-01
 
 ### E-02 — No way to read data from text
@@ -117,7 +117,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Rationale**: the reader already exists, the runner uses it for `INPUT`, and `:syntax` is an
   approved error kind [FACT: `source/harness/quux_session.c`, section 12]; only a core function is
   missing. Exposing it is size S [ESTIMATE].
-- **Record**: W13
+- **Record**: W13, D-66
 - **Decision item**: K-02
 
 ### E-03 — Changing a value deep inside nested data takes a recursive helper
@@ -143,7 +143,7 @@ resolved by fixes; then `document` and `keep as is`.
   and [`update`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/update)
   [FACT: links]; the name `update` is taken by agents in quux [FACT: section 09], so the proposal
   needs a new full-word name (D-64).
-- **Record**: W14
+- **Record**: W14, D-67
 - **Decision item**: K-03
 
 ### E-04 — Reading a value through a path of keys
@@ -156,7 +156,7 @@ resolved by fixes; then `document` and `keep as is`.
   better as two functions with related names [OPINION]. Clojure:
   [`get-in`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/get-in)
   [FACT: link].
-- **Record**: W14
+- **Record**: W14, D-67
 - **Decision item**: K-03
 
 ### E-05 — Finding the first element that satisfies a predicate
@@ -180,7 +180,7 @@ resolved by fixes; then `document` and `keep as is`.
   [FACT: program 01]. Clojure uses
   [`some`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/some) [FACT: link].
   A function for the element and one for its position cover both uses [OPINION].
-- **Record**: W15
+- **Record**: W15, D-68
 - **Decision item**: K-04
 
 ### E-06 — No form runs an effect for each element
@@ -202,7 +202,7 @@ resolved by fixes; then `document` and `keep as is`.
   [`dotimes`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/dotimes)
   [FACT: links]. A function that takes a function and a collection needs no new syntax, and
   `range` covers the counted case [OPINION].
-- **Record**: W16
+- **Record**: W16, D-69
 - **Decision item**: K-05
 
 ### E-07 — No concatenation
@@ -217,7 +217,7 @@ resolved by fixes; then `document` and `keep as is`.
   [`concat`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/concat),
   [`mapcat`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/mapcat)
   [FACT: links].
-- **Record**: W17
+- **Record**: W17, D-70
 - **Decision item**: K-06
 
 ### E-08 — No text formatting: join, padding, decimals
@@ -238,7 +238,7 @@ resolved by fixes; then `document` and `keep as is`.
   Clojure: [`clojure.string/join`](https://clojure.github.io/clojure/clojure.string-api.html#clojure.string/join)
   [FACT: link]. Join with a separator, padding to a width, and a number with a fixed count of
   decimals are enough for the programs here; a general format string can wait [OPINION].
-- **Record**: W18
+- **Record**: W18, D-71
 - **Decision item**: K-07
 
 ### E-09 — No sort, and strings cannot be ordered
@@ -254,7 +254,7 @@ resolved by fixes; then `document` and `keep as is`.
   [`compare`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/compare)
   [FACT: links]. Ordering strings by bytes is enough for ASCII data; ordering by characters ties to
   E-28 [OPINION].
-- **Record**: W19
+- **Record**: W19, D-72
 - **Decision item**: K-08
 
 ### E-10 — No conversion between integers and floats, no rounding
@@ -268,7 +268,7 @@ resolved by fixes; then `document` and `keep as is`.
   [`double`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/double),
   [`long`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/long)
   [FACT: links].
-- **Record**: W20
+- **Record**: W20, D-73
 - **Decision item**: K-09
 
 ### E-11 — No square root or power
@@ -279,7 +279,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Recommendation**: add
 - **Rationale**: one program [FACT: 09], but the functions are small and belong with E-10 in one
   numeric decision [OPINION].
-- **Record**: W20
+- **Record**: W20, D-73
 - **Decision item**: K-09
 
 ### E-12 — A mean of integers needs an error for control flow
@@ -300,7 +300,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Rationale**: `/` on integers raises `:inexact-division` unless the quotient is exact
   [FACT: section 05]. Keeping `/` exact is sound for Phase 3 [OPINION]; what is missing is a
   division that always returns a float, so that the program says which it wants [OPINION].
-- **Record**: W20
+- **Record**: W20, D-73
 - **Decision item**: K-09
 
 ### E-13 — No transform with an index, or over two collections
@@ -312,7 +312,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Rationale**: two programs [FACT: 02, 06]. Clojure:
   [`map-indexed`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/map-indexed)
   [FACT: link].
-- **Record**: W21
+- **Record**: W21, D-74
 - **Decision item**: K-10
 
 ### E-14 — The message of an error has no accessor
@@ -324,7 +324,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Rationale**: two ways to read the parts of one value [FACT: section 12]. Clojure has
   [`ex-message`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/ex-message)
   next to `ex-data` [FACT: link].
-- **Record**: W22
+- **Record**: W22, D-75
 - **Decision item**: K-11
 
 ### E-15 — An error cannot be wrapped in another one
@@ -340,7 +340,7 @@ resolved by fixes; then `document` and `keep as is`.
   an optional cause, read with
   [`ex-cause`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/ex-cause)
   [FACT: links].
-- **Record**: W22
+- **Record**: W22, D-75
 - **Decision item**: K-11
 
 ### E-16 — Core errors do not say which value or where
@@ -353,7 +353,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Rationale**: program 05 cannot name the field that failed [FACT: 05]. Putting the value and the
   argument position in `:data` is a library addition the VM must keep [OPINION]. The location
   (file, line, calling function) stays open until Phase 7, as section 12 says [FACT: section 12].
-- **Record**: W22
+- **Record**: W22, D-75
 - **Decision item**: K-11
 
 ### E-17 — No way to see a macro's expansion
@@ -367,7 +367,7 @@ resolved by fixes; then `document` and `keep as is`.
   [`macroexpand-1`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/macroexpand-1)
   [FACT: links]. The expander already does the work [FACT: `source/expander/`]; size S
   [ESTIMATE].
-- **Record**: W23
+- **Record**: W23, D-76
 - **Decision item**: K-12
 
 ### E-18 — `case` with no matching clause returns nothing silently
@@ -381,7 +381,7 @@ resolved by fixes; then `document` and `keep as is`.
   raise an error that names the value [OPINION]. Clojure's `case` throws in that situation
   [FACT: [`case`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/case)].
   This changes the meaning of existing code, so the VM inherits it [OPINION].
-- **Record**: W24
+- **Record**: W24, D-77
 - **Decision item**: K-13
 
 ### E-19 — Map patterns repeat every name
@@ -393,7 +393,7 @@ resolved by fixes; then `document` and `keep as is`.
 - **Rationale**: Clojure has a short form for this (`{:keys [key left right]}`, described with
   [`let`](https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/let))
   [FACT: link]. A short form is a pattern-syntax decision that Phase 3 inherits [OPINION].
-- **Record**: W25
+- **Record**: W25, D-78
 - **Decision item**: K-14
 
 ### E-20 — A malformed special form is `:wrong-type` without a line
@@ -408,7 +408,7 @@ resolved by fixes; then `document` and `keep as is`.
   "partly" [FACT: Mistakes log]. `:syntax` is defined for the reader only [FACT: section 12]; using
   it, with a line, for malformed special forms gives one kind and one level of detail for "this
   code is malformed" [OPINION].
-- **Record**: W26
+- **Record**: W26, D-79
 - **Decision item**: K-15
 
 ### E-21 — A name defined in two imports is silently taken from the first
@@ -422,7 +422,7 @@ resolved by fixes; then `document` and `keep as is`.
   while its closed open point says the imports are searched in order [FACT: section 14]. Raising an
   error at load time for a clashing unqualified name matches rule 1 and makes the clash visible
   [OPINION]. Either way, the text of section 14 must be made consistent.
-- **Record**: W26
+- **Record**: W26, D-79
 - **Decision item**: K-15
 
 ### E-22 — `quasi-quote` qualified only symbols that already resolved
@@ -684,9 +684,9 @@ mistake), not under 10,000, so D-63 flags nothing; the limit itself is entry E-2
 
 ## Owner decision list
 
-Fifteen items, one per group of `add` recommendations. The names are in `docs/naming.md` section K
-with status `proposed`, and each item has an open question (W12–W26) in
-`docs/spec/open-questions.md`. The names are full words (Principle VIII). Where a Clojure name is
+Fifteen items, one per group of `add` recommendations. The owner approved all fifteen on
+2026-11-25 (D-65..D-79); the names are `approved` in `docs/naming.md` section K, and the open
+questions W12–W26 are resolved. A later feature implements them. The names are full words (Principle VIII). Where a Clojure name is
 also plain English (`sort`, `sort-by`), it is kept (D-64). Names that a program already uses for a
 local helper (`trim`, `change-at-path`, `pad-right`, `read-from-string`) are avoided, as are
 `concatenate` (a helper in reference program 08) and words that appear in the specification's
@@ -713,7 +713,7 @@ parts, for example "approve, without `position-in-text`".
     pattern needs a syntax of its own;
   - a separate `text` namespace, like `clojure.string`: groups the names, but adds an import to
     every text program.
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-65)
 
 ### K-02 — Reading data from text
 
@@ -724,7 +724,7 @@ parts, for example "approve, without `position-in-text`".
 - **Programs affected**: 06
 - **Alternatives**: keep as is (no program can read data from text); the name `read` (shorter, but
   it suggests reading a file or stream).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-66)
 
 ### K-03 — Paths in nested data
 
@@ -743,7 +743,7 @@ parts, for example "approve, without `position-in-text`".
   - keep as is: every program with nested data writes the recursive helper;
   - the names `update-at-path` and `update-value`: closer to Clojure, but `update` is the agent
     operation (section 09).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-67)
 
 ### K-04 — Searching a collection
 
@@ -757,7 +757,7 @@ parts, for example "approve, without `position-in-text`".
 - **Programs affected**: 01
 - **Alternatives**: keep as is (a `reduce` over `range`); only `find-first`, with the index found
   through `transform-indexed` (K-10).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-68)
 
 ### K-05 — Effects for each element
 
@@ -768,7 +768,7 @@ parts, for example "approve, without `position-in-text`".
 - **Programs affected**: 01, 02, 07
 - **Alternatives**: keep as is (a `reduce` with an ignored accumulator); a special form with
   bindings, like Clojure's `doseq` (more syntax for the same effect).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-69)
 
 ### K-06 — Concatenation
 
@@ -780,7 +780,7 @@ parts, for example "approve, without `position-in-text`".
 - **Programs affected**: 01, 04
 - **Alternatives**: keep as is (`reduce` with `pour-into`); a variadic `concatenate`, which needs
   another name because program 08 uses that one.
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-70)
 
 ### K-07 — Formatting
 
@@ -793,7 +793,7 @@ parts, for example "approve, without `position-in-text`".
 - **Programs affected**: 01, 02
 - **Alternatives**: keep as is (local helpers); one format function with a format string
   (powerful, but a small language of its own).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-71)
 
 ### K-08 — Ordering
 
@@ -806,7 +806,7 @@ parts, for example "approve, without `position-in-text`".
 - **Programs affected**: 02, 09
 - **Alternatives**: keep as is (hand-written insertion sort); make `<` and `>` accept strings
   (no new name, but R4 keeps them as numeric notation).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-72)
 
 ### K-09 — Numbers
 
@@ -823,7 +823,7 @@ parts, for example "approve, without `position-in-text`".
   - keep as is: `(* 1.0 n)`, and `try` around `/`;
   - make `/` return a float when the quotient is not exact: simpler for a mean, but it changes
     section 05, and the VM inherits it.
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-73)
 
 ### K-10 — Transform with an index
 
@@ -834,7 +834,7 @@ parts, for example "approve, without `position-in-text`".
 - **Alternatives**: keep as is (`range` and `element-at`); let `transform` take several
   collections, like Clojure's `map` (no new name, and it covers walking two collections side by
   side).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-74)
 
 ### K-11 — Errors
 
@@ -851,7 +851,7 @@ parts, for example "approve, without `position-in-text`".
 - **Programs affected**: 05, 10
 - **Alternatives**: keep as is (`(get problem :message)`, and the original error is lost); the
   location (file and line) is not part of this item, because section 12 leaves it to Phase 7.
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-75)
 
 ### K-12 — Macro expansion
 
@@ -861,7 +861,7 @@ parts, for example "approve, without `position-in-text`".
 - **Friction removed**: E-17
 - **Programs affected**: 07
 - **Alternatives**: keep as is (run and read the effects); only `expand-macro`.
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-76)
 
 ### K-13 — `case` without a matching clause
 
@@ -874,7 +874,7 @@ parts, for example "approve, without `position-in-text`".
   - keep as is (`nothing`, and the error surfaces far away);
   - reuse `:wrong-type` (no new kind, but the kind says nothing about the cause).
 - **Inherited by**: Phase 3 (it changes the meaning of existing code).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-77)
 
 ### K-14 — Short map pattern
 
@@ -887,7 +887,7 @@ parts, for example "approve, without `position-in-text`".
 - **Alternatives**: keep as is (J2, every name written twice); Clojure's `:keys` (shorter, but the
   word means map keys, not the names bound).
 - **Inherited by**: Phase 3 (pattern syntax).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-78)
 
 ### K-15 — Two load-time checks
 
@@ -907,4 +907,4 @@ The two parts are independent and can be answered separately.
   - for part 2, a warning instead of an error (quux has no warnings yet);
   - for part 2, keep "first import wins" and only fix the text of section 14.
 - **Inherited by**: Phase 3 (error kinds and name resolution).
-- **Owner answer**:
+- **Owner answer**: approve (2026-11-25; D-79)
