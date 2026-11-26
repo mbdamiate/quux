@@ -97,11 +97,12 @@ simulated nodes in one process; Phase 5 produces them on real nodes.
 
 <!-- example-requires: concurrency -->
 ```quux
-;; several failing children: one primary, the others suppressed
+;; several failing children: one primary, the others suppressed. Neither child reaches a
+;; cancellation point, so the scope's cancellation cannot stop the second failure.
 (try
   (with-scope [scope]
-    (future (sleep 10) (raise (error :user "first" {})))
-    (future (sleep 10) (raise (error :timeout "second" {})))
+    (future (raise (error :user "first" {})))
+    (future (raise (error :timeout "second" {})))
     :unreachable)
   (catch (function [candidate] true) caught
     [(error-kind caught) (count (get caught :suppressed))]))

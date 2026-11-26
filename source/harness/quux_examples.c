@@ -217,7 +217,7 @@ static void run_block(example_run *run, quux_context *context, const block *curr
         size_t expected_length = 0;
         expectation_kind expectation = find_expectation(text, current->length, reader.position,
                                                         &expected_start, &expected_length);
-        bool evaluated = quux_evaluate_form(context, form, &value);
+        bool evaluated = quux_session_evaluate_form(context, form, &value);
         context->recursion_depth = 0;
         char description[600];
         switch (expectation) {

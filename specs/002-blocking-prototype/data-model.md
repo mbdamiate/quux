@@ -19,6 +19,7 @@ One per running task. Passed explicitly to every runtime function.
 | `current_node` | the simulated node the task runs on | the first node when there are no `:nodes` |
 | `pending_error` | the error value after a failed call | set only when a function returns `false` |
 | `recursion_depth` | non-tail evaluation depth | above the limit → `:stack-exhausted` (D-51) |
+| `task_function`, `task_arguments`, `task_future` | a spawned task's work and the future it fills (added in US3) | roots of the task, registered by its creator before it starts; `nothing` for the session's task |
 
 ## Heap object header — D-35
 
@@ -64,7 +65,7 @@ verifier checks this invariant in single-task runs.
 | `scope` | owning scope |
 | `computing_task` | the task computing it (for the wait-for graph) |
 | `waiters` | tasks parked on it |
-| `tag_names` | harness tags evaluated inside it (for `future-state`, `future-error`) |
+| `tag_names` | harness tags evaluated inside it (for `future-state`, `future-error`). US3 keeps them in the harness instead (`Program run.tag_events`: tag → future) |
 | `remote` | for a remote reference: node and identifier, else null |
 
 State transitions: `:empty → :filled` or `:empty → :failed`; the first transition wins (compare

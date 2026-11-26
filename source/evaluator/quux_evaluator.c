@@ -407,7 +407,7 @@ static bool evaluate_try(quux_context *context, quux_value code, quux_value envi
 /* ---- Globals, definitions, namespaces ---- */
 
 static bool global_value(quux_context *context, quux_object *code, quux_value *result) {
-    quux_value definition = code->values[1];
+    quux_value definition = quux_load_shared(code, 1);
     if (quux_is_nothing(definition)) {
         /* Not defined when analyzed (a forward reference): resolve now and keep the record
          * (section 14 rules 3 and 5). */
@@ -419,7 +419,7 @@ static bool global_value(quux_context *context, quux_object *code, quux_value *r
             return quux_raise(context, "undefined-name", "%.*s is not defined",
                               (int)quux_name_length(name), quux_name_bytes(name));
         }
-        quux_store(context, code, 1, definition);
+        quux_store_shared(context, code, 1, definition);
     }
     if (quux_definition_flags(definition) & QUUX_DEFINITION_FLAG_MACRO) {
         quux_value name = code->values[0];
@@ -703,12 +703,10 @@ static bool name_function(quux_value function, quux_text *text) {
     return true;
 }
 
-bool quux_define_primitive(quux_context *context, const char *name,
-                           quux_primitive_function function, uint32_t minimum, uint32_t maximum) {
+bool quux_make_primitive(quux_context *context, const char *name, quux_primitive_function function,
+                         uint32_t minimum, uint32_t maximum, quux_value *result) {
     quux_value symbol = quux_nothing;
-    quux_value primitive = quux_nothing;
-    quux_value definition = quux_nothing;
-    QUUX_ROOT_FRAME(context, &symbol, &primitive, &definition);
+    QUUX_ROOT_FRAME(context, &symbol);
     bool done = quux_intern_symbol(context, name, strlen(name), &symbol);
     quux_object *object =
         done ? quux_allocate(context, QUUX_KIND_PRIMITIVE, 1, sizeof(primitive_shape)) : NULL;
@@ -717,10 +715,21 @@ bool quux_define_primitive(quux_context *context, const char *name,
         object->values[QUUX_PRIMITIVE_NAME] = symbol;
         primitive_shape shape = {function, minimum, maximum};
         memcpy(quux_object_bytes(object), &shape, sizeof shape);
-        primitive = quux_object_value(object);
-        done = quux_namespace_define(context, quux_namespace_core(context), symbol, primitive,
-                                     quux_nothing, 0, &definition);
+        *result = quux_object_value(object);
     }
+    QUUX_ROOT_FRAME_END(context);
+    return done;
+}
+
+bool quux_define_primitive(quux_context *context, const char *name,
+                           quux_primitive_function function, uint32_t minimum, uint32_t maximum) {
+    quux_value primitive = quux_nothing;
+    quux_value definition = quux_nothing;
+    QUUX_ROOT_FRAME(context, &primitive, &definition);
+    bool done = quux_make_primitive(context, name, function, minimum, maximum, &primitive) &&
+                quux_namespace_define(context, quux_namespace_core(context),
+                                      quux_checked_object(primitive)->values[QUUX_PRIMITIVE_NAME],
+                                      primitive, quux_nothing, 0, &definition);
     QUUX_ROOT_FRAME_END(context);
     return done;
 }

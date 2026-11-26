@@ -10,11 +10,13 @@ extern const quux_unit_module quux_unit_module_collections;
 extern const quux_unit_module quux_unit_module_reader_printer;
 extern const quux_unit_module quux_unit_module_expander;
 extern const quux_unit_module quux_unit_module_evaluator;
+extern const quux_unit_module quux_unit_module_concurrency;
+extern const quux_unit_module quux_unit_module_harness;
 
 static const quux_unit_module *const modules[] = {
     &quux_unit_module_portability, &quux_unit_module_memory,         &quux_unit_module_values,
     &quux_unit_module_collections, &quux_unit_module_reader_printer, &quux_unit_module_expander,
-    &quux_unit_module_evaluator,
+    &quux_unit_module_evaluator,   &quux_unit_module_concurrency,    &quux_unit_module_harness,
 };
 
 int quux_unit_run(const char *module_name) {

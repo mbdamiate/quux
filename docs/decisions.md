@@ -100,3 +100,5 @@ These were fixed before planning and are encoded in the constitution:
 | D-77 | `case` without a default raises `:no-matching-case` when nothing matches (K13); approved from the ergonomics decision list | 003 | adopted (owner) | Phase 3 |
 | D-78 | map pattern short form `{:names [a b …]}` (K14); approved from the ergonomics decision list | 003 | adopted (owner) | Phase 3 |
 | D-79 | malformed special forms raise `:syntax` with a line; a name defined in two imports raises `:name-clash` (K15); approved from the ergonomics decision list | 003 | adopted (owner) | Phase 3 |
+| D-80 | The alternatives of `first-success` do not fail their scope; only `:all-failed` does (sections 07 rule 8, 08 rule 5) | 002 / Phase 1 (US3) | recommended (owner to confirm) | Phase 3 |
+| D-81 | A future or scope created in a cancelling scope starts cancelled; an agent update sent from `shield-from-cancellation` is never withdrawn | 002 / Phase 1 (US3) | recommended (owner to confirm) | Phase 3 |

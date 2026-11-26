@@ -133,19 +133,36 @@ under `--verify-roots`; one million tail calls with bounded stack.
 
 ### Tests for User Story 3
 
-- [ ] T038 [P] [US3] Write `tests/unit/test_concurrency.c`: single state transition under a race, scope join, cancellation at `wait-for` and `sleep`, `shield-from-cancellation`, primary and suppressed errors, a two-task deadlock raising `:deadlock` with `:cycle` (M)
-- [ ] T039 [US3] Implement the program mode of `quux-test` in `source/harness/`: parse `conditions.qx` and `expected.qx` with the reader, reject unknown keys and assertion forms (FR-025), `tag` with delays and failures, watchdog on `:bounds`, report per contracts/harness-report.md with data-model.md `Program run.program`, `Program run.conditions`, `Program run.assertions`, `Program run.outcome`, `Program run.tag_events`, `Program run.elapsed_milliseconds`, `Program run.primary_error_raced`; register the 12 programs with label `pending`; each later task moves a program to `programs` (and `concurrent`) when it passes (L)
+- [X] T038 [P] [US3] Write `tests/unit/test_concurrency.c`: single state transition under a race, scope join, cancellation at `wait-for` and `sleep`, `shield-from-cancellation`, primary and suppressed errors, a two-task deadlock raising `:deadlock` with `:cycle` (M)
+- [X] T039 [US3] Implement the program mode of `quux-test` in `source/harness/`: parse `conditions.qx` and `expected.qx` with the reader, reject unknown keys and assertion forms (FR-025), `tag` with delays and failures, watchdog on `:bounds`, report per contracts/harness-report.md with data-model.md `Program run.program`, `Program run.conditions`, `Program run.assertions`, `Program run.outcome`, `Program run.tag_events`, `Program run.elapsed_milliseconds`, `Program run.primary_error_raced`; register the 12 programs with label `pending`; each later task moves a program to `programs` (and `concurrent`) when it passes (L)
   - **Note from feature 003 (research risk R1):** `programs/ergonomics/` holds the ergonomics programs, which have their own CTest registration (`tests/ergonomics/`) and no `conditions.qx`. The loop that registers the reference programs must list the 12 programs or match `programs/[0-9][0-9]-*`, so that it does not pick up `programs/ergonomics/`.
-- [ ] T040 [P] [US3] Write `tests/unit/test_harness.c`: an unknown key and an unknown assertion are rejected; the watchdog stops a non-terminating program with exit status 3 (S)
+- [X] T040 [P] [US3] Write `tests/unit/test_harness.c`: an unknown key and an unknown assertion are rejected; the watchdog stops a non-terminating program with exit status 3 (S)
 
 ### Implementation for User Story 3
 
-- [ ] T041 [US3] Define the executor interface in `source/concurrency/quux_executor.h` per contracts/module-interface.md (S)
-- [ ] T042 [US3] Implement `source/executor_blocking/` (D-40): data-model.md `Task.thread`, `Task.mutex`, `Task.condition`, `Task.cancellation_requested`, `Task.shield_depth`, `Task.waiting_for`, `Task.future`; explicit stack size; `:resource-exhausted` on thread failure (M)
-- [ ] T043 [US3] Implement futures and scopes in `source/concurrency/`: data-model.md `Future.state` (one transition, compare-and-swap), `Future.value`, `Future.error`, `Future.scope`, `Future.computing_task`, `Future.waiters`, `Future.tag_names`; `Scope.identifier` (128 random bits), `Scope.state`, `Scope.parent`, `Scope.children`, `Scope.primary_error`, `Scope.suppressed`; current scope per section 06 rule 3 (L)
-- [ ] T044 [US3] Implement cancellation points, `cancel!`, `check-cancellation`, `shield-from-cancellation`, `finally` under cancellation, and the global wait-for graph with `:deadlock` (D-14, D-40) in `source/concurrency/` (M)
-- [ ] T045 [US3] Implement the combinators `all`, `first-success`, `then`, `with-timeout`, `let-parallel` (section 08; combinator cancellations do not fail the scope, D-11 amendment) in `source/concurrency/quux_combinators.c` (M)
+- [X] T041 [US3] Define the executor interface in `source/concurrency/quux_executor.h` per contracts/module-interface.md (S)
+- [X] T042 [US3] Implement `source/executor_blocking/` (D-40): data-model.md `Task.thread`, `Task.mutex`, `Task.condition`, `Task.cancellation_requested`, `Task.shield_depth`, `Task.waiting_for`, `Task.future`; explicit stack size; `:resource-exhausted` on thread failure (M)
+- [X] T043 [US3] Implement futures and scopes in `source/concurrency/`: data-model.md `Future.state` (one transition, compare-and-swap), `Future.value`, `Future.error`, `Future.scope`, `Future.computing_task`, `Future.waiters`, `Future.tag_names`; `Scope.identifier` (128 random bits), `Scope.state`, `Scope.parent`, `Scope.children`, `Scope.primary_error`, `Scope.suppressed`; current scope per section 06 rule 3 (L)
+- [X] T044 [US3] Implement cancellation points, `cancel!`, `check-cancellation`, `shield-from-cancellation`, `finally` under cancellation, and the global wait-for graph with `:deadlock` (D-14, D-40) in `source/concurrency/` (M)
+- [X] T045 [US3] Implement the combinators `all`, `first-success`, `then`, `with-timeout`, `let-parallel` (section 08; combinator cancellations do not fail the scope, D-11 amendment) in `source/concurrency/quux_combinators.c` (M)
 - [ ] T046 [US3] Make programs 01, 02, 03, 08 and 09 pass on macOS; then run each 20 times under TSan locally and in CI; fix races, and record any spec or program correction with its reason (M)
+
+Notes from the implementation of US3:
+
+- Programs 08 and 09 need pieces that this list places in US4: `fork-join` (T054), the
+  `same-as-sequential` assertion (T050) and agents (T051). US3 implements them as far as those
+  two programs need: `fork-join` in `source/concurrency/quux_parallelism.c`;
+  `same-as-sequential` in the harness; `agent`, `state`, `update` and `transact` in
+  `source/concurrency/quux_agents.c` with a ticket order instead of D-41's queue and worker, and
+  without the agent's own scope, `update-once` or the deadlock of section 07 rule 18. T050, T051
+  and T054 do the rest.
+- T040's watchdog check is the CTest test `harness_never-ends` (exit status 3 ends the process,
+  so a unit test cannot observe it); `tests/unit/test_harness.c` checks the rejections.
+- The example suite found a contradiction between section 07 rule 5 and the `first-success`
+  example of section 08 (D-80, W29), and the unit tests found that a shielded agent update was
+  withdrawn (D-81, W30). Both are recommended decisions for the owner to confirm. Corrected
+  examples and their reasons: `docs/spec/open-questions.md`, "Example corrections in feature
+  002, User Story 3".
 
 **Checkpoint**: stopping point 3 — structured concurrency demonstrated.
 

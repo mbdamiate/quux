@@ -69,3 +69,19 @@ added below, and then answered in the specification or marked with their closing
 | W26 | Should malformed special forms raise `:syntax` with a line, and should a name defined in two imports raise an error? (Section 14 rule 1 says a clashing name is not available unqualified; its closed open point says imports are searched in order.) | feature 003, ergonomics report K-15 | Resolved: approved by the owner (D-79, naming K15, report K-15); to be implemented by a later feature |
 | W27 | Does `count` on a string count bytes or characters? Phase 1 counts bytes (documented in section 02) | feature 003, ergonomics report E-28 | **Open — owner decision, feature 003**; Phase 1 behavior documented |
 | W28 | Can a namespace keep a definition private? | feature 003, ergonomics report E-30 | **Open — deferred with the module decisions of section 14** (Phase 7) |
+| W29 | Does a failure of an alternative of `first-success` fail the scope that owns it? (Section 07 rule 5 says yes; the example of section 08 expected `:all-failed`) | feature 002, US3 example suite | **Open — owner confirmation**: Phase 1 implements D-80 (the alternatives' failures do not fail the scope; only `:all-failed` does), stated in section 07 rule 8 and section 08 rule 5 |
+| W30 | What happens to a future or scope created in a scope that is already cancelling, and to an agent update sent from `shield-from-cancellation`? | feature 002, US3 unit tests | **Open — owner confirmation**: Phase 1 implements D-81 (they start cancelled; a shielded update is never withdrawn), stated in section 07 rules 10 and 14 and section 09 rule 11 |
+
+### Example corrections in feature 002, User Story 3
+
+The example suite (T046) ran sections 06–09 and the concurrent example of section 12 for the
+first time. These examples were corrected; none changes a rule except where D-80 is named:
+
+- Sections 07 and 08: three `;=>` lines mixed the value with prose (`;=> [:user :orders], after
+  about 150 ms`). The prose now follows a second `;`, as everywhere else.
+- Section 08, `first-success` when everything fails: the alternatives now sleep 10 ms before they
+  fail, so that they fail after `first-success` has received them (D-80, W29).
+- Section 12, several failing children: the children no longer sleep. With the sleeps, the first
+  failure usually cancelled the second child while it slept, so `[:user 0]` was also correct
+  under section 07 rule 7 and the example's `[:user 1] or [:timeout 1]` failed. Without a
+  cancellation point, both children always fail.

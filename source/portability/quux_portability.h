@@ -131,6 +131,9 @@ void quux_sleep_nanoseconds(uint64_t nanoseconds);
 size_t quux_page_size(void);
 /* Whether standard input is an interactive terminal (the REPL prints a prompt only then). */
 bool quux_standard_input_is_terminal(void);
+/* Ends the process at once with the given status, without running exit handlers (the
+ * harness's watchdog, D-46). */
+QUUX_NO_RETURN void quux_exit_immediately(int status);
 /* Fills the buffer with random bytes from the operating system. Returns false on failure. */
 bool quux_random_bytes(void *buffer, size_t size);
 

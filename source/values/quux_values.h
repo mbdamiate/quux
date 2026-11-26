@@ -100,6 +100,7 @@ typedef struct quux_runtime quux_runtime;
 struct quux_task;
 struct quux_namespace_registry;
 struct quux_evaluator_state;
+struct quux_concurrency_state;
 
 /* Per-task state, passed explicitly to every runtime function (D-33). */
 typedef struct quux_context {
@@ -111,10 +112,26 @@ typedef struct quux_context {
     quux_value current_namespace;
     quux_value current_node;
     quux_value pending_error;
+    /* A spawned task's work: the function, its ARGUMENTS object and the future it fills
+     * (nothing for the session's own task). */
+    quux_value task_function;
+    quux_value task_arguments;
+    quux_value task_future;
     uint32_t recursion_depth;
 } quux_context;
 
-enum { QUUX_CONTEXT_FIXED_SLOT_COUNT = 4 };
+enum { QUUX_CONTEXT_FIXED_SLOT_COUNT = 7 };
+
+/* The functions that the concurrency forms (`future`, `spawn`, `with-scope`,
+ * `shield-from-cancellation`, `tag`) call after the expander wraps their bodies in functions.
+ * Installed by the concurrency module and the harness; `nothing` until then. */
+typedef enum quux_form_function {
+    QUUX_FORM_SPAWN,      /* (f function) or (f scope function) */
+    QUUX_FORM_WITH_SCOPE, /* (f (function [scope] body ...)) */
+    QUUX_FORM_SHIELD,     /* (f function) */
+    QUUX_FORM_TAG,        /* (f name function) */
+    QUUX_FORM_FUNCTION_COUNT
+} quux_form_function;
 
 struct quux_runtime {
     quux_heap *heap;
@@ -128,6 +145,8 @@ struct quux_runtime {
     quux_atomic_unsigned unique_symbol_counter;
     struct quux_namespace_registry *namespaces;
     struct quux_evaluator_state *evaluator;
+    struct quux_concurrency_state *concurrency;
+    quux_value form_functions[QUUX_FORM_FUNCTION_COUNT];
     FILE *output;
     uint32_t maximum_recursion_depth;
     /* Preallocated, because raising it must not need memory. */
@@ -149,6 +168,13 @@ quux_object *quux_allocate(quux_context *context, quux_kind kind, uint32_t value
 
 /* Stores a value into a mutable cell of `owner`, through the write barrier (rule 5). */
 void quux_store(quux_context *context, quux_object *owner, uint32_t index, quux_value value);
+
+/* For cells that several tasks may read and write at the same time (the resolution cache of a
+ * global reference): the store releases and the load acquires. */
+void quux_store_shared(quux_context *context, quux_object *owner, uint32_t index, quux_value value);
+static inline quux_value quux_load_shared(quux_object *owner, uint32_t index) {
+    return __atomic_load_n(&owner->values[index], __ATOMIC_ACQUIRE);
+}
 
 /* ---- Numbers ---- */
 

@@ -123,6 +123,10 @@ quux_runtime *quux_runtime_create(void) {
     runtime->output = stdout;
     runtime->maximum_recursion_depth = 10000;
     quux_memory_register_root_enumerator(runtime->heap, enumerate_intern_tables, runtime);
+    for (int i = 0; i < QUUX_FORM_FUNCTION_COUNT; i++) {
+        runtime->form_functions[i] = quux_nothing;
+        quux_memory_register_global_root(runtime->heap, &runtime->form_functions[i]);
+    }
     return runtime;
 }
 
@@ -134,6 +138,7 @@ void quux_runtime_destroy(quux_runtime *runtime) {
     /* Module state blocks are plain allocations owned by the runtime. */
     free(runtime->namespaces);
     free(runtime->evaluator);
+    free(runtime->concurrency);
     free(runtime->symbol_table);
     free(runtime->keyword_table);
     quux_mutex_destroy(&runtime->intern_mutex);
@@ -147,6 +152,9 @@ void quux_context_initialize(quux_context *context, quux_runtime *runtime) {
     context->current_namespace = quux_nothing;
     context->current_node = quux_nothing;
     context->pending_error = quux_nothing;
+    context->task_function = quux_nothing;
+    context->task_arguments = quux_nothing;
+    context->task_future = quux_nothing;
     context->roots.fixed_slots = &context->current_scope;
     context->roots.fixed_count = QUUX_CONTEXT_FIXED_SLOT_COUNT;
     quux_memory_register_root_stack(runtime->heap, &context->roots);
@@ -179,6 +187,12 @@ quux_object *quux_allocate(quux_context *context, quux_kind kind, uint32_t value
 void quux_store(quux_context *context, quux_object *owner, uint32_t index, quux_value value) {
     quux_memory_write_barrier(context->runtime->heap, owner, value);
     owner->values[index] = value;
+}
+
+void quux_store_shared(quux_context *context, quux_object *owner, uint32_t index,
+                       quux_value value) {
+    quux_memory_write_barrier(context->runtime->heap, owner, value);
+    __atomic_store_n(&owner->values[index], value, __ATOMIC_RELEASE);
 }
 
 /* ---- Numbers ---- */

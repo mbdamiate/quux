@@ -199,11 +199,11 @@ static int group_index(const group_context *group, quux_value definition) {
 
 /* The definition a GLOBAL node refers to, resolving it now if analysis could not. */
 static quux_value global_definition(quux_context *context, quux_object *code) {
-    quux_value definition = code->values[1];
+    quux_value definition = quux_load_shared(code, 1);
     if (quux_is_nothing(definition)) {
         if (quux_namespace_resolve(context, code->values[2], code->values[0], &definition) &&
             !quux_is_nothing(definition)) {
-            quux_store(context, code, 1, definition);
+            quux_store_shared(context, code, 1, definition);
         } else {
             context->pending_error = quux_nothing;
             definition = quux_nothing;

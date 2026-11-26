@@ -74,3 +74,20 @@
                  (as-sequence (add (pour-into [] step) value))
                  (list step value))]
       (quasi-quote (thread-last (unquote call) (unquote-splicing (rest steps)))))))
+
+;; (let-parallel [name expression ...] body ...): starts every expression as a future, then binds
+;; each name to its value, in order, and evaluates body (section 08). Names may be patterns.
+(define-macro let-parallel [bindings :rest body]
+  (let-functions [(expand [remaining future-bindings value-bindings]
+                    (if (empty? remaining)
+                      (quasi-quote
+                        (let (unquote future-bindings)
+                          (let (unquote value-bindings)
+                            (unquote-splicing body))))
+                      (let [holder (unique-symbol "parallel")]
+                        (expand (rest (rest remaining))
+                                (add (add future-bindings holder)
+                                     (list (quote future) (first (rest remaining))))
+                                (add (add value-bindings (first remaining))
+                                     (list (quote wait-for) holder))))))]
+    (expand (as-sequence bindings) [] [])))

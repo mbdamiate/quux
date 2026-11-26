@@ -2,10 +2,10 @@
 # later user story are labelled `pending` until the task that makes them pass moves them.
 set(quux_example_sections_ready
   01-values-and-equality 02-collections 03-evaluation-and-tail-calls 04-macros 05-numerics
-  12-errors 13-serialization-and-identity 14-modules)
+  06-futures 07-scopes-and-cancellation 08-combinators 09-agents 12-errors
+  13-serialization-and-identity 14-modules)
 set(quux_example_sections_pending
-  06-futures 07-scopes-and-cancellation 08-combinators 09-agents 10-streams
-  11-data-parallelism appendix-input-output)
+  10-streams 11-data-parallelism appendix-input-output)
 
 foreach(section IN LISTS quux_example_sections_ready)
   add_test(NAME examples_${section}
@@ -25,7 +25,7 @@ endforeach()
 
 foreach(section IN LISTS quux_example_sections_pending)
   add_test(NAME examples_${section}
-    COMMAND quux-test --available "core concurrency" examples
+    COMMAND quux-test examples
             ${CMAKE_SOURCE_DIR}/docs/spec/${section}.md)
   set_tests_properties(examples_${section} PROPERTIES LABELS pending)
 endforeach()

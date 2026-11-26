@@ -568,6 +568,41 @@ fact yet.
   placeholder; fixing it before US3 avoids more tests and examples depending on it.
 - **Inherited by**: Phase 3 (the VM's compiler reads the same text).
 
+### D-80 — The alternatives of `first-success` do not fail their scope (found in US3)
+
+- **Decision**: a future passed to `first-success` is handled by it: when it fails, its error
+  does not fail the scope that owns it. Only `:all-failed`, through the future of
+  `first-success`, reaches the scope. This extends the D-11 amendment, which covered only the
+  cancellations of the losers. An alternative that already failed before it was passed to
+  `first-success` has already failed its scope (section 07 rule 5); programs create the
+  alternatives in the call. Sections 07 rule 8 and 08 rule 5 state it.
+- **Rationale**: with rule 5 alone, an alternative that fails fast cancels the scope, and with it
+  the alternatives still running, so `first-success` could never wait for a slower replica after
+  a fast failure. The example of section 08 (`;!! :all-failed`) already assumed this rule; the
+  example suite found the contradiction `[FACT: quux-test examples docs/spec/08-combinators.md,
+  "got :user, expected :all-failed"]`.
+- **Alternatives**: keep rule 5 and change the example to `;!! :user` (rejected: it makes
+  `first-success` useless whenever a replica fails); let every combinator absorb its inputs'
+  failures (rejected: `all` and `then` pass the error on, and the scope must fail).
+- **Status**: recommended; **the owner confirms or rejects it** (it changes section 07).
+- **Inherited by**: Phase 3.
+
+### D-81 — Work started while a scope is cancelling (found in US3)
+
+- **Decision**: (1) a future or a scope created in a scope that is already `:cancelling` starts
+  cancelled: its task observes `:cancelled` at its first cancellation point. (2) An agent update
+  sent from inside `shield-from-cancellation` is never withdrawn, even when the sender's scope is
+  cancelled while it is queued.
+- **Rationale**: section 07 says what a cancelling scope does to the children it already has,
+  not to children created later; (1) keeps "no work runs on in a cancelled scope" true. Without
+  (2), cleanup code that tells an agent that a resource is released, the use case of rule 14,
+  would have its update withdrawn `[FACT: tests/unit/test_concurrency.c, "shield-from-cancellation
+  lets cleanup finish"]`.
+- **Alternatives**: run futures created in a cancelling scope normally (they would outlive the
+  intent of `cancel!`); make every future created in shielded code shielded (wider than needed).
+- **Status**: recommended; the owner confirms it with D-80.
+- **Inherited by**: Phase 3.
+
 ## Hypotheses after this research
 
 | Hypothesis | Status after planning | Closed by |

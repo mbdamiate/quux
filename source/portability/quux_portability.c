@@ -211,6 +211,10 @@ bool quux_random_bytes(void *buffer, size_t size) {
     return true;
 }
 
+void quux_exit_immediately(int status) {
+    _exit(status);
+}
+
 bool quux_standard_input_is_terminal(void) {
     return isatty(STDIN_FILENO) != 0;
 }

@@ -17,7 +17,8 @@ static int usage(void) {
     fprintf(stderr, "usage: quux-test unit [MODULE]\n"
                     "       quux-test [--verify-roots | --verify-roots-every-allocation]\n"
                     "                 [--available FEATURES] examples PATH\n"
-                    "       quux-test program DIRECTORY\n"
+                    "       quux-test [--verify-roots | --verify-roots-every-allocation]\n"
+                    "                 [--report FILE] [--seed N] program DIRECTORY\n"
                     "       quux-test [--verify-roots | --verify-roots-every-allocation]\n"
                     "                 run FILE.qx [INPUT]\n");
     return 2;
@@ -64,7 +65,8 @@ static int run_examples_path(const char *path, const quux_example_options *optio
 }
 
 int main(int argument_count, char **arguments) {
-    quux_example_options options = {"core", false, false};
+    quux_example_options options = {"core concurrency", false, false};
+    quux_program_options program_options = {NULL, false, 0, QUUX_VERIFY_OFF};
     while (argument_count > 1 && strncmp(arguments[1], "--", 2) == 0) {
         if (strcmp(arguments[1], "--verify-roots-every-allocation") == 0) {
             options.verify_every_allocation = true;
@@ -74,6 +76,19 @@ int main(int argument_count, char **arguments) {
             options.verify_roots = true;
             arguments++;
             argument_count--;
+        } else if (strcmp(arguments[1], "--report") == 0 && argument_count > 2) {
+            program_options.report_path = arguments[2];
+            arguments += 2;
+            argument_count -= 2;
+        } else if (strcmp(arguments[1], "--seed") == 0 && argument_count > 2) {
+            char *end = NULL;
+            program_options.seed = strtoull(arguments[2], &end, 0);
+            if (end == arguments[2] || *end != '\0') {
+                return usage();
+            }
+            program_options.seeded = true;
+            arguments += 2;
+            argument_count -= 2;
         } else if (strcmp(arguments[1], "--available") == 0 && argument_count > 2) {
             options.available_features = arguments[2];
             arguments += 2;
@@ -84,6 +99,16 @@ int main(int argument_count, char **arguments) {
     }
     if (argument_count < 2) {
         return usage();
+    }
+    if (strcmp(arguments[1], "program") == 0 && argument_count == 3) {
+        size_t length = strlen(arguments[2]);
+        while (length > 1 && arguments[2][length - 1] == '/') {
+            arguments[2][--length] = '\0';
+        }
+        program_options.verify_mode = options.verify_every_allocation ? QUUX_VERIFY_EVERY_ALLOCATION
+                                      : options.verify_roots          ? QUUX_VERIFY_AMORTIZED
+                                                                      : QUUX_VERIFY_OFF;
+        return quux_run_program(arguments[2], &program_options);
     }
     if (strcmp(arguments[1], "examples") == 0 && argument_count == 3) {
         return run_examples_path(arguments[2], &options);

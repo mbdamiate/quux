@@ -29,6 +29,11 @@ Rules:
 4. The futures that a combinator cancels because it no longer needs them end `:failed` with
    `:cancelled`, but they do **not** fail their scope (section 07, rule 8). Without this rule,
    `first-success` would always fail the scope that holds its losers.
+5. The failures of the alternatives of `first-success` do not fail their scope either:
+   `first-success` handles them, and only `:all-failed`, through its own future, reaches the
+   scope (D-80). An alternative that fails **before** it is passed to `first-success` has
+   already failed its scope (section 07 rule 5); programs create the alternatives in the call,
+   as in the examples below.
 
 ## Examples
 
@@ -37,7 +42,7 @@ Rules:
 (with-scope [scope]
   (wait-for (all [(future (sleep 100) :user)
                   (future (sleep 150) :orders)])))
-;=> [:user :orders], after about 150 ms
+;=> [:user :orders]   ; after about 150 ms
 
 ;; all: the first failure wins and the rest is cancelled
 (with-scope [scope]
@@ -52,10 +57,11 @@ Rules:
                             (future (sleep 200) :replica-3)])))
 ;=> :replica-2
 
-;; first-success: everything fails
+;; first-success: everything fails. The alternatives fail after first-success has received
+;; them (rule 5).
 (with-scope [scope]
-  (wait-for (first-success [(future (raise (error :user "a" {})))
-                            (future (raise (error :user "b" {})))])))
+  (wait-for (first-success [(future (sleep 10) (raise (error :user "a" {})))
+                            (future (sleep 10) (raise (error :user "b" {})))])))
 ;!! :all-failed   ; (get (error-data problem) :errors) holds both :user errors, in order
 
 ;; then
@@ -76,7 +82,7 @@ Rules:
   (let-parallel [user   (sleep 100)
                  orders (sleep 150)]
     [user orders]))
-;=> [nothing nothing], after about 150 ms
+;=> [nothing nothing]   ; after about 150 ms
 ```
 
 `sleep` returns `nothing`; reference program 01 shows `let-parallel` with real lookups.

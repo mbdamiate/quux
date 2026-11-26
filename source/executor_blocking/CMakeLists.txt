@@ -1,0 +1,3 @@
+add_library(quux_executor_blocking STATIC quux_executor_blocking.c)
+target_include_directories(quux_executor_blocking PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(quux_executor_blocking PUBLIC quux_concurrency)

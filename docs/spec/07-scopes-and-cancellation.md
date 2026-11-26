@@ -49,6 +49,8 @@ D-14 (deadlock detection), D-21 (scope identity; see section 13)
      (section 08).
 
    Every other `:cancelled` failure of a child fails the scope like any other error.
+   The failures of the alternatives of `first-success` do not fail the scope either; only
+   `:all-failed` does, through the future of `first-success` (section 08 rule 5, D-80).
 9. Because the order of completion between racing failures is not deterministic, tests MUST
    accept any of the racing errors as primary (`raises-one-of`) and may check the others with
    `suppressed-includes` (hypothesis H9).
@@ -57,6 +59,8 @@ D-14 (deadlock detection), D-21 (scope identity; see section 13)
 
 10. `(cancel! scope)` requests the cancellation of a scope: the scope moves to `:cancelling`
     and cancels all its children and its body. A scope is also cancelled when its parent is.
+    A future or a scope created in a scope that is already `:cancelling` starts cancelled
+    (D-81).
 11. Cancellation is **cooperative**. A task observes it only at a **cancellation point**, where
     it raises `:cancelled`. The cancellation points are:
     - `wait-for` (section 06);
@@ -71,7 +75,8 @@ D-14 (deadlock detection), D-21 (scope identity; see section 13)
 13. `finally` blocks run when `:cancelled` is raised through them.
 14. `(shield-from-cancellation body …)` runs `body` without observing cancellation, so cleanup
     code can finish (for example, telling another node that a resource is released). When it
-    ends, a pending cancellation is observed at the next cancellation point.
+    ends, a pending cancellation is observed at the next cancellation point. An agent update
+    sent from `body` is never withdrawn (section 09 rule 11, D-81).
 15. There is no forced cancellation: a task is never killed and its stack is never unwound
     from outside.
 
@@ -97,7 +102,7 @@ D-14 (deadlock detection), D-21 (scope identity; see section 13)
           slow-work    (future (sleep 10000) :never)]
       [(wait-for fast-failure) (wait-for slow-work)]))
   (catch :user problem (error-kind problem)))
-;=> :user, after about 50 ms; slow-work ends :failed with :cancelled
+;=> :user   ; after about 50 ms; slow-work ends :failed with :cancelled
 
 ;; explicit cancellation from inside
 (with-scope [scope]

@@ -1,5 +1,7 @@
 #include "quux_session.h"
 
+#include "quux_executor_blocking.h"
+
 #include "quux_namespaces.h"
 #include "quux_printer.h"
 #include "quux_reader.h"
@@ -8,7 +10,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum { QUUX_SESSION_STACK_BYTES = 512u * 1024u * 1024u };
+/* The C stacks of the session's thread and of every task. Non-tail recursion stops at
+ * runtime->maximum_recursion_depth with :stack-exhausted (D-51) long before; pages are only
+ * committed when touched. */
+enum {
+    QUUX_SESSION_STACK_BYTES = 512u * 1024u * 1024u,
+    QUUX_TASK_STACK_BYTES = 256u * 1024u * 1024u,
+};
 
 typedef struct session {
     quux_session_body body;
@@ -25,12 +33,25 @@ static void *run_session(void *argument) {
     }
     quux_context context;
     quux_context_initialize(&context, runtime);
-    if (!quux_evaluator_initialize(&context)) {
+    quux_executor *executor = quux_executor_blocking_create(QUUX_TASK_STACK_BYTES);
+    if (executor == NULL || !quux_evaluator_initialize(&context) ||
+        !quux_concurrency_initialize(&context, executor)) {
         fprintf(stderr, "quux: start-up failed: ");
         quux_session_print_error(&context, stderr, context.pending_error);
         current->status = 2;
+        if (runtime->concurrency == NULL && executor != NULL) {
+            executor->operations->destroy(executor);
+        }
     } else {
         current->status = current->body(&context, current->data);
+    }
+    if (!quux_concurrency_finish(&context)) {
+        /* a future started directly in the root scope failed */
+        quux_session_print_error(&context, stdout, context.pending_error);
+        context.pending_error = quux_nothing;
+        if (current->status == 0) {
+            current->status = 1;
+        }
     }
     quux_context_finish(&context);
     quux_runtime_destroy(runtime);
@@ -46,6 +67,19 @@ int quux_session_run(quux_session_body body, void *data) {
     }
     quux_thread_join(thread);
     return current.status;
+}
+
+static bool evaluate_in_scope(quux_context *context, quux_value scope, void *data,
+                              quux_value *result) {
+    (void)scope;
+    return quux_evaluate_form(context, *(quux_value *)data, result);
+}
+
+bool quux_session_evaluate_form(quux_context *context, quux_value form, quux_value *result) {
+    QUUX_ROOT_FRAME(context, &form);
+    bool done = quux_concurrency_with_scope(context, evaluate_in_scope, &form, result);
+    QUUX_ROOT_FRAME_END(context);
+    return done;
 }
 
 void quux_session_print_error(quux_context *context, FILE *stream, quux_value error) {

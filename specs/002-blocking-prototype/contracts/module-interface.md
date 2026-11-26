@@ -44,11 +44,16 @@ VM scheduler in Phase 3).
 
 | Operation | Contract |
 |---|---|
-| `start_task(executor, task, entry, argument)` | Runs `entry(context, argument)` concurrently. Returns `false` with `:resource-exhausted` if it cannot. |
-| `park(executor, context, condition_check, deadline)` | Suspends the current task until `condition_check` is true, the deadline passes, or the task is cancelled. Returns which of the three happened. Spurious wake-ups are handled inside. |
+| `start_task(executor, task, entry)` | Runs `entry(task)` concurrently. Returns `false` if it cannot; the caller fails the future with `:resource-exhausted`. |
+| `attach_current_thread(executor, task)` / `detach_current_thread` | Makes the calling thread a task (the session's own task) and releases it. Added in US3. |
+| `lock(executor)` / `unlock(executor)` | The executor's one lock. It also protects the state of futures and scopes, so a parked task never misses a wake-up. Added in US3. |
+| `park(executor, task, condition_check, data, deadline, observe_cancellation)` | With the lock held, suspends the task until `condition_check(data)` is true, the deadline passes, or (when `observe_cancellation`) the task's cancellation flag is set. Returns which of the three happened. Spurious wake-ups are handled inside. |
 | `wake(executor, task)` | Makes a parked task re-evaluate its condition. |
 | `cancel(executor, task)` | Sets the cancellation flag and wakes the task, including from blocked input/output. |
-| `current_time(executor)` | Monotonic milliseconds. |
-| `join_task(executor, task)` | Releases the task's resources after it ended. |
+| `current_time(executor)` | Monotonic nanoseconds. |
+| `join_task(executor, task)` | Waits until a started task has ended and releases its resources. Called without the lock. |
+| `destroy(executor)` | Releases the executor. |
+
+The interface is `source/concurrency/quux_executor.h` (T041); `quux_concurrency.h` includes it.
 
 Every cancellation point of section 07 is implemented in `concurrency` on top of `park`.

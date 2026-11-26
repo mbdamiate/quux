@@ -3,13 +3,18 @@
 #ifndef QUUX_SESSION_H
 #define QUUX_SESSION_H
 
-#include "quux_evaluator.h"
+#include "quux_concurrency.h"
 
 typedef int (*quux_session_body)(quux_context *context, void *data);
 
-/* Creates a runtime, initializes the evaluator, runs body on a large-stack thread, and destroys
- * everything. Returns body's result, or 2 when start-up fails. */
+/* Creates a runtime, initializes the evaluator and the concurrency module (blocking executor),
+ * runs body on a large-stack thread, joins the root scope and destroys everything. Returns
+ * body's result, or 2 when start-up fails. */
 int quux_session_run(quux_session_body body, void *data);
+
+/* Evaluates one top-level form in a new child of the session's root scope (section 07 rule 2):
+ * the futures it starts are joined before it returns. */
+bool quux_session_evaluate_form(quux_context *context, quux_value form, quux_value *result);
 
 /* Prints an error value as "!! :kind: message". */
 void quux_session_print_error(quux_context *context, FILE *stream, quux_value error);

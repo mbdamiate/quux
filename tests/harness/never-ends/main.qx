@@ -1,0 +1,8 @@
+;; A harness fixture (tests/harness): a loop with no end, stopped by the watchdog.
+(namespace harness.fixture)
+
+(define-function forever [n]
+  (forever (increment n)))
+
+(define-function main [input]
+  (forever 0))

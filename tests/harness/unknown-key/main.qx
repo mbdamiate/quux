@@ -1,0 +1,5 @@
+;; A harness fixture (tests/harness): not a reference program.
+(namespace harness.fixture)
+
+(define-function main [input]
+  :done)

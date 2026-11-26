@@ -48,6 +48,9 @@ resolves H3)
     whether the update was applied reads `(state agent)`. From Phase 5d on, operation
     identifiers make this check exact (H5).
 
+    An update sent from inside `shield-from-cancellation` is never withdrawn: it is cleanup
+    (section 07 rule 14, D-81).
+
 ## Examples
 
 ```quux

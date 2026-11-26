@@ -64,7 +64,7 @@ static int run_repl(quux_context *context, void *data) {
                 consumed = length; /* discard the rest of the faulty input */
                 break;
             }
-            if (quux_evaluate_form(context, form, &value)) {
+            if (quux_session_evaluate_form(context, form, &value)) {
                 quux_print_to_stream(context, stdout, value, QUUX_PRINT_READABLE);
                 fputs("\n", stdout);
             } else {

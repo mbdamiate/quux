@@ -19,6 +19,10 @@ bool quux_evaluator_initialize(quux_context *context);
 
 bool quux_define_primitive(quux_context *context, const char *name,
                            quux_primitive_function function, uint32_t minimum, uint32_t maximum);
+/* A primitive that is not defined in any namespace (the functions behind the concurrency forms,
+ * and the bodies of runtime tasks). Its name appears in messages and in content hashes. */
+bool quux_make_primitive(quux_context *context, const char *name, quux_primitive_function function,
+                         uint32_t minimum, uint32_t maximum, quux_value *result);
 
 /* Analyzes (expanding macros completely) and evaluates one top-level form. */
 bool quux_evaluate_form(quux_context *context, quux_value form, quux_value *result);

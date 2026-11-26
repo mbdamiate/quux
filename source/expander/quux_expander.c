@@ -181,6 +181,11 @@ typedef enum special_form {
     SPECIAL_UNQUOTE,
     SPECIAL_UNQUOTE_SPLICING,
     SPECIAL_NAMESPACE,
+    SPECIAL_FUTURE,
+    SPECIAL_SPAWN,
+    SPECIAL_WITH_SCOPE,
+    SPECIAL_SHIELD_FROM_CANCELLATION,
+    SPECIAL_TAG,
 } special_form;
 
 static const struct {
@@ -201,6 +206,11 @@ static const struct {
     {"unquote", SPECIAL_UNQUOTE},
     {"unquote-splicing", SPECIAL_UNQUOTE_SPLICING},
     {"namespace", SPECIAL_NAMESPACE},
+    {"future", SPECIAL_FUTURE},
+    {"spawn", SPECIAL_SPAWN},
+    {"with-scope", SPECIAL_WITH_SCOPE},
+    {"shield-from-cancellation", SPECIAL_SHIELD_FROM_CANCELLATION},
+    {"tag", SPECIAL_TAG},
 };
 
 static special_form special_form_of(quux_value symbol) {
@@ -956,6 +966,99 @@ static bool analyze_symbol(analyzer *state, quux_value symbol, quux_value *resul
     return done;
 }
 
+/* The concurrency forms run their bodies on other tasks, so the body becomes a function: the
+ * form is analyzed as a call of the installed form function (quux_form_function):
+ *   (future body ...)                    -> (F (function [] body ...))
+ *   (spawn scope body ...)               -> (F scope (function [] body ...))
+ *   (with-scope [name] body ...)         -> (F (function [name] body ...))
+ *   (shield-from-cancellation body ...)  -> (F (function [] body ...))
+ *   (tag name expression)                -> (F name (function [] expression))
+ * F is quoted, so it is a constant of the code; its content hash is its name. */
+static bool analyze_concurrency_form(analyzer *state, quux_form_function which,
+                                     const char *form_name, quux_value parameters,
+                                     quux_value leading_argument, bool has_leading_argument,
+                                     quux_value body, quux_value *result) {
+    quux_context *context = state->context;
+    quux_value form_function = context->runtime->form_functions[which];
+    if (quux_is_nothing(form_function)) {
+        return quux_raise(context, "wrong-type", "%s is not available in this runtime", form_name);
+    }
+    quux_value function_form = quux_nothing;
+    quux_value call = quux_nothing;
+    quux_value quoted = quux_nothing;
+    QUUX_ROOT_FRAME(context, &parameters, &leading_argument, &body, &function_form, &call, &quoted,
+                    &form_function);
+    bool done = quux_list_prepend(context, parameters, body, &function_form) &&
+                quux_list_prepend(context, quux_symbol(context, "function"), function_form,
+                                  &function_form) &&
+                quux_list_prepend(context, function_form, quux_nothing, &call);
+    if (done && has_leading_argument) {
+        done = quux_list_prepend(context, leading_argument, call, &call);
+    }
+    done = done && quux_list_prepend(context, form_function, quux_nothing, &quoted) &&
+           quux_list_prepend(context, quux_symbol(context, "quote"), quoted, &quoted) &&
+           quux_list_prepend(context, quoted, call, &call) && analyze(state, call, result);
+    QUUX_ROOT_FRAME_END(context);
+    return done;
+}
+
+static bool analyze_concurrency_special(analyzer *state, special_form special, quux_value form,
+                                        quux_value *result) {
+    quux_context *context = state->context;
+    uint64_t count = argument_count(form);
+    quux_value no_parameters = quux_nothing;
+    QUUX_ROOT_FRAME(context, &form, &no_parameters);
+    bool done = quux_vector_empty(context, &no_parameters);
+    if (done) {
+        switch (special) {
+        case SPECIAL_FUTURE:
+            done = count >= 1
+                       ? analyze_concurrency_form(state, QUUX_FORM_SPAWN, "future", no_parameters,
+                                                  quux_nothing, false, quux_pair_rest(form), result)
+                       : malformed(context, "future", "expected (future body ...)");
+            break;
+        case SPECIAL_SPAWN:
+            done = count >= 2 ? analyze_concurrency_form(state, QUUX_FORM_SPAWN, "spawn",
+                                                         no_parameters, argument(form, 0), true,
+                                                         arguments_after(form, 1), result)
+                              : malformed(context, "spawn", "expected (spawn scope body ...)");
+            break;
+        case SPECIAL_WITH_SCOPE: {
+            quux_value binding = count >= 2 ? argument(form, 0) : quux_nothing;
+            uint64_t binding_count = 0;
+            bool well_formed = quux_is_kind(binding, QUUX_KIND_VECTOR) &&
+                               quux_count(context, binding, &binding_count) && binding_count == 1 &&
+                               quux_is_kind(quux_vector_element(binding, 0), QUUX_KIND_SYMBOL);
+            done = well_formed
+                       ? analyze_concurrency_form(state, QUUX_FORM_WITH_SCOPE, "with-scope",
+                                                  binding, quux_nothing, false,
+                                                  arguments_after(form, 1), result)
+                       : malformed(context, "with-scope", "expected (with-scope [name] body ...)");
+            break;
+        }
+        case SPECIAL_SHIELD_FROM_CANCELLATION:
+            done = count >= 1
+                       ? analyze_concurrency_form(state, QUUX_FORM_SHIELD,
+                                                  "shield-from-cancellation", no_parameters,
+                                                  quux_nothing, false, quux_pair_rest(form), result)
+                       : malformed(context, "shield-from-cancellation",
+                                   "expected (shield-from-cancellation body ...)");
+            break;
+        case SPECIAL_TAG:
+            done = count == 2 ? analyze_concurrency_form(state, QUUX_FORM_TAG, "tag", no_parameters,
+                                                         argument(form, 0), true,
+                                                         arguments_after(form, 1), result)
+                              : malformed(context, "tag", "expected (tag name expression)");
+            break;
+        default:
+            done = malformed(context, "form", "unknown special form");
+            break;
+        }
+    }
+    QUUX_ROOT_FRAME_END(context);
+    return done;
+}
+
 static bool analyze_special(analyzer *state, special_form special, quux_value form,
                             quux_value *result) {
     quux_context *context = state->context;
@@ -1025,6 +1128,12 @@ static bool analyze_special(analyzer *state, special_form special, quux_value fo
         return quux_raise(context, "wrong-type", "unquote outside quasi-quote");
     case SPECIAL_NAMESPACE:
         return analyze_namespace(state, form, result);
+    case SPECIAL_FUTURE:
+    case SPECIAL_SPAWN:
+    case SPECIAL_WITH_SCOPE:
+    case SPECIAL_SHIELD_FROM_CANCELLATION:
+    case SPECIAL_TAG:
+        return analyze_concurrency_special(state, special, form, result);
     default:
         return malformed(context, "form", "unknown special form");
     }

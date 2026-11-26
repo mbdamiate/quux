@@ -1,5 +1,6 @@
 # C unit tests, linked into quux-test and run as `quux-test unit MODULE` (T016, D-46).
-set(quux_unit_test_modules portability memory values collections reader_printer expander evaluator)
+set(quux_unit_test_modules portability memory values collections reader_printer expander evaluator
+  concurrency harness)
 set(quux_unit_test_sources quux_unit_tests.c quux_unit_evaluation.c)
 foreach(quux_unit_module IN LISTS quux_unit_test_modules)
   list(APPEND quux_unit_test_sources test_${quux_unit_module}.c)
@@ -7,4 +8,5 @@ endforeach()
 add_library(quux_unit_tests STATIC ${quux_unit_test_sources})
 target_include_directories(quux_unit_tests PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(quux_unit_tests PUBLIC quux_harness)
+target_compile_definitions(quux_unit_tests PRIVATE QUUX_SOURCE_DIRECTORY="${CMAKE_SOURCE_DIR}")
 set(QUUX_UNIT_TEST_MODULES ${quux_unit_test_modules} PARENT_SCOPE)
