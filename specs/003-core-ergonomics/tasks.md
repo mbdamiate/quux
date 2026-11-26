@@ -136,7 +136,7 @@ and a changed expectation is caught.
 
 ## Bug fixes (any time during US1 and US2)
 
-- [ ] T024 [US1] For each interpreter bug a program exposes: write a failing regression test first (a unit test in `tests/unit/` or a specification example), fix it in `source/`, and record the program, the symptom, the fix and the test in the **Bugs found** section of `programs/ergonomics/working-notes.md`. A fix larger than size M is not done here: the program stays `pending` with the bug as its reason, and the bug is written down as a task for feature 002 (FR-009; research risk R3) (S–M per bug)
+- [X] T024 [US1] For each interpreter bug a program exposes: write a failing regression test first (a unit test in `tests/unit/` or a specification example), fix it in `source/`, and record the program, the symptom, the fix and the test in the **Bugs found** section of `programs/ergonomics/working-notes.md`. A fix larger than size M is not done here: the program stays `pending` with the bug as its reason, and the bug is written down as a task for feature 002 (FR-009; research risk R3) (S–M per bug)
 
 ---
 
