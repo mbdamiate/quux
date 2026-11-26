@@ -6,11 +6,29 @@ static int check_expander(quux_context *context, void *data) {
     QUUX_CHECK(state,
                quux_unit_evaluates_to(context, "(quasi-quote (print-line (unquote (+ 1 2))))",
                                       "(core/print-line 3)"));
-    QUUX_CHECK(state, quux_unit_evaluates_to(
-                          context, "(quasi-quote (list (unquote-splicing [1 2]) local-name))",
-                          "(core/list 1 2 local-name)"));
+    /* every free symbol is qualified (section 04 rule 4), also one that does not resolve when
+     * the template is analyzed: it takes the current namespace (found by ergonomics program 07,
+     * friction P07-F3) */
+    QUUX_CHECK(state,
+               quux_unit_evaluates_to(context,
+                                      "(namespace templates)"
+                                      "(quasi-quote (list (unquote-splicing [1 2]) local-name))",
+                                      "(core/list 1 2 templates/local-name)"));
     QUUX_CHECK(state, quux_unit_evaluates_to(context, "(quasi-quote (if sequence let))",
                                              "(if sequence let)"));
+    /* so a macro that binds a literal name fails whether or not that name is defined (the
+     * message, which names the qualified symbol, is checked by hand: it is raised while the
+     * calling form is expanded, before any try can catch it) */
+    QUUX_CHECK(state,
+               quux_unit_evaluates_to(
+                   context,
+                   "(namespace templates)"
+                   "(define-macro bind-row [value] (quasi-quote (let [row (unquote value)] row)))"
+                   "(bind-row 5)",
+                   "!! :wrong-type"));
+    QUUX_CHECK(state,
+               quux_unit_evaluates_to(context, "(namespace templates) (define row 1) (bind-row 5)",
+                                      "!! :wrong-type"));
     QUUX_CHECK(state, quux_unit_evaluates_to(context, "(unquote 1)", "!! :wrong-type"));
     /* unique-symbol never clashes */
     QUUX_CHECK(state, quux_unit_evaluates_to(context,

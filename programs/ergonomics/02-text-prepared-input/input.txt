@@ -1,0 +1,5 @@
+{:words ["the" "quick" "brown" "fox" "jumps" "over" "the" "lazy" "dog" "the" "dog" "sleeps"]
+ :rows [["name" "city" "score"]
+        ["ana" "lisbon" "82"]
+        ["bruno" "porto" "71"]
+        ["carla" "faro" "100"]]}

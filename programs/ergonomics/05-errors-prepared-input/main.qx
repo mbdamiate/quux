@@ -1,0 +1,63 @@
+;; 05 — Error handling with prepared input: validating records that are already data.
+;; Each record is a map. A record that breaks a rule raises a :user error whose :data names the
+;; record and the field. Each check runs inside try, so one bad record does not stop the others;
+;; the errors become reports. At the end, the program raises one summary error, which nothing
+;; catches: the runner prints it and the exit status is 1.
+;; Run with the contents of input.txt as the second argument.
+
+(define-function reject-record [record field message]
+  (raise (error :user message {:id (get record :id) :field field})))
+
+;; Raises on the first broken rule; returns true otherwise. The age rule compares with <, so an
+;; age that is not a number raises :wrong-type from the comparison itself.
+(define-function validate [record]
+  (let [{name :name age :age email :email} record]
+    (when (or (not (string? name)) (empty? name))
+      (reject-record record :name "name is missing"))
+    (when (< age 0)
+      (reject-record record :age "age is negative"))
+    (when (nothing? email)
+      (reject-record record :email "email is missing"))
+    true))
+
+;; A report map for one record: {:id :accepted} or {:id :accepted :field :reason}.
+(define-function check-record [record]
+  (let [id (get record :id)]
+    (try
+      (validate record)
+      {:id id :accepted true}
+      (catch :user problem
+        {:id id :accepted false
+         :field (get (error-data problem) :field)
+         :reason (get problem :message)})
+      (catch :wrong-type problem
+        {:id id :accepted false :field :unknown :reason (get problem :message)})
+      (finally
+        (print-line (to-string "checked record " id))))))
+
+(define-function describe-report [report]
+  (let [{id :id accepted :accepted field :field reason :reason} report]
+    (if accepted
+      (to-string "record " id ": accepted")
+      (to-string "record " id ": rejected, field " field ", " reason))))
+
+(define-function main [input]
+  (print-line (to-string "records: " (count input)))
+  (let [reports (pour-into [] (transform check-record input))
+        accepted (filter (function [report] (get report :accepted)) reports)
+        rejected (reject (function [report] (get report :accepted)) reports)
+        accepted-ids (pour-into #{} (transform (function [report] (get report :id)) accepted))
+        accepted-ages (thread-last input
+                                   (filter (function [record] (has-key? accepted-ids (get record :id))))
+                                   (transform (function [record] (get record :age))))]
+    (reduce (function [ignored report] (print-line (describe-report report))) nothing reports)
+    (print-line (to-string "accepted: " (count accepted) ", rejected: " (count rejected)))
+    (print-line (to-string "mean age of accepted records: "
+                           (/ (reduce + 0 accepted-ages) (* 1.0 (count accepted-ages)))))
+    (try
+      (unless (empty? rejected)
+        (raise (error :user (to-string (count rejected) " of " (count reports) " records are invalid")
+                      {:invalid (pour-into [] (transform (function [report] (get report :id))
+                                                         rejected))})))
+      (finally
+        (print-line "report finished")))))

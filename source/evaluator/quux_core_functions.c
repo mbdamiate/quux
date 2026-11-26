@@ -19,8 +19,8 @@ static bool expect_kind(quux_context *context, const char *function, quux_value 
     if (quux_kind_of(value) == kind) {
         return true;
     }
-    return quux_raise(context, "wrong-type", "%s expects a %s, got a %s", function,
-                      quux_kind_name(kind), quux_kind_name(quux_kind_of(value)));
+    return quux_raise(context, "wrong-type", "%s expects %s, got %s", function,
+                      quux_kind_phrase(kind), quux_kind_phrase(quux_kind_of(value)));
 }
 
 static bool is_number(quux_value value) {
@@ -32,8 +32,8 @@ static bool expect_number(quux_context *context, const char *function, quux_valu
     if (is_number(value)) {
         return true;
     }
-    return quux_raise(context, "wrong-type", "%s expects a number, got a %s", function,
-                      quux_kind_name(quux_kind_of(value)));
+    return quux_raise(context, "wrong-type", "%s expects a number, got %s", function,
+                      quux_kind_phrase(quux_kind_of(value)));
 }
 
 static double as_double(quux_value value) {
@@ -526,16 +526,16 @@ PRIMITIVE(primitive_put) {
         }
         return quux_vector_put(context, arguments[0], (uint64_t)index, arguments[2], result);
     }
-    return quux_raise(context, "wrong-type", "put expects a map or a vector, got a %s",
-                      quux_kind_name(kind));
+    return quux_raise(context, "wrong-type", "put expects a map or a vector, got %s",
+                      quux_kind_phrase(kind));
 }
 
 PRIMITIVE(primitive_remove_key) {
     (void)count;
     quux_kind kind = quux_kind_of(arguments[0]);
     if (kind != QUUX_KIND_MAP && kind != QUUX_KIND_SET) {
-        return quux_raise(context, "wrong-type", "remove-key expects a map or a set, got a %s",
-                          quux_kind_name(kind));
+        return quux_raise(context, "wrong-type", "remove-key expects a map or a set, got %s",
+                          quux_kind_phrase(kind));
     }
     return quux_map_remove(context, arguments[0], arguments[1], result);
 }
@@ -564,8 +564,8 @@ PRIMITIVE(primitive_has_key) {
         *result = quux_false;
         return true;
     }
-    return quux_raise(context, "wrong-type", "has-key? expects a map, set or vector, got a %s",
-                      quux_kind_name(kind));
+    return quux_raise(context, "wrong-type", "has-key? expects a map, set or vector, got %s",
+                      quux_kind_phrase(kind));
 }
 
 PRIMITIVE(primitive_count) {
@@ -745,8 +745,8 @@ PRIMITIVE(primitive_element_at) {
     quux_kind kind = quux_kind_of(arguments[0]);
     uint64_t size = 0;
     if (kind != QUUX_KIND_VECTOR && kind != QUUX_KIND_PAIR && kind != QUUX_KIND_NOTHING) {
-        return quux_raise(context, "wrong-type", "element-at expects a vector or a list, got a %s",
-                          quux_kind_name(kind));
+        return quux_raise(context, "wrong-type", "element-at expects a vector or a list, got %s",
+                          quux_kind_phrase(kind));
     }
     if (!quux_count(context, arguments[0], &size)) {
         return false;
@@ -886,8 +886,8 @@ PRIMITIVE(primitive_function_hash) {
     (void)count;
     quux_kind kind = quux_kind_of(arguments[0]);
     if (kind != QUUX_KIND_CLOSURE && kind != QUUX_KIND_PRIMITIVE) {
-        return quux_raise(context, "wrong-type", "function-hash expects a function, got a %s",
-                          quux_kind_name(kind));
+        return quux_raise(context, "wrong-type", "function-hash expects a function, got %s",
+                          quux_kind_phrase(kind));
     }
     unsigned char digest[QUUX_CONTENT_HASH_BYTES];
     if (!quux_function_content_hash(context, arguments[0], digest)) {

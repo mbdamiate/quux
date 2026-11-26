@@ -1,0 +1,8 @@
+shapes: 3
+shape: :rectangle with area 12
+shape: :square with area 25
+shape: :triangle with area 9
+summary: 3 shapes, total area 46
+largest: :square
+unqualified describe: :rectangle with area 12
+46

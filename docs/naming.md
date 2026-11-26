@@ -179,6 +179,31 @@ name by name by the owner on 2026-11-24.
 | J7. Tools | executables `quux`, `quux-test`, `quux-name-check`; REPL namespace `user` | D-46, D-47, D-52 | approved |
 | J8. Error kind | `:syntax` (the reader cannot read the text: unbalanced brackets, a reader shorthand, a malformed literal, an unknown escape, text that ends inside a form) | D-54, W11 (owner, 2026-11-25) | approved |
 
+## K. Proposed in feature 003 (core ergonomics study)
+
+Each row comes from one decision item of `docs/ergonomics-report.md` (K1 from K-01, and so on).
+All fifteen groups were approved by the owner on 2026-11-25 (D-65..D-79). They are not implemented yet: a later feature adds them. Until then they appear only in this table, the report and the open questions.
+The local helpers and stubs of the ergonomics programs keep their own names, which are not
+proposals (D-58).
+
+| Group | Names | Replaces or adds | Decision | Status |
+|---|---|---|---|---|
+| K1. Text | `split-lines`, `split-words`, `split-text`, `trim-whitespace`, `substring`, `position-in-text` | new | D-65, W12 (owner, 2026-11-25) | approved |
+| K2. Reading data from text | `parse-data` | new | D-66, W13 (owner, 2026-11-25) | approved |
+| K3. Paths in nested data | `get-at-path`, `put-at-path`, `modify-at-path`, `modify-value` | new | D-67, W14 (owner, 2026-11-25) | approved |
+| K4. Searching | `find-first`, `find-position` | new | D-68, W15 (owner, 2026-11-25) | approved |
+| K5. Effects for each element | `for-each` | new | D-69, W16 (owner, 2026-11-25) | approved |
+| K6. Concatenation | `concatenate-all`, `flat-transform` | new | D-70, W17 (owner, 2026-11-25) | approved |
+| K7. Formatting | `join-text`, `pad-start`, `pad-end`, `format-decimal` | new | D-71, W18 (owner, 2026-11-25) | approved |
+| K8. Ordering | `sort`, `sort-by`, `compare-values` | new | D-72, W19 (owner, 2026-11-25) | approved |
+| K9. Numbers | `to-floating-point`, `round`, `floor`, `ceiling`, `truncate`, `square-root`, `power-of`, `divide-floating-point` | new | D-73, W20 (owner, 2026-11-25) | approved |
+| K10. Indexed transform | `transform-indexed` | new | D-74, W21 (owner, 2026-11-25) | approved |
+| K11. Errors | `error-message`, `error-cause`; keys in core error data `:wrong-value`, `:argument-position`, `:function-name` | new | D-75, W22 (owner, 2026-11-25) | approved |
+| K12. Macro expansion | `expand-macro`, `expand-macro-once` | new | D-76, W23 (owner, 2026-11-25) | approved |
+| K13. `case` without a match | error kind `:no-matching-case` | new | D-77, W24 (owner, 2026-11-25) | approved |
+| K14. Short map pattern | pattern key `:names` (`{:names [key left right]}`) | adds to J2 | D-78, W25 (owner, 2026-11-25) | approved |
+| K15. Load-time checks | error kind `:name-clash` (`:syntax` reused for malformed special forms) | new | D-79, W26 (owner, 2026-11-25) | approved |
+
 ## H. C code: abbreviations allowed as exceptions
 
 The default rule is full words in `snake_case`, with the prefix `quux_` on exported symbols

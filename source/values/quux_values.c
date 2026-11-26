@@ -44,6 +44,44 @@ const char *quux_kind_name(quux_kind kind) {
     return kind < QUUX_KIND_COUNT ? quux_kind_names[kind] : "unknown";
 }
 
+static const char *const quux_kind_phrases[QUUX_KIND_COUNT] = {
+    [QUUX_KIND_NOTHING] = "nothing",
+    [QUUX_KIND_BOOLEAN] = "a boolean",
+    [QUUX_KIND_INTEGER] = "an integer",
+    [QUUX_KIND_FLOAT] = "a floating-point number",
+    [QUUX_KIND_STRING] = "a string",
+    [QUUX_KIND_SYMBOL] = "a symbol",
+    [QUUX_KIND_KEYWORD] = "a keyword",
+    [QUUX_KIND_PAIR] = "a list",
+    [QUUX_KIND_VECTOR] = "a vector",
+    [QUUX_KIND_VECTOR_NODE] = "a vector node",
+    [QUUX_KIND_MAP] = "a map",
+    [QUUX_KIND_SET] = "a set",
+    [QUUX_KIND_CHAMP_NODE] = "a map node",
+    [QUUX_KIND_COLLISION_NODE] = "a map collision node",
+    [QUUX_KIND_ERROR] = "an error",
+    [QUUX_KIND_CLOSURE] = "a function",
+    [QUUX_KIND_PRIMITIVE] = "a function",
+    [QUUX_KIND_MACRO] = "a macro",
+    [QUUX_KIND_LAMBDA] = "function code",
+    [QUUX_KIND_CODE] = "code",
+    [QUUX_KIND_ENVIRONMENT] = "an environment",
+    [QUUX_KIND_NAMESPACE] = "a namespace",
+    [QUUX_KIND_DEFINITION] = "a definition",
+    [QUUX_KIND_ARGUMENTS] = "arguments",
+    [QUUX_KIND_FUTURE] = "a future",
+    [QUUX_KIND_SCOPE] = "a scope",
+    [QUUX_KIND_AGENT] = "an agent",
+    [QUUX_KIND_STREAM] = "a stream",
+    [QUUX_KIND_NODE] = "a node",
+    [QUUX_KIND_RESOURCE] = "a resource",
+    [QUUX_KIND_INTERNAL] = "an internal value",
+};
+
+const char *quux_kind_phrase(quux_kind kind) {
+    return kind < QUUX_KIND_COUNT ? quux_kind_phrases[kind] : "an unknown value";
+}
+
 /* ---- Interning tables ---- */
 
 static uint64_t name_hash(const char *bytes, size_t length) {

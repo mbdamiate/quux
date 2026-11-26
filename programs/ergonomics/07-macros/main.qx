@@ -1,0 +1,71 @@
+;; 07 — User-written macros: a counted loop and a small language for checking records.
+;; Both macros build code with quasi-quote, unquote and unquote-splicing, written out in full.
+;; Every name a macro introduces into the expanded code comes from unique-symbol, so it can never
+;; clash with a name in the caller's code.
+
+;; (repeat-times [name start end] body ...) runs body with name bound to start, start + 1, ...
+;; up to end - 1, and returns nothing. `end` is evaluated once.
+(define-macro repeat-times [binding :rest body]
+  (let [[name start end] binding
+        loop (unique-symbol "loop")
+        limit (unique-symbol "limit")]
+    (quasi-quote
+      (let [(unquote limit) (unquote end)]
+        (let-functions [((unquote loop) [(unquote name)]
+                          (when (< (unquote name) (unquote limit))
+                            (unquote-splicing body)
+                            ((unquote loop) (increment (unquote name)))))]
+          ((unquote loop) (unquote start)))))))
+
+;; (define-checks name (description field predicate) ...) defines a function of one record
+;; that returns the descriptions of the checks the record fails, as a vector. A check passes
+;; when (predicate (get record field)) is true.
+(define-macro define-checks [name :rest checks]
+  (let [record (unique-symbol "record")]
+    (quasi-quote
+      (define-function (unquote name) [(unquote record)]
+        (pour-into []
+                   (reject nothing?
+                           (vector
+                             (unquote-splicing
+                               (transform
+                                 (function [check]
+                                   (let [[description field predicate] check]
+                                     (quasi-quote
+                                       (if ((unquote predicate) (get (unquote record) (unquote field)))
+                                         nothing
+                                         (unquote description)))))
+                                 checks)))))))))
+
+(define-checks check-account
+  ("owner is a string" :owner string?)
+  ("balance is not negative" :balance (function [balance] (>= balance 0)))
+  ("currency is known" :currency (function [currency] (has-key? #{:euro :real} currency))))
+
+(define accounts
+  [{:owner "ana" :balance 100 :currency :euro}
+   {:owner "bruno" :balance -20 :currency :real}
+   {:owner 42 :balance 5 :currency :dollar}])
+
+(define-function compute-limit []
+  (print-line "limit computed")
+  2)
+
+(define-function main [input]
+  (print-line "squares")
+  (repeat-times [number 0 4]
+    (print-line (to-string "square of " number " is " (* number number))))
+  ;; The caller's own `limit` is not touched by the macro's hidden limit.
+  (let [limit 100]
+    (repeat-times [index 0 (compute-limit)]
+      (print-line (to-string index " of limit " limit))))
+  (print-line "table")
+  (repeat-times [row 1 3]
+    (repeat-times [column 1 4]
+      (print-line (to-string row " x " column " = " (* row column)))))
+  (print-line (to-string "accounts: " (count accounts)))
+  (repeat-times [index 0 (count accounts)]
+    (let [failures (check-account (element-at accounts index))]
+      (print-line (to-string "account " (increment index) ": " (count failures) " failed "
+                             failures))))
+  (count (filter (function [account] (empty? (check-account account))) accounts)))

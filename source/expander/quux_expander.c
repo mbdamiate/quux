@@ -266,7 +266,10 @@ static bool bind_pattern(analyzer *state, quux_value pattern, quux_value *result
     quux_kind kind = quux_kind_of(pattern);
     if (kind == QUUX_KIND_SYMBOL) {
         if (quux_symbol_namespace_length(pattern) > 0) {
-            return malformed(context, "binding", "a local name cannot be qualified");
+            return quux_raise(context, "wrong-type",
+                              "malformed binding: %.*s is qualified; a macro binds a local name "
+                              "made by unique-symbol (section 04 rule 5)",
+                              (int)quux_name_length(pattern), quux_name_bytes(pattern));
         }
         uint32_t slot = 0;
         if (!add_name(state, pattern, &slot)) {
@@ -492,8 +495,11 @@ static bool is_form_named(quux_value form, special_form special) {
     return quux_is_kind(form, QUUX_KIND_PAIR) && special_form_of(quux_pair_first(form)) == special;
 }
 
-/* A free symbol in a template is qualified with the namespace where it resolves (section 04
- * rule 4); special forms and unresolved symbols stay as written. */
+/* A free symbol in a template is qualified (section 04 rule 4): with the namespace where it
+ * resolves, or, when it does not resolve yet, with the current namespace, where the macro is being
+ * defined. Special forms stay as written. Before feature 003 an unresolved symbol stayed as
+ * written, so a macro that bound a literal name worked or failed depending on what was defined
+ * before it (friction P07-F3). */
 static bool qualify_symbol(analyzer *state, quux_value symbol, quux_value *result) {
     quux_context *context = state->context;
     *result = symbol;
@@ -503,8 +509,11 @@ static bool qualify_symbol(analyzer *state, quux_value symbol, quux_value *resul
     quux_value definition = quux_nothing;
     QUUX_ROOT_FRAME(context, &symbol, &definition);
     bool done = quux_namespace_resolve(context, context->current_namespace, symbol, &definition);
+    quux_value namespace_value = context->current_namespace;
     if (done && !quux_is_nothing(definition)) {
-        quux_value namespace_value = quux_definition_field(definition, QUUX_DEFINITION_NAMESPACE);
+        namespace_value = quux_definition_field(definition, QUUX_DEFINITION_NAMESPACE);
+    }
+    if (done && !quux_is_nothing(namespace_value)) {
         quux_value namespace_name =
             quux_checked_object(namespace_value)->values[QUUX_NAMESPACE_NAME];
         size_t prefix = quux_name_length(namespace_name);

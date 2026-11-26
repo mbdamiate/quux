@@ -1,0 +1,19 @@
+lines: 7
+checked line 1
+checked line 2
+checked line 3
+checked line 4
+checked line 5
+checked line 6
+checked line 7
+record 1: accepted
+record 2: rejected, field :name, name is missing
+record 3: rejected, field :age, age is negative
+record 4: rejected, field :email, email is missing
+record 5: rejected, field :unknown, < expects a number, got a string
+record 6: accepted
+record 7: rejected, field :syntax, the line is not valid quux data
+accepted: 2, rejected: 5
+mean age of accepted records: 31.5
+report finished
+!! :user: 5 of 7 records are invalid

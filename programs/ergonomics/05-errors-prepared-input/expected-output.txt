@@ -1,0 +1,17 @@
+records: 6
+checked record 1
+checked record 2
+checked record 3
+checked record 4
+checked record 5
+checked record 6
+record 1: accepted
+record 2: rejected, field :name, name is missing
+record 3: rejected, field :age, age is negative
+record 4: rejected, field :email, email is missing
+record 5: rejected, field :unknown, < expects a number, got a string
+record 6: accepted
+accepted: 2, rejected: 4
+mean age of accepted records: 31.5
+report finished
+!! :user: 4 of 6 records are invalid

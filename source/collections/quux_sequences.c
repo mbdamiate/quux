@@ -9,8 +9,8 @@
 bool quux_list_prepend(quux_context *context, quux_value value, quux_value list,
                        quux_value *result) {
     if (!quux_is_nothing(list) && !quux_is_kind(list, QUUX_KIND_PAIR)) {
-        return quux_raise(context, "wrong-type", "prepend expects a list, got a %s",
-                          quux_kind_name(quux_kind_of(list)));
+        return quux_raise(context, "wrong-type", "prepend expects a list, got %s",
+                          quux_kind_phrase(quux_kind_of(list)));
     }
     QUUX_ROOT_FRAME(context, &value, &list);
     quux_object *pair = quux_allocate(context, QUUX_KIND_PAIR, 2, sizeof(uint64_t));

@@ -1,8 +1,11 @@
 /* quux-test: the test tool (D-46, contracts/command-line.md).
  *   quux-test unit [MODULE]       C unit tests
  *   quux-test examples PATH       specification examples (;=> and ;!!)
- *   quux-test program DIRECTORY   one reference program (from User Story 3) */
+ *   quux-test program DIRECTORY   one reference program (from User Story 3)
+ *   quux-test run FILE.qx [INPUT] the same as `quux FILE.qx [INPUT]`, optionally under the root
+ *                                 verifier (feature 003, D-56) */
 #include "quux_harness.h"
+#include "quux_session.h"
 #include "quux_unit_test.h"
 
 #include <dirent.h>
@@ -14,7 +17,9 @@ static int usage(void) {
     fprintf(stderr, "usage: quux-test unit [MODULE]\n"
                     "       quux-test [--verify-roots | --verify-roots-every-allocation]\n"
                     "                 [--available FEATURES] examples PATH\n"
-                    "       quux-test program DIRECTORY\n");
+                    "       quux-test program DIRECTORY\n"
+                    "       quux-test [--verify-roots | --verify-roots-every-allocation]\n"
+                    "                 run FILE.qx [INPUT]\n");
     return 2;
 }
 
@@ -82,6 +87,15 @@ int main(int argument_count, char **arguments) {
     }
     if (strcmp(arguments[1], "examples") == 0 && argument_count == 3) {
         return run_examples_path(arguments[2], &options);
+    }
+    if (strcmp(arguments[1], "run") == 0 && (argument_count == 3 || argument_count == 4) &&
+        ends_with(arguments[2], ".qx")) {
+        quux_verify_mode verify_mode = options.verify_every_allocation
+                                           ? QUUX_VERIFY_EVERY_ALLOCATION
+                                       : options.verify_roots ? QUUX_VERIFY_AMORTIZED
+                                                              : QUUX_VERIFY_OFF;
+        return quux_session_run_file(arguments[2], argument_count == 4 ? arguments[3] : NULL,
+                                     verify_mode);
     }
     if (strcmp(arguments[1], "unit") == 0) {
         int failures = quux_unit_run(argument_count > 2 ? arguments[2] : NULL);

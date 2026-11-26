@@ -1,0 +1,17 @@
+keys inserted: 8
+tree size: 7
+in order: [20 30 40 50 60 70 80]
+height: 3
+smallest: 20
+has 40: true
+has 65: false
+new size: 8
+in order: [20 30 40 50 60 65 70 80]
+original size: 7
+expressions: 5
+[1 :plus 2 :times 3] -> [:plus 1 [:times 2 3]] = 7
+[[1 :plus 2] :times 3] -> [:times [:plus 1 2] 3] = 9
+[10 :minus 4 :minus 3] -> [:minus [:minus 10 4] 3] = 3
+[2 :times [3 :plus 4] :divided-by 7] -> [:divided-by [:times 2 [:plus 3 4]] 7] = 2
+[1 :plus] -> error: expected a number or a group, found nothing
+8

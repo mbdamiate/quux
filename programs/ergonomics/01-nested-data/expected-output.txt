@@ -1,0 +1,10 @@
+warehouses: 2
+north: 2 products, stock value 540
+south: 2 products, stock value 80
+out of stock: ["south/washer"]
+north: 2 products, stock value 440
+south: 2 products, stock value 130
+out of stock: []
+bolts in all warehouses: 160
+original washer quantity: 0
+{:price 1 :product "washer" :quantity 50}

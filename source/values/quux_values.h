@@ -90,6 +90,10 @@ static inline bool quux_is_kind(quux_value value, quux_kind kind) {
 /* The kind's name for messages ("integer", "vector", ...). */
 const char *quux_kind_name(quux_kind kind);
 
+/* The kind's name as a noun phrase for messages: "an integer", "a vector", and "nothing" for the
+ * nothing value (friction P10-F1). */
+const char *quux_kind_phrase(quux_kind kind);
+
 /* ---- Runtime and context ---- */
 
 typedef struct quux_runtime quux_runtime;

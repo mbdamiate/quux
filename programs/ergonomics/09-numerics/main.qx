@@ -1,0 +1,110 @@
+;; 09 — Numerics: simple statistics and fraction arithmetic.
+;; Integers are exact and 64-bit; floats are IEEE 754 doubles. `/` on two integers gives an exact
+;; integer or raises :inexact-division, so the statistics divide exactly when they can and fall
+;; back to floating point when they cannot. Fractions are vectors [numerator denominator] kept
+;; in lowest terms. Integer overflow raises :overflow instead of wrapping around.
+
+;; a / b: the exact integer when b divides a, a float otherwise.
+(define-function divide [a b]
+  (try
+    (/ a b)
+    (catch :inexact-division problem (/ a (* 1.0 b)))))
+
+;; ---- Statistics ----
+
+;; Inserts value into an increasing vector, keeping it increasing.
+(define-function insert-in-order [sorted value]
+  (pour-into (add (pour-into [] (filter (function [element] (<= element value)) sorted)) value)
+             (filter (function [element] (> element value)) sorted)))
+
+(define-function sort-numbers [values]
+  (reduce insert-in-order [] values))
+
+(define-function sum [values]
+  (reduce + 0 values))
+
+(define-function mean [values]
+  (divide (sum values) (count values)))
+
+(define-function median [values]
+  (let [sorted (sort-numbers values)
+        middle (quotient (count sorted) 2)]
+    (if (odd? (count sorted))
+      (element-at sorted middle)
+      (divide (+ (element-at sorted (decrement middle)) (element-at sorted middle)) 2))))
+
+;; The population variance. With an integer mean, the squared deviations stay integers.
+(define-function variance [values]
+  (let [average (mean values)]
+    (divide (sum (transform (function [value] (* (- value average) (- value average))) values))
+            (count values))))
+
+;; ---- Fractions ----
+
+(define-function greatest-common-divisor [a b]
+  (if (zero? b)
+    (absolute-value a)
+    (greatest-common-divisor b (remainder a b))))
+
+(define-function fraction [numerator denominator]
+  (let [divisor (greatest-common-divisor numerator denominator)]
+    [(quotient numerator divisor) (quotient denominator divisor)]))
+
+(define-function add-fractions [left right]
+  (let [[a b] left
+        [c d] right]
+    (fraction (+ (* a d) (* c b)) (* b d))))
+
+(define-function multiply-fractions [left right]
+  (let [[a b] left
+        [c d] right]
+    (fraction (* a c) (* b d))))
+
+(define-function fraction-text [value]
+  (let [[numerator denominator] value]
+    (to-string numerator "/" denominator)))
+
+(define-function harmonic-sum [last-term]
+  (reduce (function [total term] (add-fractions total [1 term]))
+          [0 1]
+          (range 1 (increment last-term))))
+
+;; ---- Errors as results ----
+
+(define-function factorial [n]
+  (reduce * 1 (range 1 (increment n))))
+
+;; The value of (thunk), or the kind of the error it raises.
+(define-function value-or-error-kind [thunk]
+  (try
+    (thunk)
+    (catch (function [problem] true) problem (error-kind problem))))
+
+(define-function show [label value]
+  (print-line (to-string label ": " value)))
+
+(define-function main [input]
+  (let [values [15 4 42 8 23 16]
+        float-values [2.5 3.5 1.0]]
+    (show "values" (count values))
+    (show "sorted" (sort-numbers values))
+    (show "sum" (sum values))
+    (show "mean" (mean values))
+    (show "median" (median values))
+    (show "variance" (variance values))
+    (show "float values" (count float-values))
+    (show "float mean" (/ (reduce + 0.0 float-values) (count float-values)))
+    (show "0.1 + 0.2" (+ 0.1 0.2))
+    (show "equal to 0.3" (equal? (+ 0.1 0.2) 0.3))
+    (show "equal? 2 2.0" (equal? 2 2.0))
+    (show "numerically-equal? 2 2.0" (numerically-equal? 2 2.0))
+    (show "1/6 + 1/3" (fraction-text (add-fractions [1 6] [1 3])))
+    (show "2/3 * 9/4" (fraction-text (multiply-fractions [2 3] [9 4])))
+    (show "harmonic sum to 10" (fraction-text (harmonic-sum 10)))
+    (show "factorial of 20" (value-or-error-kind (function [] (factorial 20))))
+    (show "factorial of 21" (value-or-error-kind (function [] (factorial 21))))
+    (show "factorial of 21 as a float" (reduce * 1.0 (range 1 22)))
+    (show "7 / 2 with integers" (value-or-error-kind (function [] (/ 7 2))))
+    (show "1.0 / 0" (/ 1.0 0))
+    (show "quotient 1 0" (value-or-error-kind (function [] (quotient 1 0))))
+    (harmonic-sum 10)))

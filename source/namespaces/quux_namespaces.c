@@ -84,9 +84,26 @@ bool quux_namespace_import(quux_context *context, quux_value namespace_value, qu
             return true;
         }
     }
+    /* Imports are searched in the order they are written, and `core` stays last (section 14):
+     * the new import goes after the existing ones and before `core`. */
+    quux_value core = context->runtime->namespaces->core;
+    quux_value remaining = imports;
+    quux_value earlier = quux_nothing;
     quux_value updated = quux_nothing;
-    QUUX_ROOT_FRAME(context, &namespace_value, &updated);
-    bool done = quux_list_prepend(context, imported, imports, &updated);
+    QUUX_ROOT_FRAME(context, &namespace_value, &imported, &core, &remaining, &earlier, &updated);
+    bool done = true;
+    for (; done && !quux_is_nothing(remaining); remaining = quux_pair_rest(remaining)) {
+        if (quux_pair_first(remaining) != core) {
+            done = quux_list_prepend(context, quux_pair_first(remaining), earlier, &earlier);
+        }
+    }
+    if (done && !quux_is_nothing(core)) {
+        done = quux_list_prepend(context, core, quux_nothing, &updated);
+    }
+    done = done && quux_list_prepend(context, imported, updated, &updated);
+    for (quux_value cell = earlier; done && !quux_is_nothing(cell); cell = quux_pair_rest(cell)) {
+        done = quux_list_prepend(context, quux_pair_first(cell), updated, &updated);
+    }
     if (done) {
         quux_store(context, quux_checked_object(namespace_value), QUUX_NAMESPACE_IMPORTS, updated);
     }

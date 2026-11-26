@@ -424,8 +424,8 @@ bool quux_count(quux_context *context, quux_value collection, uint64_t *count) {
         *count = quux_string_length(collection);
         return true;
     default:
-        return quux_raise(context, "wrong-type", "count expects a collection, got a %s",
-                          quux_kind_name(quux_kind_of(collection)));
+        return quux_raise(context, "wrong-type", "count expects a collection, got %s",
+                          quux_kind_phrase(quux_kind_of(collection)));
     }
 }
 
@@ -471,8 +471,8 @@ bool quux_get(quux_context *context, quux_value collection, quux_value key,
         *result = default_value;
         return true;
     default:
-        return quux_raise(context, "wrong-type", "get expects a map, set or vector, got a %s",
-                          quux_kind_name(quux_kind_of(collection)));
+        return quux_raise(context, "wrong-type", "get expects a map, set or vector, got %s",
+                          quux_kind_phrase(quux_kind_of(collection)));
     }
 }
 
@@ -524,8 +524,8 @@ bool quux_as_list(quux_context *context, quux_value collection, quux_value *resu
         break;
     }
     default:
-        done = quux_raise(context, "wrong-type", "expected a collection, got a %s",
-                          quux_kind_name(kind));
+        done = quux_raise(context, "wrong-type", "expected a collection, got %s",
+                          quux_kind_phrase(kind));
         break;
     }
     if (done) {
@@ -551,7 +551,7 @@ bool quux_add(quux_context *context, quux_value collection, quux_value value, qu
         }
         return quux_raise(context, "wrong-type", "adding to a map expects a [key value] vector");
     default:
-        return quux_raise(context, "wrong-type", "add expects a collection, got a %s",
-                          quux_kind_name(quux_kind_of(collection)));
+        return quux_raise(context, "wrong-type", "add expects a collection, got %s",
+                          quux_kind_phrase(quux_kind_of(collection)));
     }
 }

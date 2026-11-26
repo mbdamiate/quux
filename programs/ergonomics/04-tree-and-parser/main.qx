@@ -1,0 +1,132 @@
+;; 04 — A persistent binary search tree and a small recursive-descent parser.
+;; The tree is made of maps {:key :left :right}; an empty tree is nothing. Inserting returns a
+;; new tree and leaves the old one unchanged. The parser reads arithmetic written as a vector
+;; of tokens, such as [1 :plus 2 :times 3], where a nested vector is a parenthesized group.
+;; It builds a tree of vectors [operator left right] and evaluates it.
+
+;; ---- The binary search tree ----
+
+(define-function insert [tree key]
+  (if (nothing? tree)
+    {:key key :left nothing :right nothing}
+    (let [{node-key :key left :left right :right} tree]
+      (conditional
+        (< key node-key) (put tree :left (insert left key))
+        (> key node-key) (put tree :right (insert right key))
+        true tree))))
+
+(define-function has? [tree key]
+  (if (nothing? tree)
+    false
+    (let [{node-key :key left :left right :right} tree]
+      (conditional
+        (< key node-key) (has? left key)
+        (> key node-key) (has? right key)
+        true true))))
+
+(define-function size [tree]
+  (if (nothing? tree)
+    0
+    (+ 1 (size (get tree :left)) (size (get tree :right)))))
+
+(define-function height [tree]
+  (if (nothing? tree)
+    0
+    (+ 1 (maximum (height (get tree :left)) (height (get tree :right))))))
+
+(define-function smallest [tree]
+  (if (nothing? (get tree :left))
+    (get tree :key)
+    (smallest (get tree :left))))
+
+;; The keys in increasing order, as a vector.
+(define-function in-order [tree]
+  (if (nothing? tree)
+    []
+    (let [{key :key left :left right :right} tree]
+      (pour-into (add (in-order left) key) (in-order right)))))
+
+;; ---- The parser ----
+;; expression = term, then any number of (:plus or :minus, term)
+;; term       = factor, then any number of (:times or :divided-by, factor)
+;; factor     = an integer, or a vector holding a whole expression
+;; Each parse function returns [tree remaining-tokens].
+
+(define-function parse-factor [tokens]
+  (let [[token :rest remaining] tokens]
+    (conditional
+      (integer? token) [token remaining]
+      (vector? token) [(parse-all token) remaining]
+      true (raise (error :user (to-string "expected a number or a group, found " token)
+                         {:token token})))))
+
+;; After a first operand, keeps reading (operator operand) pairs while the operator is one of
+;; `operators`, building a left-leaning tree.
+(define-function continue-operations [operators parse-operand left tokens]
+  (let [[operator :rest after] tokens]
+    (if (has-key? operators operator)
+      (let [[right remaining] (parse-operand after)]
+        (continue-operations operators parse-operand [operator left right] remaining))
+      [left tokens])))
+
+(define-function parse-operations [operators parse-operand tokens]
+  (let [[left remaining] (parse-operand tokens)]
+    (continue-operations operators parse-operand left remaining)))
+
+(define-function parse-term [tokens]
+  (parse-operations #{:times :divided-by} parse-factor tokens))
+
+(define-function parse-expression [tokens]
+  (parse-operations #{:plus :minus} parse-term tokens))
+
+(define-function parse-all [tokens]
+  (let [[tree remaining] (parse-expression tokens)]
+    (if (empty? remaining)
+      tree
+      (raise (error :user (to-string "unexpected token " (first remaining))
+                    {:tokens remaining})))))
+
+(define-function evaluate [tree]
+  (if (integer? tree)
+    tree
+    (let [[operator left right] tree
+          left-value (evaluate left)
+          right-value (evaluate right)]
+      (case operator
+        :plus (+ left-value right-value)
+        :minus (- left-value right-value)
+        :times (* left-value right-value)
+        :divided-by (/ left-value right-value)))))
+
+(define expressions
+  [[1 :plus 2 :times 3]
+   [[1 :plus 2] :times 3]
+   [10 :minus 4 :minus 3]
+   [2 :times [3 :plus 4] :divided-by 7]
+   [1 :plus]])
+
+(define-function show-expression [expression]
+  (print-line
+    (try
+      (let [tree (parse-all expression)]
+        (to-string expression " -> " tree " = " (evaluate tree)))
+      (catch :user problem
+        (to-string expression " -> error: " (get problem :message))))))
+
+(define-function main [input]
+  (let [keys [50 30 70 20 40 60 80 30]
+        tree (reduce insert nothing keys)
+        bigger (insert tree 65)]
+    (print-line (to-string "keys inserted: " (count keys)))
+    (print-line (to-string "tree size: " (size tree)))
+    (print-line (to-string "in order: " (in-order tree)))
+    (print-line (to-string "height: " (height tree)))
+    (print-line (to-string "smallest: " (smallest tree)))
+    (print-line (to-string "has 40: " (has? tree 40)))
+    (print-line (to-string "has 65: " (has? tree 65)))
+    (print-line (to-string "new size: " (size bigger)))
+    (print-line (to-string "in order: " (in-order bigger)))
+    (print-line (to-string "original size: " (size tree)))
+    (print-line (to-string "expressions: " (count expressions)))
+    (reduce (function [ignored expression] (show-expression expression)) nothing expressions)
+    (size bigger)))

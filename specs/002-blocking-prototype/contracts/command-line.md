@@ -18,6 +18,7 @@ Only the `.qx` extension is accepted (R9).
 | `quux-test program DIRECTORY` | Runs one reference program per the [reference-program contract](../../001-language-spec/contracts/reference-program.md) and prints a [report](./harness-report.md). | 0 if every assertion holds; 1 otherwise; 2 if `conditions.qx` or `expected.qx` is invalid; 3 if the wall-clock bound was exceeded |
 | `quux-test examples PATH` | Runs the `;=>` / `;!!` examples of one section file or of every file in a directory. | 0 if all pass; 1 otherwise |
 | `quux-test unit [MODULE]` | Runs the C unit tests of one module or of all modules. | 0 if all pass; 1 otherwise |
+| `quux-test [--verify-roots \| --verify-roots-every-allocation] run FILE.qx [INPUT]` | Added by feature 003 (D-56). Behaves exactly like `quux FILE.qx [INPUT]` (the same function, `quux_session_run_file`), with the root verifier on in the chosen mode. | as for `quux FILE.qx` |
 
 Options: `--report FILE` (also write the report as quux data), `--seed N` (fix the seed used for
 scope identifiers, printed in every report), `--verify-roots` (enable the root verifier, debug

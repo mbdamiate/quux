@@ -1,0 +1,14 @@
+mistakes: 12
+1 missing argument -> :wrong-argument-count: deposit expects 2 arguments, got 1
+2 misspelled name -> :undefined-name: incremnt is not defined
+3 vector pattern on a map -> :wrong-type: a vector pattern needs a list or a vector, got a map
+4 get on a string -> :wrong-type: get expects a map, set or vector, got a string
+5 keyword called as a function -> :wrong-type: a keyword is not a function
+6 arithmetic on a missing key -> :wrong-type: + expects a number, got nothing
+7 index one past the end -> :index-out-of-range: index 3 outside 0 ... 2
+8 put on a vector with a keyword -> :wrong-type: put expects an integer, got a keyword
+9 deep non-tail recursion -> :stack-exhausted: calls not in tail position are nested deeper than 10000
+10 raise of a string -> :wrong-type: raise expects an error, got a string
+11 integer division expecting a fraction -> :inexact-division: 7 is not divisible by 2
+12 reduce without an initial value -> :wrong-argument-count: reduce expects 3 arguments, got 2
+12

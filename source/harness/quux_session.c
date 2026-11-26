@@ -1,9 +1,12 @@
 #include "quux_session.h"
 
+#include "quux_namespaces.h"
 #include "quux_printer.h"
+#include "quux_reader.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 enum { QUUX_SESSION_STACK_BYTES = 512u * 1024u * 1024u };
 
@@ -87,4 +90,65 @@ char *quux_session_read_file(const char *path, size_t *length) {
         *length = used;
     }
     return buffer;
+}
+
+typedef struct file_run {
+    const char *path;
+    const char *input;
+    quux_verify_mode verify_mode;
+} file_run;
+
+static int run_file(quux_context *context, void *data) {
+    file_run *run = data;
+    size_t length = 0;
+    char *text = quux_session_read_file(run->path, &length);
+    if (text == NULL) {
+        fprintf(stderr, "quux: cannot read %s\n", run->path);
+        return 2;
+    }
+    quux_value value = quux_nothing;
+    quux_value input = quux_nothing;
+    quux_value main_function = quux_nothing;
+    quux_value definition = quux_nothing;
+    QUUX_ROOT_FRAME(context, &value, &input, &main_function, &definition);
+    int status = 0;
+    quux_memory_set_verify_mode(context->runtime->heap, run->verify_mode);
+    bool done = quux_evaluate_text(context, text, length, &value);
+    if (done && run->input != NULL) {
+        done = quux_read_one(context, run->input, strlen(run->input), &input);
+        if (!done) {
+            /* a malformed INPUT is a read error: status 2 (command-line contract) */
+            status = 2;
+        }
+    }
+    if (done) {
+        done = quux_namespace_resolve(context, context->current_namespace,
+                                      quux_symbol(context, "main"), &definition);
+        if (done && quux_is_nothing(definition)) {
+            fprintf(stderr, "quux: %s does not define main\n", run->path);
+            status = 2;
+        } else if (done) {
+            main_function = quux_definition_field(definition, QUUX_DEFINITION_VALUE);
+            done = quux_call1(context, main_function, input, &value);
+            if (done) {
+                quux_print_to_stream(context, stdout, value, QUUX_PRINT_READABLE);
+                fputs("\n", stdout);
+            }
+        }
+    }
+    if (!done) {
+        quux_session_print_error(context, stdout, context->pending_error);
+        if (status == 0) {
+            status = 1;
+        }
+    }
+    quux_memory_set_verify_mode(context->runtime->heap, QUUX_VERIFY_OFF);
+    QUUX_ROOT_FRAME_END(context);
+    free(text);
+    return status;
+}
+
+int quux_session_run_file(const char *path, const char *input_text, quux_verify_mode verify_mode) {
+    file_run run = {path, input_text, verify_mode};
+    return quux_session_run(run_file, &run);
 }

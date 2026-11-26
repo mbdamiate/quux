@@ -68,6 +68,54 @@ static int check_errors(quux_context *context, void *data) {
     return 0;
 }
 
+/* Error messages use the right article for a kind ("an integer", "nothing"), and a wrong argument
+ * count reads the same for core functions and program functions (found by ergonomics program 10,
+ * friction P10-F1 and P10-F2). */
+static int check_error_messages(quux_context *context, void *data) {
+    quux_unit_state *state = data;
+    static const char *const cases[][2] = {
+        {"(+ 1 nothing)", "\"+ expects a number, got nothing\""},
+        {"(count 1)", "\"count expects a collection, got an integer\""},
+        {"(1 2)", "\"an integer is not a function\""},
+        {"(:a {:a 1})", "\"a keyword is not a function\""},
+        {"(raise (error-kind (error :user \"x\" {})))",
+         "\"raise expects an error, got a keyword\""},
+        {"(prepend 1 (error :user \"x\" {}))", "\"prepend expects a list, got an error\""},
+        {"(reduce +)", "\"reduce expects 3 arguments, got 1\""},
+        {"(get {})", "\"get expects 2 or 3 arguments, got 1\""},
+        {"(-)", "\"- expects at least 1 argument, got 0\""},
+        {"((function [a b] a) 1)", "\"function expects 2 arguments, got 1\""},
+    };
+    char text[256];
+    for (size_t i = 0; i < sizeof cases / sizeof cases[0]; i++) {
+        snprintf(text, sizeof text, "(try %s (catch (function [e] true) e (get e :message)))",
+                 cases[i][0]);
+        QUUX_CHECK(state, quux_unit_evaluates_to(context, text, cases[i][1]));
+    }
+    return 0;
+}
+
+/* An unqualified name is looked up in the namespace, then in its imports in the order they are
+ * written, then in core (section 14; found by ergonomics program 08). */
+static int check_import_order(quux_context *context, void *data) {
+    quux_unit_state *state = data;
+    QUUX_CHECK(state, quux_unit_evaluates_to(context,
+                                             "(namespace first-source)"
+                                             "(define-function label [] :first)"
+                                             "(namespace second-source)"
+                                             "(define-function label [] :second)"
+                                             "(define-function only-second [] :only-second)"
+                                             "(namespace both (:import first-source second-source))"
+                                             "[(label) (only-second) (count [1 2])]",
+                                             "[:first :only-second 2]"));
+    QUUX_CHECK(state,
+               quux_unit_evaluates_to(context,
+                                      "(namespace reversed (:import second-source first-source))"
+                                      "(label)",
+                                      ":second"));
+    return 0;
+}
+
 /* Root verification from the first allocation, including the prelude. */
 static void *verify_everything(void *argument) {
     quux_unit_state *state = argument;
@@ -100,6 +148,14 @@ static void errors_are_raised_and_caught(quux_unit_state *state) {
     QUUX_CHECK(state, quux_session_run(check_errors, state) == 0);
 }
 
+static void error_messages_read_well(quux_unit_state *state) {
+    QUUX_CHECK(state, quux_session_run(check_error_messages, state) == 0);
+}
+
+static void imports_are_searched_in_order(quux_unit_state *state) {
+    QUUX_CHECK(state, quux_session_run(check_import_order, state) == 0);
+}
+
 static void prelude_follows_the_root_convention(quux_unit_state *state) {
     quux_thread *thread = NULL;
     QUUX_CHECK(state, quux_thread_start(&thread, 512u * 1024u * 1024u, verify_everything, state));
@@ -111,4 +167,6 @@ static void prelude_follows_the_root_convention(quux_unit_state *state) {
 QUUX_UNIT_CASES(evaluator, {"tail calls run in constant stack", tail_calls_run_in_constant_stack},
                 {"content hashes ignore names and order", content_hashes_ignore_names},
                 {"errors are raised and caught", errors_are_raised_and_caught},
+                {"error messages read well", error_messages_read_well},
+                {"imports are searched in order", imports_are_searched_in_order},
                 {"the prelude follows the root convention", prelude_follows_the_root_convention});
