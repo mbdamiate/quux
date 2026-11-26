@@ -145,7 +145,7 @@ under `--verify-roots`; one million tail calls with bounded stack.
 - [X] T043 [US3] Implement futures and scopes in `source/concurrency/`: data-model.md `Future.state` (one transition, compare-and-swap), `Future.value`, `Future.error`, `Future.scope`, `Future.computing_task`, `Future.waiters`, `Future.tag_names`; `Scope.identifier` (128 random bits), `Scope.state`, `Scope.parent`, `Scope.children`, `Scope.primary_error`, `Scope.suppressed`; current scope per section 06 rule 3 (L)
 - [X] T044 [US3] Implement cancellation points, `cancel!`, `check-cancellation`, `shield-from-cancellation`, `finally` under cancellation, and the global wait-for graph with `:deadlock` (D-14, D-40) in `source/concurrency/` (M)
 - [X] T045 [US3] Implement the combinators `all`, `first-success`, `then`, `with-timeout`, `let-parallel` (section 08; combinator cancellations do not fail the scope, D-11 amendment) in `source/concurrency/quux_combinators.c` (M)
-- [ ] T046 [US3] Make programs 01, 02, 03, 08 and 09 pass on macOS; then run each 20 times under TSan locally and in CI; fix races, and record any spec or program correction with its reason (M)
+- [X] T046 [US3] Make programs 01, 02, 03, 08 and 09 pass on macOS; then run each 20 times under TSan locally and in CI; fix races, and record any spec or program correction with its reason (M)
 
 Notes from the implementation of US3:
 
@@ -158,6 +158,10 @@ Notes from the implementation of US3:
   and T054 do the rest.
 - T040's watchdog check is the CTest test `harness_never-ends` (exit status 3 ends the process,
   so a unit test cannot observe it); `tests/unit/test_harness.c` checks the rejections.
+- T046 evidence: `tools/local-check.sh --repeat 20` passed every preset on macOS arm64
+  (programs 01, 02, 03, 08, 09 twenty times under TSan) and in the Linux arm64 container; CI
+  run 45737238226 passed every job, and the rerun 45737479589 passed the five programs twenty
+  times under TSan on Linux x86_64.
 - The example suite found a contradiction between section 07 rule 5 and the `first-success`
   example of section 08 (D-80, W29), and the unit tests found that a shielded agent update was
   withdrawn (D-81, W30). Both are recommended decisions for the owner to confirm. Corrected
